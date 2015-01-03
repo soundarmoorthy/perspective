@@ -1,0 +1,389 @@
+<HTML>
+<HEAD>
+	<LINK REL=StyleSheet HREF="style.css" TYPE="text/css" MEDIA=screen>
+<TITLE>Statistics</TITLE>
+</HEAD>
+<BODY>
+	<H1>Statistics</H1>
+	<H2>How to best mis-interpret results!</H2>
+	The stats page of the application provides quantative measurements for:<UL>
+		<LI>current sensor reading
+		<LI>minimum value observed over the last sampling interval
+		<LI>mean value computed over the last sampling interval
+		<LI>maximum value observed over the last sampling interval
+		<LI>Standard deviation of measured values
+		<LI>Standard deviation per-root-Hertz (useful for noise measurements)
+	</UL>
+
+	But beware! The old saying "Lies, damn lies and Statistics!" is all too true.  Before going into details on the
+	measurement features of the application, let's discuss why they should always be taken with a grain of salt.  The following subsections discuss just a few
+	of the things that can cause your results to vary.
+	<H3>Is your environment magnetically clean?</H3>
+	The answer is "most probably not".  Magnetic interference can be caused by the presence of ferrous materials near your sensor, permanent magnets, speakers, electrical wiring and traces, etc.  Typical indoor environments have so many things influencing the magnetic field that even moving your sensor just a few inches can have major impacts on the magnitude of the magnetic field.   Assuming it is not practical to take measurements in the middle of a corn field, we've found that a wooden conference table centrally located within a conference room often is the best we can do.
+	<H3>Have you collected enough data points for the calibration function to be working well?</H3>
+	Freescale's magnetic calibration software is extremely sophisticated.  Normally it collects calibration points naturally during normal operation.  But if you reset or power up your device immediately prior to taking measurements, you probably will have insufficient data to properly tune the device.  Take a few seconds to rotate your sensor in space to collect a constellation of data points prior to taking measurments.
+	<H3>Is your work surface stable enough?</H3>
+	Today's accelerometers are extremely sensitive.  If you are not careful, you will not be measuring the noise performance of the sensor.  You will be measuring vibrations from machinery and people walking by your test setup!
+	<H3>Have you inadvertently violated any datasheet restrictions?</H3>
+	For instance, MEMS gyroscopes typically have moving masses with very high Q-factors.  This means they may continue to oscillate for some time after power down or transition to low power modes.  If you transition back to "on" before the mass has come to rest, you may have erratic results until the gyro comes back "into lock". 
+	<H2>Stats Page Controls</H2>
+	There are two main controls that affect statistics gathering: <OL>
+		<LI><strong>Sample Size</strong> - The application supports sample sizes of 10, 100, 500, 1000 and 5000 samples.  The sample size control is located on the Fusion Settings Bar as shown in the figure below.
+		<img class="mod" src="images/sample_size.png">
+		<center>Sample Size pulldown</center>
+		<P>Obviously more samples means a longer test time.  We use the classic equation for computation of variance as a function of sample size:
+		<img class="small" src="images/standardDeviation.png">
+		Recall that the standard deviation is the square root of the variance.  It is "S" in the equation above.
+		</LI>
+		<LI><strong>Sampling Mode</strong> - You can either collect stats in a continuous or "one-shot" mode.  In continuous mode, the results from the previous bucket of [sample size] samples will continue to be displayed until the next [sample size] is collected, at which time displayed stats are updated and the process repeats.  If in "single pass" mode, stats are frozen once computed.  You can manually initiate an update by re-selecting that menu option.<P>
+		<img class="mod" src="images/sampling_mode.png">
+		<P>A status bar is shown under the Fusion Settings Bar to indicate how far you are through your first sampling interval.  Once you reach 100%, you can view statistics in HTML format via "Options Menu->View Statistics Report".  You will then be presented with a selection of applications on your Android device capable of viewing that report.  Alternately, you can "share" a copy of the stats report via the "Share" control in the Action Bar.
+	</OL>
+	<H2>Stats Display</H2>
+	A sample screen dump of the statistics display is shown below.  In it, you see similar sections for:<UL>
+		<LI>Accelerometer
+		<LI>Magnetometer
+		<LI>Gyro
+		<LI>Quaternion
+	</UL>
+	Of these, only the first three represent the output of physical sensors.  The quaternion is an output of a virtual sensor based upon sensor fusion code in your android device or development board.  
+	<img class="mod" src="images/stats.png">
+	<P>Notice that the application also computes the magnitude of each of the 3-axis sensor signals.  This is especially useful for the accelerometer and magnetometer.  Both sensors should ideally have fixed magnitudes, regardless of sensor orientation, when at rest. Variance in the magnitude of the magnetic field indicates one of two things:<OL>
+		<LI>Your magnetic calibration routine hasn't collected enough points, or is otherwise not compensating for all hard/soft iron effects
+		<LI>Your environment is not magnetically clean
+	</OL>
+	<P>The application also computes statistics on the duration between samples.  Native Android implementations tend to be all over the map.  This is due to the fact that Android is not (at least at the high API level) a real time system.  Complex algorithms such as Kalman filters require an accurate timebase, which you will see is true of samples from your development board(s).
+	<P>The Quaternion report includes a line item entitled "Angle".  The entries on that line correspond to 2 X acos(q0).  This is the angle magnitude component of the quaternion.  Think of it as the "noise" associated with the computed orientation.
+	<P>Note that sensor device information is NOT transmitted via the Bluetooth link.  This application ASSUMES the FXAS21000 Gyro and FXOS8700CQ 6-axis combo device are used when running from Freescale development boards.  This is true when using precompiled versions of Freescale's sensor fusion demo application.  If you are using the Xtrinsic Sensor Fusion Library for Kinetis MCUs to program your own application, you can use other sensor combinations.  This Android application can continue to be used, but the displayed sensor types will be incorrect.
+	<H2>Sample Report</H2>
+	<HR>
+	<h1>Xtrinsic Sensor Fusion Toolbox Statistics Report</h1>
+<P>Copyright 2013 by Freescale Semiconductor<P>Program version: 2013.05.07<P>Application settings:<UL>
+<LI>Data source = REMOTE</LI>
+<LI>Algoritm = NINE_AXIS</LI>
+</UL>
+<P class="h2">Accelerometer</P>
+<P><P>Sensor Description:<PRE>Remote accelerometer = Freescale FXOS8700CQ.
++/-4 gravities full range.
+</PRE>
+Sample quantity used for stats gathering: 100 (-1 for rate)<P><TABLE class="threeQuarter">
+<THEAD>
+<TR>
+<TD>Quantity</TD>
+<TD>Value</TD>
+<TD>Minimum</TD>
+<TD>Mean</TD>
+<TD>Maximum</TD>
+<TD>StdDev</TD>
+<TD>Units</TD>
+<TD>/rtHz</TD>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+<TD>X</TD>
+<TD>   -0.0620</TD>
+<TD>   -0.0698</TD>
+<TD>   -0.0633</TD>
+<TD>   -0.0591</TD>
+<TD>  0.001919</TD>
+<TD>gravity</TD>
+<TD>  0.000271</TD>
+</TR>
+<TR>
+<TD>Y</TD>
+<TD>    0.0469</TD>
+<TD>    0.0410</TD>
+<TD>    0.0451</TD>
+<TD>    0.0483</TD>
+<TD>  0.001438</TD>
+<TD>gravity</TD>
+<TD>  0.000203</TD>
+</TR>
+<TR>
+<TD>Z</TD>
+<TD>    1.0176</TD>
+<TD>    1.0117</TD>
+<TD>    1.0166</TD>
+<TD>    1.0205</TD>
+<TD>  0.000628</TD>
+<TD>gravity</TD>
+<TD>  0.000089</TD>
+</TR>
+<TR>
+<TD>Magnitude</TD>
+<TD>    1.0205</TD>
+<TD>    1.0147</TD>
+<TD>    1.0196</TD>
+<TD>    1.0234</TD>
+<TD>  0.001570</TD>
+<TD>gravity</TD>
+<TD>  0.000222</TD>
+</TR>
+<TR>
+<TD>Rates</TD>
+<TD>   50.0948</TD>
+<TD>   49.8948</TD>
+<TD>   50.0021</TD>
+<TD>   50.1081</TD>
+<TD>  0.057431</TD>
+<TD>samples/sec</TD>
+<TD>-</TD>
+</TR>
+</TBODY>
+</TABLE>
+<P class="h2">Magnetometer</P>
+<P><P>Sensor Description:<PRE>Remote magnetometer = Freescale FXOS8700CQ.
++/-1200 microTeslas full range.
+</PRE>
+Sample quantity used for stats gathering: 100 (-1 for rate)<P><TABLE class="threeQuarter">
+<THEAD>
+<TR>
+<TD>Quantity</TD>
+<TD>Value</TD>
+<TD>Minimum</TD>
+<TD>Mean</TD>
+<TD>Maximum</TD>
+<TD>StdDev</TD>
+<TD>Units</TD>
+<TD>/rtHz</TD>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+<TD>X</TD>
+<TD>   25.0000</TD>
+<TD>    1.0000</TD>
+<TD>   16.9100</TD>
+<TD>   34.9000</TD>
+<TD>  6.793689</TD>
+<TD>microTeslas</TD>
+<TD>  0.960753</TD>
+</TR>
+<TR>
+<TD>Y</TD>
+<TD>   22.1000</TD>
+<TD>   18.6000</TD>
+<TD>   21.7350</TD>
+<TD>   24.5000</TD>
+<TD>  1.228389</TD>
+<TD>microTeslas</TD>
+<TD>  0.173717</TD>
+</TR>
+<TR>
+<TD>Z</TD>
+<TD>   14.0000</TD>
+<TD>    9.0000</TD>
+<TD>   16.1080</TD>
+<TD>   25.2000</TD>
+<TD>  3.142990</TD>
+<TD>microTeslas</TD>
+<TD>  0.444477</TD>
+</TR>
+<TR>
+<TD>Magnitude</TD>
+<TD>   36.1858</TD>
+<TD>   28.4290</TD>
+<TD>   32.6461</TD>
+<TD>   43.2760</TD>
+<TD>  3.019499</TD>
+<TD>microTeslas</TD>
+<TD>  0.427013</TD>
+</TR>
+<TR>
+<TD>Rates</TD>
+<TD>   50.0948</TD>
+<TD>   49.8948</TD>
+<TD>   50.0021</TD>
+<TD>   50.1081</TD>
+<TD>  0.057431</TD>
+<TD>samples/sec</TD>
+<TD>-</TD>
+</TR>
+</TBODY>
+</TABLE>
+<P class="h2">Gyroscope</P>
+<P><P>Sensor Description:<PRE>Remote gyroscope = Freescale FXAS21000.
++/-1600 dps full range.
+</PRE>
+Sample quantity used for stats gathering: 100 (-1 for rate)<P><TABLE class="threeQuarter">
+<THEAD>
+<TR>
+<TD>Quantity</TD>
+<TD>Value</TD>
+<TD>Minimum</TD>
+<TD>Mean</TD>
+<TD>Maximum</TD>
+<TD>StdDev</TD>
+<TD>Units</TD>
+<TD>/rtHz</TD>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+<TD>X</TD>
+<TD>   -0.0017</TD>
+<TD>   -0.0201</TD>
+<TD>   -0.0041</TD>
+<TD>    0.0113</TD>
+<TD>  0.004995</TD>
+<TD>radians/sec</TD>
+<TD>  0.000706</TD>
+</TR>
+<TR>
+<TD>Y</TD>
+<TD>    0.0026</TD>
+<TD>   -0.0009</TD>
+<TD>    0.0096</TD>
+<TD>    0.0218</TD>
+<TD>  0.004377</TD>
+<TD>radians/sec</TD>
+<TD>  0.000619</TD>
+</TR>
+<TR>
+<TD>Z</TD>
+<TD>    0.0113</TD>
+<TD>    0.0070</TD>
+<TD>    0.0173</TD>
+<TD>    0.0253</TD>
+<TD>  0.003469</TD>
+<TD>radians/sec</TD>
+<TD>  0.000491</TD>
+</TR>
+<TR>
+<TD>Magnitude</TD>
+<TD>    0.0118</TD>
+<TD>    0.0131</TD>
+<TD>    0.0213</TD>
+<TD>    0.0301</TD>
+<TD>  0.003370</TD>
+<TD>radians/sec</TD>
+<TD>  0.000477</TD>
+</TR>
+<TR>
+<TD>Rates</TD>
+<TD>   50.0948</TD>
+<TD>   49.8948</TD>
+<TD>   50.0021</TD>
+<TD>   50.1081</TD>
+<TD>  0.057431</TD>
+<TD>samples/sec</TD>
+<TD>-</TD>
+</TR>
+</TBODY>
+</TABLE>
+<P class="h2">Quaternion</P>
+<P>Sample quantity used for stats gathering: 100<P>Sensor Description:<PRE>Quaternion sensor fusion by Freescale Semiconductor.
+6 and 9-axis options are available.</PRE>
+<P><TABLE class="threeQuarter">
+<THEAD>
+<TR>
+<TD>Quantity</TD>
+<TD>Value</TD>
+<TD>Minimum</TD>
+<TD>Mean</TD>
+<TD>Maximum</TD>
+<TD>StdDev</TD>
+<TD>Units</TD>
+<TD>/rtHz</TD>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+<TD>q0</TD>
+<TD>    0.9330</TD>
+<TD>    0.9350</TD>
+<TD>    0.9376</TD>
+<TD>    0.9403</TD>
+<TD>  0.001333</TD>
+<TD>cos(theta/2)</TD>
+<TD>  0.000188</TD>
+</TR>
+<TR>
+<TD>X</TD>
+<TD>    0.0109</TD>
+<TD>    0.0089</TD>
+<TD>    0.0101</TD>
+<TD>    0.0111</TD>
+<TD>  0.000442</TD>
+<TD>X sin(theta/2)</TD>
+<TD>  0.000062</TD>
+</TR>
+<TR>
+<TD>Y</TD>
+<TD>    0.0361</TD>
+<TD>    0.0359</TD>
+<TD>    0.0368</TD>
+<TD>    0.0378</TD>
+<TD>  0.000389</TD>
+<TD>Y sin(theta/2)</TD>
+<TD>  0.000055</TD>
+</TR>
+<TR>
+<TD>Z</TD>
+<TD>    0.3579</TD>
+<TD>    0.3381</TD>
+<TD>    0.3456</TD>
+<TD>    0.3527</TD>
+<TD>  0.003292</TD>
+<TD>Z sin(theta/2)</TD>
+<TD>  0.000466</TD>
+</TR>
+<TR>
+<TD>Magnitude</TD>
+<TD>    1.0000</TD>
+<TD>    1.0000</TD>
+<TD>    1.0000</TD>
+<TD>    1.0000</TD>
+<TD>  0.000000</TD>
+<TD></TD>
+<TD>  0.000000</TD>
+</TR>
+<TR>
+<TD>Angle</TD>
+<TD>    0.7362</TD>
+<TD>    0.6944</TD>
+<TD>    0.7103</TD>
+<TD>    0.7252</TD>
+<TD>  0.006959</TD>
+<TD>radians</TD>
+<TD>  0.000984</TD>
+</TR>
+<TR>
+<TD>Rates</TD>
+<TD>   50.0948</TD>
+<TD>   49.8948</TD>
+<TD>   50.0021</TD>
+<TD>   50.1081</TD>
+<TD>  0.057431</TD>
+<TD>samples/sec</TD>
+<TD>-</TD>
+</TR>
+</TBODY>
+</TABLE>
+<P class="h2">Android device parameters</P>
+<UL>
+<LI>Board = unknown</LI>
+<LI>CPU_ABI = armeabi-v7a</LI>
+<LI>CPU_ABI2 = armeabi</LI>
+<LI>DEVICE = wingray</LI>
+<LI>DISPLAY = JZO54K</LI>
+<LI>FINGERPRINT = motorola/tervigon/wingray:4.1.2/JZO54K/485486:user/release-keys</LI>
+<LI>HARDWARE = stingray</LI>
+<LI>MANUFACTURER = Motorola</LI>
+<LI>MODEL = Xoom</LI>
+<LI>PRODUCT = tervigon</LI>
+<LI>ANDROID_VERSION = 4.1.2</LI>
+<LI>CODENAME = REL</LI>
+<LI>Screen_Height = 1232</LI>
+<LI>Screen Width = 800</LI>
+<LI>Screen xdpi = 149.82489 pixels/inch in X dimension</LI>
+<LI>Screen ydpi = 149.82489 pixels/inch in Y dimension</LI>
+<LI>Screen scaled density = 1.0</LI>
+<LI>Computed Screen X dimension = 5.3395667 inches</LI>
+<LI>Computed Screen Y dimension = 8.245669 inches</LI>
+</UL>
+	<HR>
+<p>Continue to <a href="hardware.html"><strong>Hardware &amp; Software Requirements</strong></a>.
+</HTML>
+

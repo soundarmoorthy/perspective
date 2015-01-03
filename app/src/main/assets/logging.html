@@ -1,0 +1,103 @@
+<HTML>
+<HEAD>
+	<LINK REL=StyleSheet HREF="style.css" TYPE="text/css" MEDIA=screen>
+<TITLE>Data Logging Features</TITLE>
+</HEAD>
+<BODY>
+	<H1>Data Logging Features</H1>
+	<H2>Introduction</H2>
+<P>The <strong>Data Logger</strong> page might more accuractly be considered to be the <strong>Console</strong> page.  It contains a general text view utilized by many parts of the application.  
+<H2>Source Spinner</H2>
+<p>Data logging options are set via the <strong>Source</strong> spinner control.  <p>
+
+<center><img src="images/source_spinner.png"></center><P>
+This control has the same source options used on both <strong>Device</strong> and <strong>Panorama</strong> views.  These are: 
+<OL>
+	<LI><strong>STOPPED</strong> - There is no sensor data stream
+	<LI><strong>Local Accel</strong> - Uses data from accelerometer sensors on your Android device to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations.  This version uses the native accelerometers on your Android device.
+
+	<LI><strong>Local Mag/Accel</strong> - Uses data from accelerometer and magnetic sensors on your Android device to drive the display.  This is an example of 6-axis sensor fusion using the Native Android function: getRotationMatrix().
+	<LI><strong>Local 9-Axis</strong> - Uses data from accelerometer, magnetic and gyro sensors on your Android device to drive the display.  This is an example of 9-axis sensor fusion using the Android synthetic rotation vector sensor.
+	<LI><strong>Remote Accel</strong> - Uses data from accelerometer sensors on your Bluetooth-enabled Freescale sensor board to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations.  
+	<LI><strong>Remote mag (2D algorithm)</strong> - Uses data from the magnetometer sensor on your Bluetooth-enabled Freescale sensor board to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations.  
+	<LI><strong>Remote gyroscope</strong> - Uses data from the gyroscope sensor on your Bluetooth-enabled Freescale sensor board to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations.  
+	<LI><strong>Remote Mag/Accel</strong> - Uses data from accelerometer and magnetic sensors on your Bluetooth-enabled Freescale sensor board to drive the display.  This is an example of 6-axis sensor fusion.
+	<LI><strong>Remote Accel/Gyro</strong> - Uses data from accelerometer and gyroscope sensors on your Bluetooth-enabled Freescale sensor board to drive the display.  This is an example of 6-axis sensor fusion.
+	<LI><strong>Remote 9-Axis</strong> - Uses data from accelerometer, magnetic and gyro sensors on your Bluetooth-enabled Freescale sensor board to drive the display.  This is an example uses Freescale 9-axis sensor fusion results calculated on your Freescale sensor board.
+	<LI><strong>Wi-Go accel</strong>  - Uses data from accelerometer sensors on your Avnet Wi-Go module to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations. Uses data from accelerometer and magnetic sensors on your Avnet Wi-Go module to drive the display.  This is an example of 6-axis sensor fusion.
+	<LI><strong>Wi-Go Mag/Accel</strong> - Uses data from accelerometer and magnetic sensors, as well as eCompass algorithm, on your Avnet Wi-Go to drive the display.  This is an example of 6-axis sensor fusion.
+	<LI><strong>Fixed Rotation</strong> - Uses preprogrammed values to drive display functions.  The logging function is inactive in this mode.
+</OL>
+<H2>Log Formats</H2>
+<P>Data can be dumped to the log window (and output file) in any of three different formats.  These are explored in the following sections.
+
+<H3>Legacy Log Format</H3>
+<P>This format has been available since the first version of this application.  The application can display sample logs for the following:
+<OL>
+	<LI><strong>Accelerometer</strong> record fields:<OL>
+		<LI>A:
+		<LI>Accelerometer sample time in seconds
+		<LI>Accelerometer X value in g's
+		<LI>Accelerometer Y value in g's
+		<LI>Accelerometer Z value in g's</OL>
+	Example: "A: 704792.2 -0.3 0.5 0.812"<P>
+	<LI><strong>Magnetometer</strong> record fields:<OL>
+		<LI>Magnetometer sample time in seconds
+		<LI>Magnetometer X value in micro-Teslas 
+		<LI>Magnetometer Y value in micro-Teslas
+		<LI>Magnetometer Z value in micro-Teslas</OL>
+	Example: "M: 704792.2 -12.0 20.1 32.48"<P>
+	<LI><strong>Gyro</strong> record fields:<OL>
+		<LI>Gyro sample time in seconds
+		<LI>Gyro X value in radians/s
+		<LI>Gyro Y value in radians/s
+		<LI>Gyro Z value in radians/s</OL>
+	Example: "G: 704792.2 -3.5 0.0001 .99001"<P>
+	<LI><strong>Quaternions</strong> record fields:<OL>
+		<LI>Q:
+		<LI>Orientation sample time in seconds
+		<LI>Quaternion q0 (cosine theta/2) value
+		<LI>Quaternion q1 (x) value
+		<LI>Quaternion q2 (y) value
+		<LI>Quaternion q3 (z) value</OL>
+		Example: "Q: 704792.2 0.7071 0.00 0.7071 0.0001"
+	</OL>
+<center><img src="images/log.png"></center><P>
+
+</OL>
+<H3>Hex Log Format</H3>
+<P>This format was introduced in the 2nd release of this application.  It is intended only for development/debug purposes.  It presents a view of the "raw" hex data recieved from the remote device. This varies between platforms. The embedded Bluetooth packet format is documented <a href="packet_structure.html">here</a>.  Note that the data shown in the log window is displayed AFTER decoding any escape sequences. 
+<H3>CSV Log Format</H3>
+<P>This format was also introduced in the 2nd release of this application.  It can be used to write a comma delimited format readable by Excel and other tools.
+The quaternion represents the axis/angle rotation required to rotate the board from a native ENU (East-North-Up) orientation to it's current orientation.  "Columns" of the data are:<OL>
+	<LI>timestamp in seconds
+	<LI>Accelerometer X in g's
+	<LI>Accelerometer Y in g's
+	<LI>Accelerometer Z in g's
+	<LI>Magnetometer X in microTeslas 
+	<LI>Magnetometer Y in microTeslas 
+	<LI>Magnetometer Z in microTeslas 
+	<LI>Gyro X in radians/sec
+	<LI>Gyro Y in radians/sec
+	<LI>Gyro Z in radians/sec
+	<LI>Quaternion q0
+	<LI>Quaternion q1
+	<LI>Quaternion q2
+	<LI>Quaternion q3
+</OL>
+<H2><a id="fileLogging">Logging to a Data File</a></H2>
+<P>The logging window retains history for a limited number (generally 100-200 entries) of past logs.  You can enable logging to a file by checking the <strong>File logging enable</strong> checkbox on the form.  The application will then log up to a predetermined number of records before it stops.  This number can be set in the  <a href="preferences.html"><strong>Preferences screen</strong></a>.   Care should be taken to keep this setting low enough so that the application does not attempt to utilize all the storage on your Android device.  We recommend that you determine how much storage you are willing to devote to this task, and divide by 50.  So if you have 1MB you can devote to logging, you can set the Preferences <strong>Max # of messages to record</strong> field to 1,000,000/50 = 20,000. 
+<p>You can set the filename used for logging via the Preferences <strong>Output filename</strong> field.  The file will be placed in a directory named <strong>Freescale_Demo</strong> in the external storage area of your Android device (often this is: "sdcard0").  You can send a copy of this file to any email account using the <strong>Sharing</strong> function.  Note that the <strong>Clear Log Window</strong> command on the options menu also has the effect of closing any currently opened output files.  If the File logging enable checkbox is checked, the output file will be reopened (AND CLEARED) when the next message is displayed.
+<P>Other controls that are useful in this mode include:<OL>
+	<LI><strong>Options Menu->Clear Log Window</strong> - sets the text view to empty ("");
+	<LI><strong>Options Menu->Dump Local Configuration</strong> - queries your Android device regarding local sensor support and logs the result to the text view.
+	<LI><strong>Share</strong> - allows you to email a copy of the current text view to any desired recipient.  Please note that this feature utilizes the standard Android "intent" mechanism for sending email.  You must have an email client installed on your Android device in order for this feature to work properly.
+</OL>
+<P>You can set a default email address for sharing activities via the applications <a href="preferences.html"><strong>Preferences</strong> screen</a>.  You can also set the Android sampling rate on the same screen.
+
+<H2>Low Pass Filter</H2>
+<P>A <a href="algorithms.html#lpf">low pass filter</a> option is available for use with a number of Source/Algorithm options. Details are contained  <a href="algorithms.html#lpf">on a separate page</a>.
+</BODY>
+<p>Continue to <a href="device.html"><strong>Device View</strong></a>.  
+</HTML>
+

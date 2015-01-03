@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/stats_display"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
+
+    <TableRow
+        android:background="@color/fsl_yellow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/sensor_name"
+            android:background="@color/fsl_yellow"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_span="2"
+            style="@style/table_text"
+            android:text="@string/sensorLabel" />
+
+        <Spinner
+            android:layout_span="3"
+            android:id="@+id/rate_spinner"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dip"
+            android:background="@drawable/button_simple"
+            android:padding="2dip"
+            android:visibility="gone" />
+    </TableRow>
+
+    <TextView
+        android:id="@+id/sensor_description"
+        android:layout_height="wrap_content"
+        style="@style/table_text"
+        android:text="@string/dash" />
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/quantity" />
+
+        <TextView
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/value" />
+
+        <TextView
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/min" />
+
+        <TextView
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/mean" />
+
+        <TextView
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/max" />
+
+        <TextView
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/stddev" />
+
+        <TextView
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/units" />
+        <TextView
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/rtHz" />
+        </TableRow>
+
+    <TableRow android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/q0_label"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/q0" />
+
+        <TextView
+            android:id="@+id/q0_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/min_q0_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/mean_q0_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/max_q0_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/stddev_q0_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/q0_units"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/q0_units" />
+        <TextView
+            android:id="@+id/q0_rtHz"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+        </TableRow>
+
+    <TableRow android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/q1_label"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/x" />
+
+        <TextView
+            android:id="@+id/q1_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/min_q1_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/mean_q1_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/max_q1_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/stddev_q1_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/q1_units"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/q1_units" />
+        
+        <TextView
+            android:id="@+id/q1_rtHz"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+        </TableRow>
+
+    <TableRow android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/q2_label"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/y" />
+
+        <TextView
+            android:id="@+id/q2_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/min_q2_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/mean_q2_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/max_q2_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/stddev_q2_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/q2_units"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/q2_units" />
+
+        <TextView
+            android:id="@+id/q2_rtHz"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+        </TableRow>
+
+    <TableRow android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/q3_label"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/z" />
+
+        <TextView
+            android:id="@+id/q3_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/min_q3_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/mean_q3_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/max_q3_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/stddev_q3_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/q3_units"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/q3_units" />
+        
+        <TextView
+            android:id="@+id/q3_rtHz"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+        </TableRow>
+
+    <TableRow android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/mag_label"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/magnitude" />
+
+        <TextView
+            android:id="@+id/mag_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/min_mag_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/mean_mag_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/max_mag_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/stddev_mag_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/mag_units"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+        
+        <TextView
+            android:id="@+id/mag_rtHz"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+        </TableRow>
+
+    <TableRow android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/angle_label"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/angle" />
+
+        <TextView
+            android:id="@+id/angle_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/min_angle_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/mean_angle_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/max_angle_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/stddev_angle_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/angle_units"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/angleUnits" />
+        
+        <TextView
+            android:id="@+id/angle_rtHz"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+        </TableRow>
+
+    <TableRow android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/rate_label"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/rate" />
+
+        <TextView
+            android:id="@+id/rate_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/min_rate_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/mean_rate_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/max_rate_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/stddev_rate_value"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+
+        <TextView
+            android:id="@+id/rate_units"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/rate_units" />
+        
+        <TextView
+            android:id="@+id/rate_rtHz"
+            android:layout_height="wrap_content"
+            style="@style/right_justified_table_text"
+            android:text="@string/dash" />
+        
+        </TableRow>
+
+</TableLayout>

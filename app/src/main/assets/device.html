@@ -1,0 +1,91 @@
+<HTML>
+<HEAD>
+	<LINK REL=StyleSheet HREF="style.css" TYPE="text/css" MEDIA=screen>
+<TITLE>Device View</TITLE>
+</HEAD>
+<BODY>
+<center>
+	<H1>The Device View</H1>
+</center>
+	<H2>Overview</H2>
+<P>The <strong>Device</strong> view provides a graphical 3D view of a Freescale Sensor Board.  The board appears to rotate as a function of data source inputs selected via the <strong>Mode = Device</strong> spinner control which appears near the top of ths screen.  
+
+<p><center>
+	<img class="smaller" src="images/device1.png">
+	<img class="small" src="images/device2.png">
+</center>
+<P>The board displayed on your Android device may be different from that shown above.  Supported board images for this release of the toolkit are the Freescale Sensor Fusion Development Platform and the Avnet Wi-Go board.
+<P>Data source options (selected via the <strong>Source</strong> spinner control) include: 
+<OL>
+	<LI><strong>Stopped</strong> - There is no sensor data stream
+	<LI><strong>Local accel</strong> - Uses data from accelerometer sensors on your Android device to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations.  This version uses the native accelerometers on your Android device.
+
+	<LI><strong>Local mag/accel</strong> - Uses data from accelerometer and magnetic sensors on your Android device to drive the display.  This is an example of 6-axis sensor fusion using the Native Android function: getRotationMatrix().
+	<LI><strong>Local 9-Axis</strong> - Uses data from accelerometer, magnetic and gyro sensors on your Android device to drive the display.  This is an example of 9-axis sensor fusion using the Android synthetic rotation vector sensor.
+	<LI><strong>Remote accel</strong> - Uses data from the accelerometer sensor on your Bluetooth-enabled Freescale sensor board to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations.  
+	<LI><strong>Remote mag (2D algorithm)</strong> - Uses data from the magnetometer sensor on your Bluetooth-enabled Freescale sensor board to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations.  
+	<LI><strong>Remote gyroscope</strong> - Uses data from the gyroscope sensor on your Bluetooth-enabled Freescale sensor board to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations.  
+	<LI><strong>Remote mag/accel</strong> - Uses data from accelerometer and magnetic sensors on your Bluetooth-enabled Freescale sensor board to drive the display.  This is an example of 6-axis sensor fusion.
+	<LI><strong>Remote accel/gyro</strong> - Uses data from accelerometer and gyro sensors on your Bluetooth-enabled Freescale sensor board to drive the display.  This is an example of 6-axis sensor fusion.
+	<LI><strong>Remote 9-Axis</strong> - Uses data from accelerometer, magnetic and gyro sensors on your Bluetooth-enabled Freescale sensor board to drive the display.  This is an example uses Freescale 9-axis sensor fusion results calculated on your Freescale sensor board.
+	<LI><strong>Wi-Go accel</strong>  - Uses data from accelerometer sensors on your Avnet WiGo module to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations. Uses data from accelerometer and magnetic sensors on your Avnet Wi-Go module to drive the display.  This is an example of 6-axis sensor fusion.
+	<LI><strong>Fixed Rotation</strong> - Uses preprogrammed values to drive display functions.  The logging function is inactive in this mode.
+</OL>
+
+These are exactly the same options available on the <a href="logging.html">Logging</a> and <a href="panorama.html">Panorama</a> views. 
+And like those views, you can enable file logging as well as share your results via the "Share" function.
+You can set a default email address for sharing activities via the applications <a href="preferences.html"><strong>Preferences</strong> screen</a>.  You can also set the Android sampling rate on the same screen.
+<P>A <a href="algorithms.html#lpf">low pass filter</a> option is available for use with a number of Source/Algorithm options. Details are contained  <a href="algorithms.html#lpf">on a separate page</a>.
+
+<H2>Additional Demo Controls</H2>
+
+<P><img  src="images/zeroed.png">
+<P>Two other options on the Fusion Settings Bar effect this view:<UL>
+	<LI><strong>Absolute</strong> checkbox - if checked, only your development board affects the display.  If unchecked, the display is a function of both the development board sensors AND the sensors (and orientation) of your Android device.
+	<LI><strong>Zeroed</strong> checkbox.  This control can be used to cancel out any magnetic offset from the displayed board.  The offset is computed when the checkbox goes from unchecked to checked.  It only applies so long as the checkbox remains checked.
+</ul>
+<P>You can check both <strong>Absolute</strong> and <strong>Zeroed</strong> checkboxes.  In that case, be sure to check the <strong>Zeroed</strong> checkbox AFTER the <strong>Absolute</strong> checkbox.
+<P>X/Y axis alignments vary on some Android devices.  The photos below show how you should align your board to your Android device before checking the "Zeroed" checkbox.  You will get incorrect results if you do not have your Android device and development board aligned properly when you click the <strong>Zeroed</strong> checkbox. Your development board should always be aligned as the app shows it to be after the checkbox is checked.  If in doubt, experiment. Finally, the <strong>Zeroed</strong> checkbox will always be unchecked when you uncheck the <strong>Absolute</strong> checkbox.  This forces you to "re-zero" your board to account for offsets introduced by your Android device.
+<P><strong>Note:</strong> The <strong>Absolute</strong> checkbox is also present on the <a href="canvas.html">Canvas view</a>.  In that case, it selects between use of a relative air mouse and an absolute pointer.
+<center>
+	<P><HR><img class="mod" src="images/SonyAligned.png">
+<BR>Board/Phone Alignment for  FRDM-FXS-MULTI shield and Sony Xperia Phone
+<P><HR><img class="mod" src="images/NexusAligned.png">
+<BR>Board/Phone Alignment for  FRDM-FXS-MULTI shield and Nexus 7 Tablet
+<P><HR><img class="mod" src="images/XoomAligned.png">
+<BR>Board/Phone Alignment for FRDM-FXS-MULTI shield and Xoom Tablet
+<P><HR><img class="mod" src="images/WiGoAligned.png">
+<BR>Board/Phone Alignment for Wi-Go with Xoom Tablet
+<HR>
+</center>
+<H2>Additional Demo Data</H2>
+<img class="mod" src="images/additional_demo_data.png">
+<BR><center>Angular rates, roll/pitch/heading and debug packet displays</center>
+<P>In addition to the graphical display shown in the previous section, the Device view can also display<OL>
+	<LI>Angular rate X, Y and Z values (in degrees/second). 
+		Angular rates are computed on embedded software running on your Freescale development board.  They are not available when using local sensors, or Wi-Go. Rate information is computed as a function of the Source/Algorithm spinner settings as follows:<UL>
+		<LI>Remote accel - angular rates are computed using virtual gyro computations based upon orientations computed from accelerometer only.  As such, they will be inaccurate with respect to rotation about the gravity vector.
+		<LI>Remote mag (2D algorithm) - angular rates are restricted to Z-axis only.
+		<LI>Remote gyro - angular rates straight from the physical gyro (no compensation)
+		<LI>Remote accel/mag - angular rates are computed using virtual gyro computations based upon orientations computed from accelerometer and magnetometer readings.  They are therefore sensitive to magnetic interference.
+		<LI>Remote accel/gyro - gyro offsets are calculated via a 6-axis (accel + gyro) indirect Kalman filter and subtracted from physical gyro readings.  These are then displayed on the Device view.  
+		<LI>Remote 9-axis - gyro offsets are calculated via a 9-axis (accel + mag + gyro) indirect Kalman filter and subtracted from physical gyro readings.  These are then displayed on the Device view. 
+	</UL>
+		<LI>Roll, Pitch and Compass Heading in degrees. This data is not available when using local sensors, or Wi-Go. Note that Compass heading starts at 0 and increases as a board is rotated clockwise.  Conversely, angular rates (below) are positive in a counter-clockwise fashion.
+
+	<LI>Debug information - If the "Enable debug packet display" checkbox in the preferences screen is checked, then the Device view will display the following whenever a debug packet is received:<UL>
+	<LI>Embedded Software Version (corresponds to the THISBUILD macro value defined in proj_config.h of the Xtrinsic Sensor Fusion Library for Kinetis MCUs)
+	<LI>The number of system tick timer (SysTick) cycles which elapsed during the last sensor fusion calculation.  Google "ARM SysTick" for details.
+	<LI>Which Freedom board created this data stream (from Packet type 1)
+</OL>
+(1) is labeled "X: Y: Z:"<P>
+(2) is labeled "R: P: C:"<P>
+All three are enabled via checkboxes in the Preferences screen.  All require support from your embedded app.  See <a href="packet_structure.html">Bluetooth Packet Structure</a> for additional details.
+<HR>
+
+<p>Continue to <a href="panorama.html"><strong>Panorama View</strong></a>.
+<p>Continue to <a href="algorithms.html#lpf"><strong>Description of the low pass filter option</strong></a>.
+
+</BODY>
+</HTML>
+

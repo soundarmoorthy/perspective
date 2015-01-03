@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:gravity="top"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/fsl_gradient_end"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="@string/title_activity_main"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:visibility="visible" />
+
+    <HorizontalScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button"
+        android:scrollbars="none" >
+
+        <LinearLayout
+            android:id="@+id/control_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/exit_button"
+                android:layout_height="wrap_content"
+                style="@style/button"
+                android:background="@drawable/button"
+                android:text="@string/exit" />
+
+            <Button
+                android:id="@+id/data_source_popup"
+                android:layout_height="wrap_content"
+                style="@style/button"
+                android:background="@drawable/button"
+                android:onClick="showDataSelector"
+                android:text="Source/Algorithm" />
+
+            <Button
+                android:id="@+id/stats_sample_size_popup"
+                android:layout_height="wrap_content"
+                style="@style/button"
+                android:background="@drawable/button"
+                android:onClick="showSampleSizeSelector"
+                android:text="Sample size" />
+            <Button
+                android:id="@+id/stats_calc_mode_popup"
+                android:layout_height="wrap_content"
+                style="@style/button"
+                android:background="@drawable/button"
+                android:onClick="showStatsModeSelector"
+                android:text="Sampling mode" />
+            
+            <Spinner
+                android:id="@+id/doc_spinner"
+                style="@style/button"
+                android:background="@drawable/button"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/back_button"
+                style="@style/button"
+                android:background="@drawable/button"
+                android:layout_height="wrap_content"
+                android:text="@string/back" />
+
+            <Button
+                android:id="@+id/forward_button"
+                style="@style/button"
+                android:background="@drawable/button"
+                android:layout_height="wrap_content"
+                android:text="@string/forward" />
+
+            <CheckBox
+                android:id="@+id/absolute"
+                android:layout_width="wrap_content"
+                android:visibility="visible"
+                android:layout_height="wrap_content"
+                android:text="@string/absoluteLabel" />
+            
+            <CheckBox
+                android:id="@+id/zeroed"
+                android:layout_width="wrap_content"
+                android:visibility="visible"
+                android:layout_height="wrap_content"
+                android:text="@string/zeroedLabel" />
+            
+            <CheckBox
+                android:id="@+id/fl_enable"
+                android:layout_width="wrap_content"
+                android:visibility="visible"
+                android:layout_height="wrap_content"
+                android:text="@string/fl_enable" />
+
+            <TextView
+                android:id="@+id/num_msgs"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:singleLine="true"
+                android:text=""
+                android:textSize="16sp"
+                android:visibility="visible" />
+            
+            
+            <CheckBox
+                android:id="@+id/lpf_enable"
+                android:layout_width="wrap_content"
+                android:visibility="visible"
+                android:layout_height="wrap_content"
+                android:text="@string/lpf_enable" />
+
+            <TextView
+                android:id="@+id/sts"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:singleLine="true"
+                android:text=""
+                android:textSize="16sp"
+                android:visibility="visible" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:id="@+id/filter_coef_wrapper"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:background="@color/fsl_charcoal"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:text=" Filter: Less" />
+
+        <SeekBar
+            android:id="@+id/filter_coef"
+            android:thumb="@drawable/seek_thumb"
+            android:layout_weight="1"
+            android:progressDrawable="@drawable/progress_horizontal"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:text=" More " />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/webframe"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="50"
+        android:background="@color/black"
+        android:orientation="horizontal"
+        android:paddingBottom="0dip"
+        android:paddingLeft="5dip"
+        android:paddingRight="5dip"
+        android:paddingTop="5dip"
+        android:visibility="visible" >
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/listingScrollView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="50"
+        android:background="@color/black"
+        android:fadeScrollbars="false"
+        android:fillViewport="true"
+        android:padding="5dip"
+        android:scrollbars="vertical"
+        android:visibility="gone" >
+
+        <HorizontalScrollView
+            android:id="@+id/listingHorizontalScrollView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:fadeScrollbars="false"
+            android:fillViewport="true" >
+
+            <TextView
+                android:id="@+id/console1"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:background="@color/white"
+                android:paddingLeft="5dp"
+                android:singleLine="false"
+                android:text="@string/welcome"
+                android:textSize="14sp"
+                android:typeface="monospace"
+                android:visibility="visible"
+                tools:context=".A_FSL_Sensor_Demo" />
+        </HorizontalScrollView>
+    </ScrollView>
+    <TextView
+        android:id="@+id/console3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black"
+        android:textColor="@color/white"
+        android:paddingLeft="5dp"
+        android:singleLine="false"
+        android:text=""
+        android:textSize="24sp"
+        android:typeface="monospace"
+        android:visibility="visible"
+        tools:context=".A_FSL_Sensor_Demo" />
+    <TextView
+        android:id="@+id/console4"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black"
+        android:textColor="@color/white"
+        android:paddingLeft="5dp"
+        android:singleLine="false"
+        android:text=""
+        android:textSize="24sp"
+        android:typeface="monospace"
+        android:visibility="visible"
+        tools:context=".A_FSL_Sensor_Demo" />
+    <TextView
+        android:id="@+id/console2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black"
+        android:textColor="@color/white"
+        android:paddingLeft="5dp"
+        android:singleLine="false"
+        android:text=""
+        android:textSize="24sp"
+        android:typeface="monospace"
+        android:visibility="visible"
+        tools:context=".A_FSL_Sensor_Demo" />
+    
+	<LinearLayout
+			android:id="@+id/canvasFrame"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+        	android:orientation="vertical"
+			android:visibility="gone"
+			android:background="#000000"
+			android:layout_weight="1" />    
+    <LinearLayout
+        android:id="@+id/graphicFrame"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="50"
+        android:background="@color/black"
+        android:orientation="vertical"
+        android:padding="5dip"
+        android:visibility="visible" >
+
+        <android.opengl.GLSurfaceView
+            android:id="@+id/pcb_glview"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:visibility="gone" />
+
+        <android.opengl.GLSurfaceView
+            android:id="@+id/room_glview"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/statsFrame"
+        android:layout_width="fill_parent"
+        android:fadeScrollbars="true"
+        android:fillViewport="true"
+        android:layout_height="wrap_content"
+        android:scrollbars="horizontal" >
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:fadeScrollbars="true"
+            android:fillViewport="true"
+            android:padding="5dip"
+            android:scrollbarSize="100dp"
+            android:scrollbars="vertical" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:background="@color/fsl_charcoal"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:text=" 0%" />
+
+                    <ProgressBar
+                        android:id="@+id/progress_bar"
+                        style='@android:style/Widget.ProgressBar.Horizontal'
+                        android:layout_weight="1"
+                        android:progressDrawable="@drawable/progress_horizontal"
+                        android:layout_width="0dip"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:text=" 100% " />
+                </LinearLayout>
+
+                <include
+                    android:id="@+id/acc_stats"
+                    layout="@layout/xyz_stats" />
+
+                <include
+                    android:id="@+id/mag_stats"
+                    layout="@layout/xyz_stats" />
+
+                <include
+                    android:id="@+id/gyro_stats"
+                    layout="@layout/xyz_stats" />
+
+                <include
+                    android:id="@+id/quat_stats"
+                    layout="@layout/quat_stats" />
+            </LinearLayout>
+        </ScrollView>
+    </HorizontalScrollView>
+
+</LinearLayout>

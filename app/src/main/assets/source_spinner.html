@@ -1,0 +1,11 @@
+<OL>
+	<LI><strong>STOPPED</strong> - There is no sensor data stream
+	<LI><strong>Local Accel</strong> - Uses data from accelerometer sensors on your Android device to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations.  This version uses the native accelerometers on your Android device.
+
+	<LI><strong>Local Mag/Accel</strong> - Uses data from accelerometer and magnetic sensors on your Android device to drive the display.  This is an example of 6-axis sensor fusion using the Native Android function: getRotationMatrix().
+	<LI><strong>Local 9-Axis</strong> - Uses data from accelerometer, magnetic and gyro sensors on your Android device to drive the display.  This is an example of 9-axis sensor fusion using the Android synthetic rotation vector sensor.
+	<LI><strong>Remote Accel</strong> - Uses data from accelerometer sensors on your Freescale sensor board to drive the display.  This selection can be used to demonstrate the limitations of using a single sensor type to drive orientation calculations.  
+	<LI><strong>Remote Mag/Accel</strong> - Uses data from accelerometer and magnetic sensors on your Freescale sensor board to drive the display.  This is an example of 6-axis sensor fusion.
+	<LI><strong>Remote 9-Axis</strong> - Uses data from accelerometer, magnetic and gyro sensors on your Freescale sensor board to drive the display.  This is an example uses Freescale 9-axis sensor fusion results calculated on your Freescale sensor board.
+	<LI><strong>Fixed Rotation</strong> - Uses preprogrammed values to drive display functions.  The logging function is inactive in this mode.
+</OL>

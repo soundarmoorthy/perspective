@@ -1,0 +1,98 @@
+<HTML>
+<HEAD>
+	<LINK REL=StyleSheet HREF="style.css" TYPE="text/css" MEDIA=screen>
+<TITLE>The Canvas View</TITLE>
+</HEAD>
+<BODY>
+<center>
+	<H1>The Canvas</H1>
+</center>
+<H2>Introduction</H2>
+<P>If you have a wireless sensor board, the <strong>Canvas</strong> view can be used to demonstrate wireless pointer operation.  Tap the screen to center the cursor, then experiment with tilting your sensor board up and down and from left to right.  You can also experiment with all the remote sensing options supported by your board.  The underlying algorithm rotates two virtual vectors based upon the quaternion values transmitted by the board to compute an X,Y pointer location.
+<P>This chapter of the documentation describes how both absolute and relative pointers behave, and provides details of how they may be implemented based upon <a href="OrientationPart2.html#quaternions">orientation quaternions</a> computed on a sensor development board.
+
+<H2>Details</H2>
+<p><center>
+	<img class="mod" src="images/wireless_pointer.png">
+</center>
+<p class="center">Figure 1: The Canvas view</p> 
+
+<p>Figure 1 shows the Canvas view, which is very simple.  A cursor is drawn as a white square.  The location of that cursor in an origin-centered X/Y plane is shown with the displayed X and Y coordinates.  The major controls for this mode are the <strong>Source/Algorithm</strong> spinner and <strong>Absolute</strong> checkbox.  The <strong>Source/Algorithm</strong> spinner selects the source for the quaternion to be used in the pointer calculations.  The virtual pointer has two possible modes of operation.  In "relative" or "air mouse" mode, each X,Y pair computed by the pointer is with respect to the previous value.  When the <strong>Absolute</strong> checkbox is checked,  each X,Y pair is computed against a previously defined orientation which virtually aligns with the center of the screen.   You will be in the absolute pointer mode if the <strong>Absolute</strong> checkbox is checked.  You will be in air mouse mode otherwise.  When in air mouse mode, the canvas controls integrate the pointer X,Y values over time.  In absolute mode, they simply use what is supplied.  In both cases, X,Y coordinates are limited to the physical screen size.
+<P>You must have a sensor board to use the Canvas features.  Only "Remote" and "WiGo" options are supported.
+<P>The "Share" function does not support the Canvas view (which is not that interesting anyway).
+<p><img class="mod" src="images/pointer_direction.png">
+<p class="center">Figure 2: Point with the Bluetooth end of the board</p> 
+<p>Figure 2 shows the board axis that should be used as a virtual pointer.  Once you have selected your Board/Algorithm option via the <strong>Source/Algorithm</strong> spinner, you should point your board towards the center of a "screen of interest" and simultaneously tap the display on the Canvas.  This will "align" the pointer to the center of your "screen".  The <strong>pointer.center()</strong> routine to baseline the pointer works as follows:<OL>
+	<LI>compute a 3D vector px = [1,0,0] rotated by the current quaternion returned from the board
+	<LI>compute a 3D vector pz = [0,0,1] rotated by the same quaternion returned from the board
+	<LI>baseline heading = ATAN2(px.y, px.x)
+	<LI>save the sin and cosine of "-heading" = hSin and hCos.  These will be used during pointer operations
+	<LI>baselineInclination = ASIN(pz.z)
+	<LI>X=Y=0
+	<LI>A separate drawCursor() function is responsible for translating the X,Y coordinates to Android Canvas coordinates.
+</OL>
+<p>The same sequence works for both absolute and relative modes of the pointer.  The difference is that absolute mode performs this function only once when you instruct the application to align the cursor with the center of the screen.  In relative mode, it is performed at every sample interval.  So in the first case, you always get an absolute difference from a known baseline, in the second, you get the change since the previous interval.
+<p><img class="mod" src="images/pointer_xy.png">
+<p class="center">Figure 3: Pointer "X" is determined via rotations in the XY plane</p> 
+<p>Figure 3 shows that to change the "X" coordinate of your pointer, you should rotate the board about its Z-axis. 
+<p><img class="mod" src="images/pointer_inclination.png">
+<p class="center">Figure 4: Pointer "Y" is determined via rotations in the YZ plane</p> 
+<P>Figure 4 shows that to change the "Y" coordinate of your pointer, you should rotate the board about its X-axis. 
+<P>The <strong>pointer.update()</strong> routine to compute X,Y relative to the baseline defined above is as follows:<OL>
+	<LI>compute a 3D vector px = [1,0,0] rotated by the current quaternion returned from the board
+	<LI>compute a 3D vector pz = [0,0,1] rotated by the same quaternion returned from the board
+	<LI>de-rotate px by an amount equal to the baseline heading.  This is done using a simple 2D rotation matrix<UL>
+		<LI>xeff = hCos x px.x - hSin x px.y
+		<LI>yeff = hSin x px.x + hCos x px.y
+	</UL>
+	<LI>headingDelta = ATAN2(yeff, xeff)
+	<LI>currentInclination = ASIN(pz.y)
+	<LI>yEst = sensitivity x TAN(currentInclination - baselineInclination)
+	<LI>IF (mouseMode) {<UL>rebaseline using new quaternion</UL>
+	} else {<UL>Limit headingDelta to a predefined "window".  We use +/-30 degrees</UL>
+	}
+	<LI>xEst = sensitivity x TAN(headingDelta)
+	<LI>IF (mouseMode) {<UL>
+		x = xEst<BR>
+		y = yEst</UL>
+		} else {<UL>
+			x = round((xEst + x)/2) // simple filter plus rounding operation<BR>
+			y = round((yEst + y)/2) // simple filter plus rounding operation<BR>
+			limit x to +/- maxX<BR>
+		limit y to +/- maxY
+		</UL>}	
+</OL>
+<P>You may be asking "why do I need TWO different reference vectors ([1,0,0] and [0,0,1])?  You need two in order to ensure your pointer does not have "blind spots".  This would result if you rotated your board about an axis defined by your one reference vector.  That is, [1,0,0] rotated about the X-axis is still [1,0,0].  By adding a second reference vector to the mix, you ensure that you always have the data you need to determine a valid direction.
+<P>The following is a listing of the actual code called each time the canvas gets updated:<PRE>
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
+		boolean mouseMode = !demo.absoluteModeRequired(); // is the demo configured for relative or absolute pointer?
+		compute_scale();  // get screen dimensions and compute pointer sensitivity
+		A_FSL_Sensor_Demo.self.dataSelector.getQuaternion(q); // update q with the current orientation quaternion
+		pointer.update(q, mouseMode); // compute our new pointer values
+		if (mouseMode) {
+			// integrate in mouse mode
+			x += pointer.x;
+			y += pointer.y;			
+		} else {
+			// use as-is in absolute mode
+			x = pointer.x;
+			y = pointer.y;
+		}
+		x = MyUtils.limitI(x, halfWidth);  // limit X to +/- the width of the screen
+		y = MyUtils.limitI(y, halfHeight); // limit Y to +/- the width of the screen
+		drawLabel(canvas); // writes X & Y values to screen
+		updateCursor(canvas); // draws the cursor
+		demo.makeConsolesStale();  // renders screen consoles stale - not mouse related
+	}
+</PRE>
+<H2>Limitations</H2>
+	<LI>The screen that you are pointing to is assumed to be "wall-mounted".  That is, oriented vertically; not on the floor, not on the ceiling.
+	<LI>The current implementation assumes a +/-30 degree pointer variation for the largest dimension of the canvas
+	<LI>Inverting the board will give incorrect results
+	<LI>Selecting accelerometer only or magnetometer only options will result in a pointer with dead zones.  This is a fundamental limitation of the physics, and not a flaw in the algorithm.
+	</OL>
+<p>Continue to <a href="credits.html"><strong>Credits</strong></a> page.
+</BODY>
+</HTML>
+

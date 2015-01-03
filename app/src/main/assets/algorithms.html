@@ -1,0 +1,204 @@
+<HTML>
+<HEAD>
+	<LINK REL=StyleSheet HREF="style.css" TYPE="text/css" MEDIA=screen>
+<TITLE>Low Pass Filtering</TITLE>
+</HEAD>
+<BODY>
+	<H1>Algorithms</H1>
+	<H2>Overview</H2>
+This application can interface with a number of development boards.  Fusion options vary based upon the board and software running on it.  The following table serves as a quick summary of what options are available to you.
+<TABLE>
+<THEAD>
+<TR><TH>Board</TH><TH>Sensors</TH><TH>Availability</TH><TH>Interface</TH><TH>Fusion Software</TH><TH>3-axis</TH><TH>6-axis</TH><TH>9-axis</TH></TR>
+</THEAD>
+<TR><TD>Android Device supporting 9-axis or higher</TD><TD>Vary</TD><TD>Now</TD><TD>N/A (Local)</TD><TD>Android OS</TD><TD><a href="#local3">Local 3-Axis</a></TD><TD><a href="#sixam">Local GetRotationMatrix</a></TD><TD><a href="#local9">Local 9-axis</a></TD></TR>
+<TR><TD>Android Device with no gyro</TD><TD>Vary</TD><TD>Now</TD><TD>N/A (Local)</TD><TD>Android OS</TD><TD><a href="#local3">Local 3-Axis</a></TD><TD><a href="#sixam">Local GetRotationMatrix</a></TD><TD>N/A</TD></TR>
+<TR><TD>Freescale Freedom Board (KL25Z, KL26Z, K20D50M or K64F) and FRDM-FXS-MULTI Sensor Shield</TD><TD>FXAS21000 Gyro<BR>FX0S8700CQ (mag + accel)<BR>See Notes 1 and 2</TD><TD>Now</TD><TD>Bluetooth</TD><TD>Freescale Fusion Demo</TD><TD><a href="#remote3">accel, mag, gyro</a></TD><TD><a href="#sixam">GetRotationMatrix</a> and <a href="#sixag">Freescale 6-axis Accel+Gyro</a></TD><TD><a href="#fsl9">Freescale 9-axis</a></TD></TR>
+
+
+<TR><TD>Freescale Sensor Fusion Development Platform</TD><TD>FXAS21000 Gyro<BR>FX0S8700CQ (mag + accel)</TD><TD>Freescale use only</TD><TD>Bluetooth</TD><TD>Freescale Fusion Demo</TD><TD><a href="#remote3">accel, mag, gyro</a></TD><TD><a href="#sixam">GetRotationMatrix</a> and <a href="#sixag">Freescale 6-axis Accel+Gyro</a></TD><TD><a href="#fsl9">Freescale 9-axis</a></TD></TR>
+
+<TR><TD>Avnet WiGo module</TD><TD>MMA8451Q accel<BR>MAG3110 Magnetometer<BR>See Note 3</TD><TD>Now</TD><TD>WiFi</TD><TD>Avnet Fusion Demo</TD><TD><a href="#local3">Local 3-Axis</a></TD><TD><a href="#six">Freescale 6-axis</a></TD><TD>N/A</TD></TR>
+</TABLE>
+Notes:<OL>
+<LI>Freescale Freedom boards often include one or more sensors on the main board.  The Xtrinsic Sensor Fusion Library demo utilizes only those sensors on the sensor shield board.
+<LI>The default build for the Xtrinsic Sensor Fusion Library utilizes the FXAS21000 gyro and FXOS8700CQ accelerometer/magnetometer combo sensor.  The FRDM-FXS-MULTI shield board includes a number of other Freescale sensors.  Some of these are also supported by the fusion library, and can be used to drive the display - although the app itself always thinks it is using the FXAS21000/FRXOS8700CQ.
+<LI>The Avnet WiGo module also includes a Freescale MPL3115A2 pressure sensor/altimeter and an ambient light sensor.
+</OL>
+<P>In the table above, fusion options marked "Local" are computed on your Android device, regardless of where the sensor readings originated - although all the boards listed perform the magnetic calibration step on the board CPU.  Entries marked "Freescale" are based upon Freescale's fusion library. 
+<P>Not shown in the table are the <strong>relative (air mouse) and absolute pointer</strong> algorithms, which are discussed on the <a href="canvas.html">Canvas View</a> page of the documentation.
+
+	<H2><a id="lpf">Low Pass Filtering</a></H2>
+<P>When the <strong>Source</strong> spinner is set to local three or six axis OR WiGo three axis options, two additional controls may be found in the GUI.  The first is the <strong>LPF Enable</strong> checkbox.  If no check is present, raw data from the selected accelerometer and magnetometer is used as input to the sensor fusion routines.  For 6-axis selections, this is the Android getRotationMatrix() function (see <a href="http://developer.android.com/reference/android/hardware/SensorManager.html">the Android developer web page for the Sensor Manager</a> for details).  For 3-axis, it is a simple function that computes axis/angle between the current sensor reading and its reference value.  Both of these algorithms are described in the sections that follow.
+<center><img width="400" src="images/lpf_example.png"></center><P>
+When the  <strong>LPF Enable</strong> checkbox is checked, an Android SeekerBar control becomes visible.  This can be used to dynamically change a low pass filter coefficient applied to the magetometer and accelerometer samples <strong>prior</strong> to calling the 3-axis axisAngle() or 6-axis getRotationMatrix() functions.
+<P>This feature is available on the Device, Panorama and Logging screens, so long as the <strong>Source</strong> spinner is set to a three or six axis option.</strong>.
+<P>The equations used for filtering is (in each sample interation):<ul>
+	new_value=(1-filterCoefficient)*sensor_reading + filterCoefficient*old_value;<br>
+	old_value = new_value; // for next sample
+</ul>
+The low-pass feature is not available when using the <strong>9-Axis</strong> source option because Android uses a native "synthetic" Android sensor for these calculations, and Freescale has more active filters in its implementations.
+ 
+	<H2><a id="local3">Local 3-Axis</a></H2>
+This algorithm is computed on your Android device using sensor readings from either local Android sensors or Wi-Go.
+<P>The dot product and cross product operators discussed at the end of <a href="OrientationPart2.html">Rotations and Orientation: Part 2</a> hold the secret to computing axis and angle based upon measurements from a single sensor type.  When no linear acceleration is present, an accelerometer measures the gravity vector, which is know.  When there is no magnetic interference, a magnetometer measures the earth's magnetic field, which is also known (assuming you know where you are on the earth).  The 3-axis computation here can be used with either sensor type so long as you know the reference sensor value at zero rotation and have the measured value at some arbitrary rotation.	
+	<P>Assuming you have normalized your sensor readings, the following two equations hold:<OL>
+		<LI><strong>u</strong> . <strong>v</strong> = cos &alpha; 
+		<LI><strong>n</strong> = <strong>u</strong> x <strong>v</strong> / (sin &alpha;) 
+	</OL>
+	<P>Re-arranging these and reducing the result to Java code, you get the function:
+	<pre class="code">
+static public float axisAngle(float[] axis, float[] v1, float[] v2) {
+	assert(v1.length==3);
+	assert(v2.length==3);
+	float [] cp  = new float[3]; // cross product
+	float [] nv1 = new float[3]; // normalized versoin of v1
+	float [] nv2 = new float[3]; // normalized version of v2
+	normalize(nv1, v1);
+	normalize(nv2, v2);
+	float cosAngle = dotProduct(nv1, nv2);
+	float angle = (float) Math.acos(cosAngle);
+	computeCrossProduct(cp, nv1, nv2);
+	normalize(axis, cp);
+	return(angle); // Angle is in radians
+}
+</pre>
+	<OL>
+	<LI>v1 = baseline axis (normalized earth gravity or magnetic field)
+	<LI>v2 = sensor vector
+	<LI>axis = returned axis of rotation
+	<LI>function return the angle about the axis of rotation in radians
+</OL>
+	<P>The helper functions are:<P>
+	<PRE class="code">
+static public float dotProduct(float[] a, float[] b) {
+	// a and b are assumed to be the same length
+	assert(a.length==b.length);
+	float dp = 0;
+	for (int i = 0; i < b.length; i++) {
+		dp = dp + a[i]*b[i];
+	}
+	return(dp);
+}
+static public void computeCrossProduct(float[] cp, float[] a, float[] b) {
+	// a and b are assumed to be 3x1 vectors
+	assert(a.length==3);
+	assert(b.length==3);
+	cp[0] = a[1]*b[2]-a[2]*b[1];
+	cp[1] = a[2]*b[0]-a[0]*b[2];
+	cp[2] = a[0]*b[1]-a[1]*b[0];
+}
+static public float norm(float[] v) {
+	int n = v.length;
+	float norm = 0;
+	for (int i = 0; i < n; i++) {
+		norm = norm + v[i]*v[i];
+	}
+	norm = (float) Math.sqrt(norm);
+	return(norm);
+}
+static public void normalize(float[] vout, float[] vin) {
+	scalarMult(vout, vin, 1/norm(vin));
+}
+</PRE>
+	<strong>Warnings:<OL>
+<LI>This algorithm cannot detect rotation about the reference vector!
+<LI>This algorithm has a singularity near Z=-1 (try experimenting with orientations that are at or near upside down)
+</OL></strong>
+The first issue above results from the fact that you have a single reference vector, which is insufficient to determine all possible orientations.  The second results from the fact that the cross product (Equation 2) of two co-linear terms is [0;0;0], which is pretty useless as an axis of rotation.  It derives from the same root cause: a single vector is insufficient to compute all possible orientations.  With a single vector, you can always find an orientation that introduces problems.
+
+	<H2><a id="remote3">Remote 3-Axis</a></H2>
+<P>The most recent release of Freescale embedded sensor fusion includes an improved 3-axis accelerometer algorithm which does not share the problems outlined in the "local" algorithm version above.  Details will be provided in a future version of this documentation.
+<P>The "remote mag" option computes a 2D heading only.  It is designed for an automotive use case where acceleration of the vehicle would render a 6-axis accel/mag solution inaccurate.
+<P>The "remote gyro" option utilizes the physical gyro outputs to compute orientation changes.  Because the gyro is insensitive to absolute rotation, you can expect any orientation in the output.  Slow drifts in the display are the result of gyro offsets.  These are compensated for in the Kalman filter options discussed elsewhere.
+	<H2><a id="six">6-Axis Algorithms</a></H2>
+	<H3><a id="sixam">6-Axis getRotationMatrix()</a></H3>
+This algorithm combines accelerometer and magnetometer readings to compute orientation.  Depending upon your selection of board/software, this algorithm may be computed locally on your Android device or it may be computed locally using Freescale's fusion library.
+	<P>The 6-axis algorithm used is Android's standard <a href="http://developer.android.com/reference/android/hardware/SensorManager.html#getRotationMatrix(float[], float[], float[], float[])">getRotationMatrix()</a> helper function.  By helper function, we mean that getRotationMatrix() does not read sensor values directly.  You must supply the measurements yourself.  This allows us to run the same computation using the native sensors on your Android device as well as sensors residing on Freescale sensor fusion demo boards.
+	<p>This function utilizes BOTH acceleration and magnetic field measurments.  Because the two reference vectors are NOT colinear, this algorithm does not have the "blind spot" seen on the 3-axis computation in the previous section.
+	<P>The reference vectors for this algorithm are magnetic north and the gravity vector.  You can find the source for this function at <a href="http://grepcode.com">http://grepcode.com</a>, which offers convenient online browsing of the Android source.  That source is licensed under terms of the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License</a>.  The listing below has been modified with additional (non-shaded) comments.
+<P>The basic approach is to take advantage of the fact that the cross product of two vectors is a third vector which is perpendicular to the first two.  A cross product of measured gravity and magnetic north give you east.  A second cross product of "East" and gravity gives us "North".  Components of the gravity, East and North vectors can be arranged to generate a rotation matrix which models the rotation between device and world frames of reference.<P>
+	<PRE class="code">
+public static boolean getRotationMatrix(float[] R, float[] I,
+         float[] gravity, float[] geomagnetic) {
+         float Ax = gravity[0];
+         float Ay = gravity[1];
+         float Az = gravity[2];
+         final float Ex = geomagnetic[0];
+         final float Ey = geomagnetic[1];
+         final float Ez = geomagnetic[2];
+</pre><pre>
+	 // the the cross product of magnetic vector and gravity to derive a basis
+	 // vector pointing East.
+</pre><pre class="code">
+         float Hx = Ey*Az - Ez*Ay;
+         float Hy = Ez*Ax - Ex*Az;
+         float Hz = Ex*Ay - Ey*Ax;
+</pre><pre>
+	// Normalize & check the new basis vector
+</pre><pre class="code">
+         final float normH = (float)Math.sqrt(Hx*Hx + Hy*Hy + Hz*Hz);
+         if (normH < 0.1f) {
+             // device is close to free fall (or in space?), or close to
+             // magnetic north pole. Typical values are  > 100.
+             return false;
+         }
+         final float invH = 1.0f / normH;
+         Hx *= invH;
+         Hy *= invH;
+         Hz *= invH;
+</pre><PRE>
+	// Now normalize the acceleration (assumed = gravity) vector
+</pre><pre class="code">
+         final float invA = 1.0f / (float)Math.sqrt(Ax*Ax + Ay*Ay + Az*Az);
+         Ax *= invA;
+         Ay *= invA;
+         Az *= invA;
+</pre><pre>
+	// A second cross product of the newly computed East and our measured gravity
+	// vector gives a north vector in the horizontal plane.
+</pre><pre class="code">
+         final float Mx = Ay*Hz - Az*Hy;
+         final float My = Az*Hx - Ax*Hz;
+         final float Mz = Ax*Hy - Ay*Hx;
+</pre><pre>
+	// Now create a rotation matrix based upon the newly computed basis vectors
+</pre><pre class="code">
+         if (R != null) {
+             if (R.length == 9) {
+                 R[0] = Hx;     R[1] = Hy;     R[2] = Hz;
+                 R[3] = Mx;     R[4] = My;     R[5] = Mz;
+                 R[6] = Ax;     R[7] = Ay;     R[8] = Az;
+             } else if (R.length == 16) {
+                 R[0]  = Hx;    R[1]  = Hy;    R[2]  = Hz;   R[3]  = 0;
+                 R[4]  = Mx;    R[5]  = My;    R[6]  = Mz;   R[7]  = 0;
+                 R[8]  = Ax;    R[9]  = Ay;    R[10] = Az;   R[11] = 0;
+                 R[12] = 0;     R[13] = 0;     R[14] = 0;    R[15] = 1;
+             }
+         }
+ </pre><pre>
+ 	...
+	// Details of the inclination matrix have been omitted
+</pre><pre class="code">
+        return true;
+     }
+</PRE>
+	 <p>getRotationMatrix() will produce inaccurate results if linear acceleration is present (because accelerometers measure the sum of acceleration and gravity).  It will also produce inacurrate results if uncompensated magnetic interference is present in the magnetometer vector used as input.
+	 <p>And finally, remember that this algorithm references <strong>magnetic</strong> north.  Not the geographic north pole.
+	 <H3><a id="sixag">6-Axis Accel + Gyro</a></H3>
+	 This algorithm utilizes gyro and accelerometer readings to compute relative orientation.  Because magnetometer readings are not used, the algorithm cannot determine true north.  But for the same reason, it is immune to magnetic interference.  The Freescale 6-axis accel/gyro algorithm utilizes an indirect Kalman filter, and is useful for applications such as "air mouse".
+	 <h2><a id="local9">Local 9-Axis Solutions</a></H2>
+	 <P>The <strong>Local 9-axis</strong> option in the application makes use of the <A href="http://developer.android.com/guide/topics/sensors/sensors_motion.html">Android ROTATION_VECTOR</A> synthetic sensor to calculate orientation.  Implementation of this sensor type may vary from device to device.  
+	 <h2><a id="fsl9">Freescale 9-Axis Solutions</a></H2>
+	 The Freescale 9-axis solution typically includes:<ul>
+		 <li>a high frequency loop that integrates gyro data
+		 <li>a low frequency loop that computes magnetic hard/soft iron compensation parameters
+		 <LI>a medium frequency loop that invokes an <strong>Indirect Kalman Filter</strong> that dynamically computes device orientation in quaternion form based on accelerometer, corrected magnetometer and gyroscope readings.   The error state vector includes errors in orientation, gyro offset, linear acceleration and magnetic inclination.  
+	 </UL>
+	 Breaking the solution into three separate tasks allows developers to tune the algorithm to obtain best performance vs power for their application.
+	 <P>The algorithm also monitors the magnitude of the magnetic field.  Variations above a preset threshold trigger a magnetic disturbance feature which results in the magnetometer reading being ignored until readings return to reasonable values.  This limits orientation errors resulting from proximity to magnets to modest values.
+	 <P>9-axis solutions incorporate gyro readings into their calculations.  This typically results in a more responsive orientation estimate, with improved tolerance to linear acceleration and/or magnetic interference.  You should also see less noise in computed orientations.
+<p>Continue to <a href="statistics.html"><strong>Statistics</strong></a>.
+</BODY>
+</HTML>
+

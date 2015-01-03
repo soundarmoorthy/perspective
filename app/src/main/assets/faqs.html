@@ -1,0 +1,17 @@
+<HTML>
+<HEAD>
+	<LINK REL=StyleSheet HREF="style.css" TYPE="text/css" MEDIA=screen>
+<TITLE>Frequenctly Asked Questions</TITLE>
+</HEAD>
+<BODY>
+	<H1>Frequently Asked Questions</H1>
+	<H4>Is this an example of Freescale's sensor fusion solution?</H4>
+	<P>It depends on the setting of the Source/Algorithm spinner.  There is a table in the <a href="algorithms.html">Algorithms</a> page which specifies which algorithms are run on your Android device and which are run on your development board.
+	<H4>Why are the Mag/Accel options so "jittery"?</H4>
+	<P>You probably only see this using the "local" option.  Freescale's eCompass fusion includes Butterworth low pass filters on sensor outputs before they are used to compute orientation.
+	<p>The mag/accel option uses the Android getRotationMatrix (see <a href="http://developer.android.com/reference/android/hardware/SensorManager.html">the Android developer web page for the Sensor Manager</a> for details) function to compute orientation.  The function essentially does a series of cross-product operations to compute orientation.  These are very sensitive to noise in the sensor outputs.  If you check the "LPF Enable" checkbox, a slide bar will be exposed.  Slide the control to the right to add low pass filtering to the inputs of the getRotationMatrix function.  You will see it smooth out, but also get more sluggish.
+		<H4>When will Freescale boards be available for use with this application?</H4>
+		<P>Board development is underway now, and we expect general availability in the 3rd quarter of 2013.
+</BODY>
+</HTML>
+

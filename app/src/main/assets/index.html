@@ -1,0 +1,150 @@
+<HTML>
+<HEAD>
+	<LINK REL=StyleSheet HREF="style.css" TYPE="text/css" MEDIA=screen>
+<TITLE>Program Navigation</TITLE>
+</HEAD>
+<BODY>
+	<H1>Xtrinsic Sensor Fusion<BR>Toolbox for Android</H1>
+	<HR>
+	<strong>Embedded Contents:</strong>
+<OL>
+
+	<LI>Overview &amp; Top Level Navigation (this page)
+	<LI><a href="OrientationPart1.html">Rotations and Orientation: Part 1</a>
+	<LI><a href="OrientationPart2.html">Rotations and Orientation: Part 2</a>
+	<LI><a href="algorithms.html">Algorithms</a>
+	<LI><a href="statistics.html">Gathering Statistics</a>
+	<LI><a href="hardware.html">Hardware &amp; Software Requirements</a>
+	<LI><a href="packet_structure.html">Bluetooth Packet Structure</a>
+	<LI><a href="logging.html">Logging</a>
+	<LI><a href="device.html">Device View</a>
+	<LI><a href="panorama.html">Panorama View</a>
+	<LI><a href="canvas.html">Canvas View</a>
+	<LI><a href="credits.html">Credits &amp; References</a>
+	<LI><a href="preferences.html">Preferences Screen</a>
+	<LI><a href="change_log.html">Change Log</a>
+</OL>
+<P><strong>YouTube Training For This App:</strong>
+<P>Freescale has prepared a number of videos illustrating various aspects of the Xtrinsic Sensor Fusion Toolbox.  These are available on YouTube at the URL's shown below.  If you have the YouTube Android application installed, and have internet access, you should also be able to view them by clicking the links below.  The links utilize Android intents to bring up compatible application(s) capable of the viewing the videos.  Warning: you will be exiting this application, and will need to use the "Recent Apps" feature of your Android device to return.
+</UL>
+<LI><a href="http://youtu.be/SDSbHmyTJj8">Installation &amp; Setup (http://youtu.be/SDSbHmyTJj8)</a>
+<LI><a href="http://youtu.be/HGC2dzu9Ipk">Basic Operation (http://youtu.be/HGC2dzu9Ipk)</a>
+<LI><a href="http://youtu.be/G0rOS9JAyFM">6 and 9-axis Options (http://youtu.be/G0rOS9JAyFM)</a>
+<LI><a href="http://youtu.be/dBMEvoV9gy8">Bluetooth Troubleshooting (http://youtu.be/dBMEvoV9gy8)</a>
+</UL>
+<HR>
+	<H2>Overview</H2>
+	<P>Freescale supplies a full ecosystem of tools and software libraries for development of products incorporating sensor fusion technologies.  The cornerstone of that ecosystem is the Xtrinsic Sensor Fusion Library for Kinetis MCUs.  Using this library, and a variety of Freescale hardware platforms, you can develop your own sensor fusion applications.  Details and download links are available at <a href="http://www.freescale.com/sensorfusion">http://www.freescale.com/sensorfusion</a>.
+	<P>The Freescale Xtrinsic Sensor Fusion Toolbox for Android (which is part of that ecosystem) allows you to experiment with basic sensor fusion tradeoffs.  You can choose:<UL>
+		<li>to use sensor/fusion data from any of:<UL>
+			<LI>the native sensors on your Android device (even if they are not Freescale sensors) 
+			<LI>any of the following boards, running the Freescale sensor fusion library demo program, via Bluetooth:<UL>
+				<LI>Freescale Kinetis Windows 8 Sensor Platform, rev 0.5 (internal Freescale use only)
+				<LI>Freescale KL25Z ARM Cortex M0+ Freedom Board with FRDM-FXS-MULTI Freedom Sensors Shield
+				<LI>Freescale KL26Z ARM Cortex M0+ Freedom Board with FRDM-FXS-MULTI Freedom Sensors Shield
+				<LI>Freescale KL20D50M ARM Cortex M4 Freedom Board with FRDM-FXS-MULTI Freedom Sensors Shield
+				<LI>Freescale K64F ARM Cortex M4 with FPU Freedom Board with FRDM-FXS-MULTI Freedom Sensors Shield
+			</UL>
+			<LI>Avnet WiGo board with 6-axis demo app communicating via WiFi
+		</UL>
+		<li>which of a number of algorithms to play with;
+		<li>how you would like to view the results
+		</ul>
+			<p><a href="images/program_flow.png"><img src="images/program_flow.png"></a>
+			<p>Algorithms may vary from device to device.  When using the 9-axis algorithm with native sensors, you are using the algorithm provided by your Android device manufacturer.  See the <a href="algorithms.html">Algorithms</a> page for more details.
+	<P>BUT FIRST!  What is sensor fusion?
+	<P>Sensor fusion encompasses a variety of techniques which can:<UL>
+	<LI>Trade off strengths and weaknesses of the various sensors to compute something more than can be calculated using the individual components;
+	<LI>Improve the quality and noise level of computed results by taking advantage of:<UL>
+<LI>Known data redundancies between sensors
+<LI>Knowledge of system transfer functions, dynamics and/or kinematics</UL></UL>
+<P>Good lord! Sounds like something out of an engineering textbook. It’s more fun to look at it by example.  Which, coincidentally, is why Freescale developed this application.
+<p> Accelerometers return a measured quantity which includes inertial acceleration as well as gravity. When not moving, they make a great tilt meter. But they can’t detect rotation about the gravity vector. Magnetometers have a similar problem detecting rotation about the earth’s magnetic field. But combine the two, and you have a case where each complements the other to achieve something that neither can do alone.
+<P>MEMS gyros are used to measure angular rotation, and can typically respond to changes in rotation quickly. They also often have considerable offset and drift over time. Magnetometers provide a way to place bounds on those offset and drift terms. And conversely, the gyro data is useful as a second check against magnetic interference.
+<P>You can see techniques like these in use in the great variety of iPhone, Android and Windows 8 sensor applications which can be downloaded to your phone or tablet today. And sometimes, you can see cases where the developer SHOULD have used techniques like these!
+<h2>Top Level Navigation</H2>
+<P>This Android-based demontration by Freescale Semiconductor's Sensors Solutions Division shows how sensor fusion techniques can be used to power your application.  The application has several states of operation. All controls appear as buttons near the top of the GUI.  
+
+<h3>Android Action Bar</H3>
+Android versions 3.0 and above support use of a "standard" <strong>Android Action Bar</strong>.  On this application, it contains:<OL>
+		<LI>The <strong>Navigation</strong> button
+		<img class="icon" src="images/expander_open_holo_dark.png">
+		selects between any one of the following major modes of operation:<OL>
+			<br><a href="images/navigation.png"><img src="images/navigation.png"></a>
+		<LI>The <a href="logging.html">Log Window</a> is used to monitor sensor configurations, outputs and other messages from the application.  The Log Window shows only the last 100-200 lines displayed by the application.  Earlier history is deleted so that the GUI remains responsive.  You CAN save a complete session by checking "File logging enable" on the Device, Panorama and Logging screens.
+		<LI>The <a href="device.html">Device View</a> and <a href="panorama.html">Panorama View</a> utilize exactly the same set of controls, but offer different visual perspectives for interpreting the result.  The device view displays a simple 3D image of a printed circuit board.  When you have set the <strong>Source Spinner</strong> to a 3, 6 or 9-axis fusion option (explained elsewhere) you will see the PCB appear to realign itself on the screen.  If using the native sensors on your Android device, the PCB will attempt to "hold steady" in space, regarless of how you rotate your Android device.  If using a Freescale sensor fusion board via Bluetooth, the PCB on the screeen should track the movements of the actual PCB.  The Panorama view actually places you inside a virtual 3D room.  Your perspective will change as you rotate your Android device (or Freescale sensor fusion board).
+		<LI>The <a href="statistics.html">Statistics View</a> allows you to gather quantitative at-rest measurements from your sensors and fusion code.
+		<LI>The <a href="canvas.html">Canvas View</a> works with the sensor development boards mentioned above.  It lets you use your development board as an "absolute 3D pointer" into space.  This is called the "Canvas View" because we use an Android Canvas graphic object to display a cursor whose location tracks the orientation of your development board.
+		<LI>The <strong>Documentation View</strong> provides a basic introduction to the device (this page), some tutorial information on the topic of sensor fusion, and details of the various program options. 
+	</OL><P>
+	<LI>The <strong>Share</strong> button 
+		<img class="icon" src="images/ic_menu_share.png">
+	allows you to email information based on these choices:<OL>
+		<br><a href="images/sharing.png"><img src="images/sharing.png"></a>
+		<LI>Graphics Screen
+		<LI>Data Logger Transcript (<strong>Nav</strong> = Log Window)
+		<LI>Logger Output file (file logging is enabled via the "<strong>File logging enable</strong>" checkbox which is adjacent to the <strong>Source Spinner</strong> control).
+		<LI>Statistics Report
+	</OL>
+	The sharing feature requires that you have a valid email client installed on your Android device, and that it supports the standard Android "sharing intent".
+	<P>
+	<LI>On some devices, the <strong>Option Menu</strong> button 
+		<img class="icon" src="images/overflow.png">
+		looks like three vertically stacked periods.  On other devices (notably phones), the options menu is mapped to a hardware
+	       button on your device.  Either way, it gives you access to a variety of lesser used functions: 
+	       <OL><br><a href="images/options_menu.png"><img src="images/options_menu.png"></a>
+		       <LI>The <a href="preferences.html">Preferences Screen</a>
+		       <LI><a href="statistics.html">View Statistics Report</a>
+		       <LI><a href="#splitScreen">Toggle Split Screen</a> - allows you to view documentation AND interactive graphics screen or logging window.
+		       <LI>Enable/Disable hex dump (Remote and WiFi only) can be used to enable a dump of incoming data in hex format to the Log Window
+		       <LI>Enable/Disable legacy dump can be used to enable a dump of incoming data in legacy format to the Log Window
+		       <LI>Enable/Disable csv dump (Remote and WiFi only) can be used to enable a dump of incoming data in csv format to the Log Window
+		       <LI>Clear Log Window - will clear the logging window and close any open output files.
+		       <LI>Dump Android Configuration - will dump a report to the logging window which describes details of the sensor configuration on your Android device, as well as OS details.
+		       <LI>About - Freescale Copyright, program version and disclaimer.
+		       <LI>Help - will display this page
+		       <LI>Feedback - selecting this option will initiate a sequence of events:<ol>
+			       <LI>Configure the app for logging
+			       <LI>Clear the log window
+			       <LI>Write feedback template
+			       <LI>Dump Android sensor configuration
+			       <LI>Invoke the log window "share intent", which should post an email client with the template for your feedback.
+		       </OL>Then simply answer the 3 questions in the template in the body of your email and send to: sfusion@freescale.com.
+	       </OL>
+
+</OL>
+<h3>Fusion Settings Bar</H3>
+<P>Immediately below the Android Action Bar, we have the <strong>Fusion Settings Bar</strong>.  This application-specific set of controls include:
+<OL>
+<LI>The <strong>Exit</strong> button is always present. Clicking this button will exit the application.
+<LI>The	<strong>Source/Algorithm</strong> spinner control (see details on the <a href="logging.html">Logging</a> page) is present on all screens which utilize sensor data. It allows you to select which combination of data source and fusion algorithm to experiment with.
+<LI>The <strong>File logging enable</strong> checkbox can be used to send sensor and fusion outputs to a file stored on your device's permanent storage.  When in use, the number of messages written to the log file is displayed in parenthesis next to the checkbox label.
+<LI>Another checkbox will be visible when using 3 or 6-axis options on the Source/Algorithm spinner.  The <strong>LPF Enable</strong> checkbox lets you enable low pass filtering of sensor outputs BEFORE they are fed to fusion algorithm inputs (only applicable to some options, see the <a href="algorithms.html">Algorithms page</a>).
+<LI>Finally, some parts of the application may occasionally write short <strong>status messages</strong> to the right-most side of the Fusion Settings Bar controls.
+</OL>
+<P>Documentation pages, such as this, include additional buttons in the <strong>Fusion Settings Bar</strong>:<OL>
+	<LI>The <strong>Page spinner</strong> control is used to bring a specific documentation page to the foreground.
+	<a href="images/page_spinner.png"><img src="images/page_spinner.png"></a>
+	The last two entries on the Page spinner deserve mention:<UL>
+		<LI>"Freescale Sensor Website" requires that your device have internet access, as it will attempt to navigate to <a href="http://www.freescale.com/sensors">http://www.freescale.com/sensors</a>.  If you are behind a firewall, you may get a page displayed by your firewall instead of the Freescale site.
+		<LI>A number of the documentation pages contain links to other sites on the web.  The Page Spinner should display "General WWW" whenever any other page is displayed.  Otherwise it should identify the current documentation page.  Selecting "General WWW" on the Page spinner has no effect. 
+	</UL>
+	<LI>The <strong>Back</strong> Button operates the same as the "back button" on any web browser. 
+	<LI>The <strong>Forward</strong> Button operates the same as the "forward button" on any web browser. 
+</OL>
+Application documentation features were implemented with using the Android WebView class, which operates like you would expect any mobile browser to work.  Drag your finger up or down the screen to scroll vertically.  You can use left and right "fling" gestures to move sequentially through the pages.
+<h3><a id="splitScreen">Split Screen Mode</a></h3>
+<p>Because it is nice to be able to do to things at once, this application offers a <strong>split screen</strong> mode which allows you to view documentation pages at the same time you are utilizing other tasks.  The screen shot below shows the application open to the help page on the <strong>Panorama View</strong> at the same time that feature is being exercised in the lower pane.
+<p><center><a href="images/split_screen.png"><img src="images/split_screen.png"></a></center>
+<p>Split screen mode is selected via <strong>Options Menu->Toggle Split Screen</strong>.
+
+<h3><a id="swipe">Using Swipe Navigation in the Documentation View</a></h3>
+This documentation view supports swipe gestures.  If you touch the screen on either the left or right side of the screen and sweep across the screen by at least 1/3 of the width of the screen, you will automatically be taken to the previous/next page in the documentation.  The vertical distance covered by your gesture should be less than 1/5 of the screen height.  Gestures which are below a certain minimum threshold in terms of speed are also rejected.  Experiment with the interface to get a feel for it.
+<P>The figure below illustrates valid swipes (shown in green), as well as invalid swipes (shown in red).
+<P><a href="images/swipes.png"><img class="mod" src="images/swipes.png"></a>
+
+<p>Continue to <a href="OrientationPart1.html"><strong>Rotations and Orientation: Part 1</strong></a>.
+<p>
+</BODY>
+</HTML>
+

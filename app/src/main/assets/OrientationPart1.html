@@ -1,0 +1,394 @@
+<HTML>
+<HEAD>
+	<LINK REL=StyleSheet HREF="style.css" TYPE="text/css" MEDIA=screen>
+<TITLE>Rotations and Orientation: Part 1</TITLE>
+</HEAD>
+<BODY>
+	<H1>Rotations and Orientation: Part 1</H1>
+	<H2>Overview</H2>
+    <p>Our portable devices are getting more and more fun to use, due in part to new generations of augmented and virtual reality applications. If you look at the software source code at the heart of these AR &amp; VR apps, you&#8217;ll discover a common component: a mathematical model relating the position and orientation of your portable device within an earth frame of reference. Perhaps the three most common are Euler angles, rotation matrices and quaternions. This discussion will focus on the Euler angles and rotation matrices. We&#8217;ll follow up with quaternions in Part 2.</p> 
+    <H2>Rotation Basics: Rotation Matrices and Euler Angles</H2>
+
+    <p><a href="images/image001.jpg"><img class="mod" src="images/image001.jpg"></a></p> 
+    <p class="center">Figure 1: Local earth versus the body frame</p> 
+    <p>Let&#8217;s arbitrarily choose the phone screen X,Y coordinate system as our rotating frame of reference for this discussion. You can intuitively see that any X,Y point (Z assumed zero) on the phone screen will map to some X, Y, Z point in the earth frame of reference. It is also clear that the Cartesian axes in the phone (or body) frame of reference will only rarely align themselves with the local earth frame axes. Since the position offset, R, doesn&#8217;t affect orientation, we can collapse the figure down to:</p> 
+    <p><a href="images/image002.jpg"><img class="mod" src="images/image002.jpg"></a></p> 
+    <p class="center">Figure 2: Using a common origin for both earth and body frames</p> 
+    <p> Now let&#8217;s remove the phone from the picture and focus just on points in the X-Y plane. The figure below shows the earth frame rotated into the body frame by an angle Psi (&#968;).</p> 
+    <p><a href="images/image003.jpg"><img class="mod" src="images/image003.jpg"></a></p> 
+    <p class="center">Figure 3: The X-Y plane illustrates rotation from earth into body frame about the Z axis</p> 
+    <p> You probably first saw a figure like this in your high school geometry or trig course. It allows us to map any point &#8220;A&#8221; in any standard X,Y Cartesian system to any other X,Y Cartesian system, which is rotated from it by some angle Psi (&#968;), with a simple linear transformation. To see how, let&#8217;s deconstruct that figure using a number of right triangles.</p> 
+    <p><a href="images/image004.jpg"><img class="mod" src="images/image004.jpg"></a></p> 
+    <p class="center">Figure 4: Physical justification for terms in the rotation matrix</p> 
+    <p> If you study Figure 4, you can see that the rotation angle, &#968;, is present in each of the 4 right triangles we added. Additionally, the hypotenuse of each triangle is either x<sub>b</sub> or y<sub>b</sub>. Given that information, we can see how to compute x<sub>e</sub> and y<sub>e</sub> from x<sub>b</sub> and y<sub>b</sub>:</p>
+ <table class="eqn">
+  <tr>
+   <td class="eqn"> 
+    <p><b>x<sub>e</sub></b><b> = x<sub>b</sub> cos(Y) - y<sub>b</sub> sin(Y) </b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 1)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+    <p><b>y<sub>e</sub> = x<sub>b</sub> sin(Y) + y<sub>b</sub> cos(Y) </b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 2)</p>
+   </td>
+  </tr>
+  </table>
+    <p>In matrix form:</p>
+    <table class="eqn">
+  <tr>
+   <td class="eqn"> 
+    <p><b>A<sub>earth</sub></b><b> = C(-&#968;) A<sub>body</sub></b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 3)</p>
+   </td>
+  </tr>
+  </table>
+    <p>The inverse of which is:</p>
+    <table class="eqn">
+  <tr>
+   <td class="eqn"><b>A<sub>body</sub></b><b> = C(&#968;) A<sub>earth</sub></b></td>
+   <td class=eqnNum>(Eqn. 4)</td>
+  </tr>
+ </table> 
+    <p>where A<sub>earth</sub> and A<sub>body</sub> are of the form [x y]<sup>T</sup> and:</p>
+ <table class="eqn">
+  <tr>
+   <td class="eqn"><a href="images/image005.jpg"><img class="eqnM" src="images/image005.jpg"></a></td>
+   <td class="eqnNum">(Eqn. 5)</td>
+  </tr>
+  <tr>
+   <td class="eqn"><a href="images/image007.jpg"><img class="eqnM" src="images/image007.jpg"></a></td>
+   <td class="eqnNum">(Eqn. 6)</td>
+  </tr>
+ </table> 
+    <p>All other relationships included in this discussion can be similarly mapped to a diagram of the rotation. The analysis also extends naturally to three dimensions. If A<sub>earth</sub> and A<sub>body</sub> are of the form [x y z]<sup>T</sup>, then:</p>
+ <table class="eqn">
+  <tr>
+   <td class="eqn"> 
+	   <p><a href="images/image009.jpg"><img class="eqnM" src="images/image009.jpg"></a></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 7)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+	   <p><a href="images/image011.jpg"><img class="eqnM" src="images/image011.jpg"></a></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 8)</p>
+   </td>
+  </tr>
+ </table> 
+    <p>We will use the three dimensional form in the remainder of this discussion. In both two and three dimensional cases, C(&#968;) and C(-&#968;) are known as <i>rotation matrices.</i></p> 
+    <p> Notice that C(&#968;) is the transpose of C(-&#968;), and vice-versa: C(&#968;)<sup>T</sup> = C(-&#968;). This is a special property of all rotation matrices. You can reverse the sense of rotation simply by taking the transpose of the original matrix.</p>
+ <table class="eqn">
+  <tr>
+   <td class="eqn"> 
+    <p><b>C(&#968;) C(-&#968;) = I<sub>3x3</sub></b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 9)</p>
+   </td>
+  </tr>
+ </table> 
+    <p> Where I<sub>3x3</sub> is simply the identity matrix:</p>
+ <table class="eqn">
+  <tr>
+   <td class="eqn"> 
+	   <p><a href="images/image013.jpg"><img class="eqnM" src="images/image013.jpg"</a></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 10)</p>
+   </td>
+  </tr>
+ </table> 
+    <p>This also implies that the inverse of a rotation matrix is simply its own transpose:</p>
+ <table class="eqn">
+  <tr>
+   <td class="eqn"> 
+    <p><b>C(&#968;)<sup>-1</sup> = C(&#968;)<sup>T</sup></b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 11)</p>
+   </td>
+  </tr>
+ </table> 
+    <p>Similar relationships hold for rotations in the X-Z (about the Y axis) plane:</p> 
+    <p><a href="images/image014.jpg"><img class="mod" src="images/image014.jpg"></a></p> 
+    <p class="center">Figure 5: The X-Z plane illustrates rotation about the Y axis</p>
+ <table class="eqn">
+  <tr>
+   <td class="eqn"> 
+    <p><b>x<sub>e</sub></b><b> = x<sub>b</sub> cos(&#952;) + z<sub>b</sub> sin(&#952;)</b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 12)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+    <p><b>z<sub>e</sub></b><b> = - x<sub>b</sub> sin(&#952;) + z<sub>b</sub> cos(&#952;)</b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 13)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+    <p><b>A<sub>earth</sub></b><b> = C(-&#952;) A<sub>body</sub></b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 14)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+    <p><b>A<sub>body</sub></b><b> = C(&#952;) A<sub>earth</sub></b><sup> </sup></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 15)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+	   <p><a href="images/image016.jpg"><img class="eqnM" src="images/image016.jpg"></a></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 16)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+	   <p><a href="images/image018.jpg"><img class="eqnM" src="images/image018.jpg"></a></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 17)</p>
+   </td>
+  </tr>
+ </table> 
+    <p>and for rotations in the Z-Y (about the X axis) plane:</p> 
+    <p><a href="images/image019.jpg"><img class="mod" src="images/image019.jpg"></a></p> 
+    <p class="center">Figure 6: The Y-Z plane illustrates rotation about the X axis</p>
+ <table class="eqn">
+  <tr>
+   <td class="eqn"> 
+    <p><b>y<sub>e</sub> = y<sub>b</sub> cos(&#934;) - z<sub>b</sub> sin(&#934;)</b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 18)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+    <p><b>z<sub>e</sub></b><b> = y<sub>b</sub> sin(&#934;) + z<sub>b</sub> cos(&#934;)</b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 19)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+    <p><b>A<sub>earth</sub></b><b> = C(-&#934;) A<sub>body</sub></b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 20)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+    <p><b>A<sub>body</sub></b><b> = C(&#934;) A<sub>earth</sub></b></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 21)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+	   <p><a href="images/image021.jpg"><img class="eqnM" src="images/image021.jpg"</a></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 22)</p>
+   </td>
+  </tr>
+  <tr>
+   <td class="eqn"> 
+	   <p><a href="images/image023.jpg"><img class="eqnM" src="images/image023.jpg"></a></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 23)</p>
+   </td>
+  </tr>
+ </table> 
+    <p>Phi, Theta and Psi (&#934;, &#952; and &#968;) rotations <u>in sequence</u> can map a point in any right-hand-rule (RHR) 3-dimensional space into any other RHR 3-dimensional space.</p> 
+    <p>A rotation from earth by body frame about Z, then Y then X axes (the &#8220;aerospace&#8221; sequence) is represented by:</p>
+ <table class="eqn">
+  <tr>
+   <td class="eqn"> 
+	   <p><a href="images/image025.jpg"><img class="eqnFull" src="images/image025.jpg"></a></p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 24)</p>
+   </td>
+  </tr>
+ </table> 
+    <p>The composite rotation matrix is computed simply by multiplying the three individual matrices in the specified order. Consistent with the discussion above, the inverse of this expression is:</p>
+ <table class="eqn">
+  <tr>
+   <td class="eqn"> 
+    <p><a href="images/image027.jpg"><img class="eqnFull" src="images/image027.jpg"><a.</p>
+   </td>
+   <td class="eqnNum"> 
+    <p>(Eqn. 25)</p>
+   </td>
+  </tr>
+ </table> 
+    <p> Collectively, &#934;, &#952; and &#968; are known as <b><i>Euler angles</i></b>. You may also see &#934;, &#952; and &#968; referred to as &#8220;roll&#8221;, &#8220;pitch&#8221; and &#8220;yaw&#8221; respectively. The subscript &#8220;RPY&#8221; in the expression above refers to roll-pitch-yaw, and &#8220;YPR&#8221; refers to yaw-pitch-roll.</p> 
+    <H2>Variants on Euler Angles</H2>
+    <p>Euler angles are sometimes sub-divided into &#8220;Tait-Bryan&#8221; angles (in which rotations occur about all three axes) and &#8220;Proper&#8221; Euler angles (in which the first and third axes of rotation are the same). Regardless of which type you use, it is important to specify the order of the rotations &#8211; which IS significant. In the table below, the right-most rotation is performed first, consistent with the matrix operations that will be required to implement the rotation. Possible variants are:</p>
+ <table border="1" cellspacing="0" cellpadding="0">
+  <tr>
+   <td width="108" valign="top"> 
+    <p><b>Alpha</b></p>
+   </td>
+   <td width="108" valign="top"> 
+    <p><b>Angles</b></p>
+   </td>
+   <td width="216" colspan="2" valign="top"> 
+    <p><b>Comments</b></p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>YRP</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#968;-&#934;-&#952;</p>
+   </td>
+   <td width="108" rowspan="6" valign="top"> 
+    <p>Tait-Bryan angles</p> 
+    <p>(AKA Nautical or Cardan angles)</p>
+   </td>
+   <td width="108" rowspan="12" valign="top"> 
+    <p>All of these are sometimes referred to simply as &#8220;Euler Angles&#8221;</p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>YPR</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#968;-&#952;-&#934;</p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>PYR</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#952;-&#968;-&#934;</p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>PRY</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#952;-&#934;-&#968;</p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>RYP</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#934;-&#968;-&#952;</p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>RPY</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#934;-&#952;-&#968;</p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>RYR</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#934;-&#968;-&#934;</p>
+   </td>
+   <td width="108" rowspan="6" valign="top"> 
+    <p>Proper Euler Angles</p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>RPR</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#934;-&#952;-&#934;</p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>PYP</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#952;-&#968;-&#952;</p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>PRP</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#952;-&#934;-&#952;</p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>YRY</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#968;-&#934;-&#968;</p>
+   </td>
+  </tr>
+  <tr>
+   <td width="108" valign="top"> 
+    <p>YPY</p>
+   </td>
+   <td width="108" valign="top"> 
+    <p>&#968;-&#952;-&#968;</p>
+   </td>
+  </tr>
+ </table> 
+    <p>A full discussion of Euler angles is beyond the scope of this article. But some key points you need to take away are:</p> 
+    <ul> 
+    <li>Again, order of rotation matters!</li> 
+    <li>There almost as many notations for Euler angles as the references in which they appear. Be specific in <i>you</i>r notation.</li> 
+    <li>There may be multiple Euler angle combinations which map to the same physical rotation. They are not unique.</li> 
+    <li>There are typically limits on the range of Euler rotation for each axis (+/- &#960; or +/- &#960;/2). These affect how the total rotation is spread across the three angles. They also tend to introduce discontinuities when Euler angles are computed over time.</li> 
+    <li>Each Euler triad will map to 3x3 rotation matrix (which IS unique) in a manner similar to that shown in Equations 24 and 25 above.</li> </ul> 
+    <H2>Summary</H2>
+    <p>If you define a &#8220;reference orientation&#8221; for any object, then you can define its current orientation as some rotation relative to that reference. Tracking orientation over time is then equivalent to tracking rotation from that reference over time. Because Euler angles are relatively easy to visualize, they enjoyed early popularity in a number of fields. </p> 
+    <p>Rotation matrices don&#8217;t require a master&#8217;s degree to be able to use them. Anyone with a college freshman geometry class under their belt can figure them out. They don&#8217;t have the ambiguities associated with Euler angles, and can be found at the heart of many algorithms. But you need 9 numbers for each rotation in this form. That can chew up a lot of storage. A better representation is the &#8220;quaternion&#8221;, which is explored in <a href="OrientationPart2.html">Representing Orientation: Part 2</a>.</p> 
+    <p><h2>References:</h2></p> 
+    <ol> 
+    <li>Quaternions and Rotation Sequences, Jack B. Kuipers, Princeton University Press, 1999</li> 
+    <li><a href="http://demonstrations.wolfram.com/EulerAngles/">Euler Angles</a> from the <a href="http://demonstrations.wolfram.com/">Wolfram Demonstrations Project</a> by Frederick W. Strauch</li> 
+    <li>Diversified Redundancy in the Measurement of Euler Angles Using Accelerometers and Magnetometers, Chirag Jagadish and Bor-Chin Chang, Proceedings of the 46<sup>th</sup> IEEE Conference on Decision and Control, Dec. 2007</li> 
+    <li><a href="http://en.wikipedia.org/wiki/Euler_angles">Euler Angles at Wikipedia</a></li> </ol>
+<p>Continue to <a href="OrientationPart2.html"><strong>Rotations and Orientation: Part 2</strong></a>.
+<p>
+</body></html>
+
