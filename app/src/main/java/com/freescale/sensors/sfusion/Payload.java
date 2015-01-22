@@ -27,38 +27,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.freescale.sensors.sfusion;
 
 import java.nio.ByteBuffer;
+
 /**
  * This application is highly optimized to ensure that the GUI stays responsibe.
  * This means paying special attention to memory management and message passing.
  * The Payload and PayloadPool classes allow us to reuse memory blocks in an efficient manner.
+ *
  * @author Michael Stanley
  */
 
 public class Payload {
-	public ByteBuffer bb = null;
-	int index;
-	boolean inUse;
+    public ByteBuffer bb = null;
+    int index;
+    boolean inUse;
 
-	Payload(int index) {
-		this.bb = ByteBuffer.allocateDirect(60); // 60 is larger than all packet sizes
-		inUse = false;
-		reclaim();
-	}
-	void reclaim() {
-		clear();
-		inUse = false;		
-	}
-	void clear() {
-		this.bb.position(0);
-		this.bb.order(null); // Little endian
-	}
-	boolean claim() {
-		if (inUse==false) {
-			inUse=true;
-			return(true);
-		}
-		return(false);
-	}
+    Payload(int index) {
+        this.bb = ByteBuffer.allocateDirect(60); // 60 is larger than all packet sizes
+        inUse = false;
+        reclaim();
+    }
+
+    void reclaim() {
+        clear();
+        inUse = false;
+    }
+
+    void clear() {
+        this.bb.position(0);
+        this.bb.order(null); // Little endian
+    }
+
+    boolean claim() {
+        if (inUse == false) {
+            inUse = true;
+            return (true);
+        }
+        return (false);
+    }
 
 }
 

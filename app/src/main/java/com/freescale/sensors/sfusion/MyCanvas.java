@@ -42,119 +42,123 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 public class MyCanvas extends View {
-	private int x;  // only used for "mouse mode", same X,Y coordinate system as pointer
-	private int y;  // only used for "mouse mode", same X,Y coordinate system as pointer
-	private int left;
-	private int top;
-	private int bottom;
-	private int height;
-	private int width;
-	private int originX;
-	private int originY;
-	private int halfWidth;
-	private int halfHeight;
-	private Paint paintBrushBlack = new Paint(Paint.ANTI_ALIAS_FLAG);
-	private Paint paintBrushTitle = new Paint(Paint.ANTI_ALIAS_FLAG);
-	private Paint paintBrushStdText = new Paint(Paint.ANTI_ALIAS_FLAG);
-	private RectF rect;
-	private DemoQuaternion q;
-	private VirtualPointer pointer = null;
-	private String str = null;
-	private A_FSL_Sensor_Demo demo;
+    private int x;  // only used for "mouse mode", same X,Y coordinate system as pointer
+    private int y;  // only used for "mouse mode", same X,Y coordinate system as pointer
+    private int left;
+    private int top;
+    private int bottom;
+    private int height;
+    private int width;
+    private int originX;
+    private int originY;
+    private int halfWidth;
+    private int halfHeight;
+    private Paint paintBrushBlack = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint paintBrushTitle = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint paintBrushStdText = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private RectF rect;
+    private DemoQuaternion q;
+    private VirtualPointer pointer = null;
+    private String str = null;
+    private A_FSL_Sensor_Demo demo;
 
     private void compute_scale() {
-		left = getLeft();
-		bottom = getBottom();
-		top = getTop();
-		width = getWidth();
-		height = getHeight();
-		halfWidth = width/2;
-		halfHeight = height/2;
-		originX = left + halfWidth;
-		originY = (top + bottom)/2;
-		pointer.updateSensitivity(halfWidth, halfHeight); 
+        left = getLeft();
+        bottom = getBottom();
+        top = getTop();
+        width = getWidth();
+        height = getHeight();
+        halfWidth = width / 2;
+        halfHeight = height / 2;
+        originX = left + halfWidth;
+        originY = (top + bottom) / 2;
+        pointer.updateSensitivity(halfWidth, halfHeight);
     }
-	public MyCanvas(Context context) {
-		super(context);
-		x=y=0;
-		demo = (A_FSL_Sensor_Demo) context;
-		pointer = new VirtualPointer();
-		q = new DemoQuaternion();
-		str = new String();
 
-		paintBrushBlack.setTextSize(24);
-		paintBrushBlack.setColor(Color.WHITE);
-		paintBrushBlack.setStrokeWidth(2);
-		
-		paintBrushTitle.setTypeface(Typeface.MONOSPACE);
-		paintBrushTitle.setTextSize(34);
-		paintBrushTitle.setColor(Color.WHITE);
-		paintBrushTitle.setTextAlign(Paint.Align.CENTER);
-		
-		paintBrushStdText.setTextSize(16);
-		paintBrushStdText.setColor(Color.WHITE);
-		paintBrushStdText.setTextAlign(Paint.Align.CENTER);
-				
-		LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(
-				LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-		this.setLayoutParams(tlp);
-		this.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				center();			
-			}
-			
-		});
-	}
-	private void updateCursor(Canvas canvas) {
-		// converts from cartesian coordinates to canvas coordinates
-		int radius=10;
-		int canvasX = originX + x;
-		int canvasY = originY - y;
-		int left, top, right, bottom;
-		left = canvasX + - radius;
-		right = canvasX + radius;
-		top = canvasY - radius;
-		bottom = canvasY + radius;
-		rect = new RectF(left, top, right, bottom);
-		canvas.drawRect(rect, paintBrushStdText);
-	}
-	public void center() {
-		A_FSL_Sensor_Demo.self.dataSelector.getQuaternion(q);
-		pointer.center(q);
-		x=y=0;
-		invalidate();  // force re-draw
-	}
-	private void drawLabel(Canvas canvas) {
-		int yPtr = originY-200;
-		canvas.drawText("Wireless Pointer", originX, yPtr, paintBrushTitle);
-		str = String.format("X=%6d Y=%6d", x, y);
-		canvas.drawText(str, originX, yPtr+50, paintBrushTitle);		
-		canvas.drawText("Touch screen to center cursor", originX, yPtr+100,  paintBrushTitle);						
-		canvas.drawText("This function only works with sensor development boards.", originX, yPtr+150,  paintBrushStdText);
-		canvas.drawText("Re-center after changing data Source.", originX, yPtr+175,  paintBrushStdText);		
-	}
-	@Override
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-		boolean mouseMode = !demo.absoluteModeRequired(); // is the demo configured for relative or absolute pointer?
-		compute_scale();  // get screen dimensions and compute pointer sensitivity
-		A_FSL_Sensor_Demo.self.dataSelector.getQuaternion(q); // update q with the current orientation quaternion
-		pointer.update(q, mouseMode); // compute our new pointer values
-		if (mouseMode) {
-			// integrate in mouse mode
-			x += pointer.x;
-			y += pointer.y;			
-		} else {
-			// use as-is in absolute mode
-			x = pointer.x;
-			y = pointer.y;
-		}
-		x = MyUtils.limitI(x, halfWidth);  // limit X to +/- the width of the screen
-		y = MyUtils.limitI(y, halfHeight); // limit Y to +/- the width of the screen
-		drawLabel(canvas); // writes X & Y values to screen
-		updateCursor(canvas); // draws the cursor
-		demo.makeConsolesStale();  // renders screen consoles stale - not mouse related
-	}
+    public MyCanvas(Context context) {
+        super(context);
+        x = y = 0;
+        demo = (A_FSL_Sensor_Demo) context;
+        pointer = new VirtualPointer();
+        q = new DemoQuaternion();
+        str = new String();
+
+        paintBrushBlack.setTextSize(24);
+        paintBrushBlack.setColor(Color.WHITE);
+        paintBrushBlack.setStrokeWidth(2);
+
+        paintBrushTitle.setTypeface(Typeface.MONOSPACE);
+        paintBrushTitle.setTextSize(34);
+        paintBrushTitle.setColor(Color.WHITE);
+        paintBrushTitle.setTextAlign(Paint.Align.CENTER);
+
+        paintBrushStdText.setTextSize(16);
+        paintBrushStdText.setColor(Color.WHITE);
+        paintBrushStdText.setTextAlign(Paint.Align.CENTER);
+
+        LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(
+                LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+        this.setLayoutParams(tlp);
+        this.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                center();
+            }
+
+        });
+    }
+
+    private void updateCursor(Canvas canvas) {
+        // converts from cartesian coordinates to canvas coordinates
+        int radius = 10;
+        int canvasX = originX + x;
+        int canvasY = originY - y;
+        int left, top, right, bottom;
+        left = canvasX + -radius;
+        right = canvasX + radius;
+        top = canvasY - radius;
+        bottom = canvasY + radius;
+        rect = new RectF(left, top, right, bottom);
+        canvas.drawRect(rect, paintBrushStdText);
+    }
+
+    public void center() {
+        A_FSL_Sensor_Demo.self.dataSelector.getQuaternion(q);
+        pointer.center(q);
+        x = y = 0;
+        invalidate();  // force re-draw
+    }
+
+    private void drawLabel(Canvas canvas) {
+        int yPtr = originY - 200;
+        canvas.drawText("Wireless Pointer", originX, yPtr, paintBrushTitle);
+        str = String.format("X=%6d Y=%6d", x, y);
+        canvas.drawText(str, originX, yPtr + 50, paintBrushTitle);
+        canvas.drawText("Touch screen to center cursor", originX, yPtr + 100, paintBrushTitle);
+        canvas.drawText("This function only works with sensor development boards.", originX, yPtr + 150, paintBrushStdText);
+        canvas.drawText("Re-center after changing data Source.", originX, yPtr + 175, paintBrushStdText);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        boolean mouseMode = !demo.absoluteModeRequired(); // is the demo configured for relative or absolute pointer?
+        compute_scale();  // get screen dimensions and compute pointer sensitivity
+        A_FSL_Sensor_Demo.self.dataSelector.getQuaternion(q); // update q with the current orientation quaternion
+        pointer.update(q, mouseMode); // compute our new pointer values
+        if (mouseMode) {
+            // integrate in mouse mode
+            x += pointer.x;
+            y += pointer.y;
+        } else {
+            // use as-is in absolute mode
+            x = pointer.x;
+            y = pointer.y;
+        }
+        x = MyUtils.limitI(x, halfWidth);  // limit X to +/- the width of the screen
+        y = MyUtils.limitI(y, halfHeight); // limit Y to +/- the width of the screen
+        drawLabel(canvas); // writes X & Y values to screen
+        updateCursor(canvas); // draws the cursor
+    }
 
 }

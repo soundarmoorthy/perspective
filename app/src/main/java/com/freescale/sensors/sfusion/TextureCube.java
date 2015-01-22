@@ -31,11 +31,14 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+
 import javax.microedition.khronos.opengles.GL10;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLUtils;
+
 /*
 
 /**
@@ -50,198 +53,212 @@ import android.opengl.GLUtils;
  * @author Michael Stanley
 */
 public class TextureCube {
-   private int front, left, back, right, top, bottom;
-   public String description = null; // used for debug purposes
-   private FloatBuffer vertexArrayBuffer; // Buffer for vertex-array
-   private FloatBuffer textureBuffer;    // Buffer for texture-coords-array 
-   private float w, l, h; // w=screen_width(x)/2, l=length(y)/2, h=screen_height(z)/2
-   public float offset;  // perspective offset/2
-   private float[] vertices = { // Vertices for top and bottom
-      -1.0f, -1.0f, 0.0f,  // 0. left-bottom-front
-       1.0f, -1.0f, 0.0f,  // 1. right-bottom-front
-      -1.0f,  1.0f, 0.0f,  // 2. left-top-front
-       1.0f,  1.0f, 0.0f,  // 3. right-top-front
-      -1.0f, -1.0f, 0.0f,  // 0. left-bottom-front
-       1.0f, -1.0f, 0.0f,  // 1. right-bottom-front
-      -1.0f,  1.0f, 0.0f,  // 2. left-top-front
-       1.0f,  1.0f, 0.0f,  // 3. right-top-front
-      -1.0f, -1.0f, 0.0f,  // 0. left-bottom-front
-       1.0f, -1.0f, 0.0f,  // 1. right-bottom-front
-      -1.0f,  1.0f, 0.0f,  // 2. left-top-front
-       1.0f,  1.0f, 0.0f   // 3. right-top-front
-   };
-  
-   float[] textureCoordinates = { // Texture coords for the above face 
-      0.0f, 1.0f,  // A. left-bottom (NEW)
-      1.0f, 1.0f,  // B. right-bottom (NEW)
-      0.0f, 0.0f,  // C. left-top (NEW)
-      1.0f, 0.0f,  // D. right-top (NEW)
-      0.0f, 1.0f,  // A. left-bottom (NEW)
-      1.0f, 1.0f,  // B. right-bottom (NEW)
-      0.0f, 0.0f,  // C. left-top (NEW)
-      1.0f, 0.0f,  // D. right-top (NEW)
-      0.0f, 1.0f,  // A. left-bottom (NEW)
-      1.0f, 1.0f,  // B. right-bottom (NEW)
-      0.0f, 0.0f,  // C. left-top (NEW)
-      1.0f, 0.0f   // D. right-top (NEW)
-   };
-   int[] textureIds = new int[6];   // Array for 1 texture-ID 
-     
-   // Constructor - Set up the buffers
-   //public TextureCube(float w, float l, float h) {
-   public TextureCube(int[] surfaces, float[] dimensions, String desc) {
-	   assert(dimensions.length==3); 
-	   this.description = new String(desc);
-	   this.w = dimensions[0];
-	   this.l = dimensions[1];
-	   this.h = dimensions[2];
-	   this.offset = dimensions[3];
-	   this.front = surfaces[0];
-	   this.left = surfaces[1];
-	   this.back = surfaces[2];
-	   this.right = surfaces[3];
-	   this.top = surfaces[4];
-	   this.bottom = surfaces[5];
+    private int front, left, back, right, top, bottom;
+    public String description = null; // used for debug purposes
+    private FloatBuffer vertexArrayBuffer; // Buffer for vertex-array
+    private FloatBuffer textureBuffer;    // Buffer for texture-coords-array
+    private float w, l, h; // w=screen_width(x)/2, l=length(y)/2, h=screen_height(z)/2
+    public float offset;  // perspective offset/2
+    private float[] vertices = { // Vertices for top and bottom
+            -1.0f, -1.0f, 0.0f,  // 0. left-bottom-front
+            1.0f, -1.0f, 0.0f,  // 1. right-bottom-front
+            -1.0f, 1.0f, 0.0f,  // 2. left-top-front
+            1.0f, 1.0f, 0.0f,  // 3. right-top-front
+            -1.0f, -1.0f, 0.0f,  // 0. left-bottom-front
+            1.0f, -1.0f, 0.0f,  // 1. right-bottom-front
+            -1.0f, 1.0f, 0.0f,  // 2. left-top-front
+            1.0f, 1.0f, 0.0f,  // 3. right-top-front
+            -1.0f, -1.0f, 0.0f,  // 0. left-bottom-front
+            1.0f, -1.0f, 0.0f,  // 1. right-bottom-front
+            -1.0f, 1.0f, 0.0f,  // 2. left-top-front
+            1.0f, 1.0f, 0.0f   // 3. right-top-front
+    };
 
-	   // scale for top & bottom
-	  vertices[0]*=w; vertices[1]*=l; 
-	  vertices[3]*=w; vertices[4]*=l; 
-	  vertices[6]*=w; vertices[7]*=l; 
-	  vertices[9]*=w; vertices[10]*=l; 
+    float[] textureCoordinates = { // Texture coords for the above face
+            0.0f, 1.0f,  // A. left-bottom (NEW)
+            1.0f, 1.0f,  // B. right-bottom (NEW)
+            0.0f, 0.0f,  // C. left-top (NEW)
+            1.0f, 0.0f,  // D. right-top (NEW)
+            0.0f, 1.0f,  // A. left-bottom (NEW)
+            1.0f, 1.0f,  // B. right-bottom (NEW)
+            0.0f, 0.0f,  // C. left-top (NEW)
+            1.0f, 0.0f,  // D. right-top (NEW)
+            0.0f, 1.0f,  // A. left-bottom (NEW)
+            1.0f, 1.0f,  // B. right-bottom (NEW)
+            0.0f, 0.0f,  // C. left-top (NEW)
+            1.0f, 0.0f   // D. right-top (NEW)
+    };
+    int[] textureIds = new int[6];   // Array for 1 texture-ID
 
-	  // scale for left and right
-	  vertices[12]*=l; vertices[13]*=h; 
-	  vertices[15]*=l; vertices[16]*=h; 
-	  vertices[18]*=l; vertices[19]*=h; 
-	  vertices[21]*=l; vertices[22]*=h; 
+    // Constructor - Set up the buffers
+    //public TextureCube(float w, float l, float h) {
+    public TextureCube(int[] surfaces, float[] dimensions, String desc) {
+        assert (dimensions.length == 3);
+        this.description = new String(desc);
+        this.w = dimensions[0];
+        this.l = dimensions[1];
+        this.h = dimensions[2];
+        this.offset = dimensions[3];
+        this.front = surfaces[0];
+        this.left = surfaces[1];
+        this.back = surfaces[2];
+        this.right = surfaces[3];
+        this.top = surfaces[4];
+        this.bottom = surfaces[5];
 
-	  // scale for front and back
-	  vertices[24]*=w; vertices[25]*=h; 
-	  vertices[27]*=w; vertices[28]*=h; 
-	  vertices[30]*=w; vertices[31]*=h; 
-	  vertices[33]*=w; vertices[34]*=h; 
+        // scale for top & bottom
+        vertices[0] *= w;
+        vertices[1] *= l;
+        vertices[3] *= w;
+        vertices[4] *= l;
+        vertices[6] *= w;
+        vertices[7] *= l;
+        vertices[9] *= w;
+        vertices[10] *= l;
 
-	  // Setup vertex-array buffer. Vertices in float. An float has 4 bytes
-      ByteBuffer vbb0 = ByteBuffer.allocateDirect(vertices.length * 4);
-      vbb0.order(ByteOrder.nativeOrder());   // Use native byte order
-      vertexArrayBuffer = vbb0.asFloatBuffer(); // Convert from byte to float
-      vertexArrayBuffer.put(vertices);      // Copy data into buffer
-      vertexArrayBuffer.position(0);           // Rewind
-   
-      // Setup texture-coords-array buffer, in float. An float has 4 bytes (NEW)
-      ByteBuffer tbb = ByteBuffer.allocateDirect(textureCoordinates.length * 4);
-      tbb.order(ByteOrder.nativeOrder());
-      textureBuffer = tbb.asFloatBuffer();
-      textureBuffer.put(textureCoordinates);
-      textureBuffer.position(0);      
-   }
-   
-   // Draw the shape
-   public void draw(GL10 gl) {
-      gl.glFrontFace(GL10.GL_CCW);    // Front face in counter-clockwise orientation
-   
-      gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-      gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexArrayBuffer);
-      gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);  // Enable texture-coords-array 
-      gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer); // Define texture-coords buffer 
-      
-      gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
-      gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+        // scale for left and right
+        vertices[12] *= l;
+        vertices[13] *= h;
+        vertices[15] *= l;
+        vertices[16] *= h;
+        vertices[18] *= l;
+        vertices[19] *= h;
+        vertices[21] *= l;
+        vertices[22] *= h;
 
-	  gl.glEnable(GL10.GL_TEXTURE_2D);
-  
-      // left
-      gl.glPushMatrix();
-	  gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[1]);
-      gl.glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
-      gl.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-      gl.glTranslatef(0.0f, 0.0f, -w);
-      gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 4, 4);
-      gl.glPopMatrix();
-  
-  
-      // right
-      gl.glPushMatrix();
-	  gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[3]);
-      gl.glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
-      gl.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-      gl.glTranslatef(0.0f, 0.0f, -w);
-      gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 4, 4);
-      gl.glPopMatrix();
-  
-      // front
-      gl.glPushMatrix();
-	  gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[0]);
-      gl.glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
-      gl.glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-      gl.glTranslatef(0.0f, 0.0f, l);
-      gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 8, 4);
-      gl.glPopMatrix();
-  
-      // back
-      gl.glPushMatrix();
-	  gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[2]);
-      gl.glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
-      gl.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-      gl.glTranslatef(0.0f, 0.0f, -l);
-      gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 8, 4);
-      gl.glPopMatrix();
+        // scale for front and back
+        vertices[24] *= w;
+        vertices[25] *= h;
+        vertices[27] *= w;
+        vertices[28] *= h;
+        vertices[30] *= w;
+        vertices[31] *= h;
+        vertices[33] *= w;
+        vertices[34] *= h;
 
-      // top
-      gl.glPushMatrix();
-	  gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[4]);
-      gl.glTranslatef(0.0f, 0.0f, h);
-      gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
-      gl.glPopMatrix();
+        // Setup vertex-array buffer. Vertices in float. An float has 4 bytes
+        ByteBuffer vbb0 = ByteBuffer.allocateDirect(vertices.length * 4);
+        vbb0.order(ByteOrder.nativeOrder());   // Use native byte order
+        vertexArrayBuffer = vbb0.asFloatBuffer(); // Convert from byte to float
+        vertexArrayBuffer.put(vertices);      // Copy data into buffer
+        vertexArrayBuffer.position(0);           // Rewind
 
-      // bottom
-      gl.glPushMatrix();
-	  gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[5]);
-      gl.glTranslatef(0.0f, 0.0f, -h);
-      gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
-      gl.glPopMatrix();
-  
-      gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);  // Disable texture-coords-array (NEW)
-      gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-      gl.glDisable(GL10.GL_CULL_FACE);
-   }
-   public void loadTextures(GL10 gl, Context context) {
-	   loadTexture(gl, context, 0, this.front);
-	   loadTexture(gl, context, 1, this.left);
-	   loadTexture(gl, context, 2, this.back);
-	   loadTexture(gl, context, 3, this.right);
-	   loadTexture(gl, context, 4, this.top);
-	   loadTexture(gl, context, 5, this.bottom);
-   }
-  
-   // Load an image into GL texture
-   public void loadTexture(GL10 gl, Context context, int index, int image) {
-	      // image is of the form R.drawable.floor
+        // Setup texture-coords-array buffer, in float. An float has 4 bytes (NEW)
+        ByteBuffer tbb = ByteBuffer.allocateDirect(textureCoordinates.length * 4);
+        tbb.order(ByteOrder.nativeOrder());
+        textureBuffer = tbb.asFloatBuffer();
+        textureBuffer.put(textureCoordinates);
+        textureBuffer.position(0);
+    }
 
-	  if (index==0) {
-		  gl.glGenTextures(6, textureIds, 0); // Generate texture-ID array
-	  } else {
-		  
-	  }
- 
-      gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[index]);   // Bind to texture ID
-      // Set up texture filters
-      gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
-      gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
-  
-      InputStream istream = context.getResources().openRawResource(image);
-      Bitmap bitmap;
-      try {
-         // Read and decode input as bitmap
-         bitmap = BitmapFactory.decodeStream(istream);
-      } finally {
-         try {
-            istream.close();
-         } catch(IOException e) { }
-      }
-  
-      // Build Texture from loaded bitmap for the currently-bind texture ID
-      GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-      bitmap.recycle();
-   }
+    // Draw the shape
+    public void draw(GL10 gl) {
+        gl.glFrontFace(GL10.GL_CCW);    // Front face in counter-clockwise orientation
+
+        gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexArrayBuffer);
+        gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);  // Enable texture-coords-array
+        gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer); // Define texture-coords buffer
+
+        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+
+        gl.glEnable(GL10.GL_TEXTURE_2D);
+
+        // left
+        gl.glPushMatrix();
+        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[1]);
+        gl.glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+        gl.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+        gl.glTranslatef(0.0f, 0.0f, -w);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 4, 4);
+        gl.glPopMatrix();
+
+
+        // right
+        gl.glPushMatrix();
+        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[3]);
+        gl.glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
+        gl.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+        gl.glTranslatef(0.0f, 0.0f, -w);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 4, 4);
+        gl.glPopMatrix();
+
+        // front
+        gl.glPushMatrix();
+        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[0]);
+        gl.glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+        gl.glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+        gl.glTranslatef(0.0f, 0.0f, l);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 8, 4);
+        gl.glPopMatrix();
+
+        // back
+        gl.glPushMatrix();
+        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[2]);
+        gl.glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
+        gl.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+        gl.glTranslatef(0.0f, 0.0f, -l);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 8, 4);
+        gl.glPopMatrix();
+
+        // top
+        gl.glPushMatrix();
+        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[4]);
+        gl.glTranslatef(0.0f, 0.0f, h);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+        gl.glPopMatrix();
+
+        // bottom
+        gl.glPushMatrix();
+        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[5]);
+        gl.glTranslatef(0.0f, 0.0f, -h);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+        gl.glPopMatrix();
+
+        gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);  // Disable texture-coords-array (NEW)
+        gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+        gl.glDisable(GL10.GL_CULL_FACE);
+    }
+
+    public void loadTextures(GL10 gl, Context context) {
+        loadTexture(gl, context, 0, this.front);
+        loadTexture(gl, context, 1, this.left);
+        loadTexture(gl, context, 2, this.back);
+        loadTexture(gl, context, 3, this.right);
+        loadTexture(gl, context, 4, this.top);
+        loadTexture(gl, context, 5, this.bottom);
+    }
+
+    // Load an image into GL texture
+    public void loadTexture(GL10 gl, Context context, int index, int image) {
+        // image is of the form R.drawable.floor
+
+        if (index == 0) {
+            gl.glGenTextures(6, textureIds, 0); // Generate texture-ID array
+        } else {
+
+        }
+
+        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIds[index]);   // Bind to texture ID
+        // Set up texture filters
+        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+
+        InputStream istream = context.getResources().openRawResource(image);
+        Bitmap bitmap;
+        try {
+            // Read and decode input as bitmap
+            bitmap = BitmapFactory.decodeStream(istream);
+        } finally {
+            try {
+                istream.close();
+            } catch (IOException e) {
+            }
+        }
+
+        // Build Texture from loaded bitmap for the currently-bind texture ID
+        GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+        bitmap.recycle();
+    }
 }

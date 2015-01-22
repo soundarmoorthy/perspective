@@ -35,35 +35,35 @@ package com.freescale.sensors.sfusion;
 import java.util.ArrayList;
 
 public class PayloadPool {
-	public int maxPayloads;
-	int maxClaimed;
-	ArrayList<Payload> PayloadPool = new ArrayList<Payload>();
-	
-	PayloadPool(int size) {
-		maxPayloads = size;
-		int i;
-		maxClaimed=-1;
-		for (i=0; i<size; i++) {
-			PayloadPool.add(new Payload(i));
-		}
-	}
-	
-	public Payload getInstance() {
-		int size = PayloadPool.size();
-		Payload pl = null;
-		for (int i=0; i<size; i++) {
-			pl = PayloadPool.get(i);
-			if (pl.claim()) {
-				if (i>maxClaimed) {
-					maxClaimed=i; // track the maximum payload claimed.
-					//Log.i(A_FSL_Sensor_Demo.LOG_TAG, "Payload pool usage extended to index " + maxClaimed);
-				}
-				return(pl);
-			}
-		}
-		//Log.w(A_FSL_Sensor_Demo.LOG_TAG, "Demand exceeded size of payload pool = " + maxPayloads + "\n");
-		return(null);
-	}
+    public int maxPayloads;
+    int maxClaimed;
+    ArrayList<Payload> PayloadPool = new ArrayList<Payload>();
+
+    PayloadPool(int size) {
+        maxPayloads = size;
+        int i;
+        maxClaimed = -1;
+        for (i = 0; i < size; i++) {
+            PayloadPool.add(new Payload(i));
+        }
+    }
+
+    public Payload getInstance() {
+        int size = PayloadPool.size();
+        Payload pl = null;
+        for (int i = 0; i < size; i++) {
+            pl = PayloadPool.get(i);
+            if (pl.claim()) {
+                if (i > maxClaimed) {
+                    maxClaimed = i; // track the maximum payload claimed.
+                    //Log.i(A_FSL_Sensor_Demo.LOG_TAG, "Payload pool usage extended to index " + maxClaimed);
+                }
+                return (pl);
+            }
+        }
+        //Log.w(A_FSL_Sensor_Demo.LOG_TAG, "Demand exceeded size of payload pool = " + maxPayloads + "\n");
+        return (null);
+    }
 }
 
 

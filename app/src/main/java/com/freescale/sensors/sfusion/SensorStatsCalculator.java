@@ -32,65 +32,68 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.freescale.sensors.sfusion;
 
 public class SensorStatsCalculator {
-	private float mn = 9999;
-	public float mean = 0;
-	private float mx = -9999;
-	public float min=mn;
-	public float max=mx;
-	public float variance = 0;
-	public float stddev = 0;
-	private float sumX = 0;
-	private float sumXX = 0;
-	private int n=0;	
-	public boolean dataReady = false;
-	
-	// Call tick() at every sample
-	public synchronized void tick(float newValue, float newValueSquared) {
-		if (newValue<mn) mn=newValue;
-		if (newValue>mx) mx=newValue;
-		sumX += newValue;
-		sumXX += newValueSquared;
-		n += 1;
-	}
-	public void clear() {
-		clear(true);
-	}
-	/**
-	 * The SensorStatsCalculator four states:
-	 * 1) Not calculating (statsLoggingEnable at the sensor level = 0)
-	 * 2) calculating (statsLoggingEnable && (numSamples<maxSamples))
-	 * 3) stats available and continuously updating (dataReady=true AND states of (2)
-	 * 4) stats available and NOT updating (dataReady=true AND (statsLoggingEnable=false OR (numSamples<maxSamples))
-	 * clear() only clears the variables used to compute stats, not the statistical results themselves
-	 * 
-	 * @param all set to true to clear dataReady
-	 */
-	public synchronized void clear(boolean all) {
-		mn = 9999;
-		mx = -9999;
-		sumX = 0;
-		sumXX = 0;
-		n=0;	
-		if (all) dataReady = false;
-	}
+    private float mn = 9999;
+    public float mean = 0;
+    private float mx = -9999;
+    public float min = mn;
+    public float max = mx;
+    public float variance = 0;
+    public float stddev = 0;
+    private float sumX = 0;
+    private float sumXX = 0;
+    private int n = 0;
+    public boolean dataReady = false;
 
-	// Call compute after the tick on the last sample of a sequence
-	public synchronized void compute() {
-		mean = sumX/(float) n;
-		double temp = (n*sumXX - sumX*sumX)/(float) (n*(n-1));
-		variance = (float) temp;
-		stddev = (float) Math.sqrt(temp);
-		min=mn;
-		max=mx;
-		clear(false);
-		dataReady=true;
-	}
-	public synchronized void snapshot(SensorStatsCalculator old) {
-		this.mean = old.mean;
-		this.min = old.min;
-		this.max = old.max;
-		this.variance = old.variance;
-		this.stddev = old.stddev;
-		this.dataReady = old.dataReady;
-	}
+    // Call tick() at every sample
+    public synchronized void tick(float newValue, float newValueSquared) {
+        if (newValue < mn) mn = newValue;
+        if (newValue > mx) mx = newValue;
+        sumX += newValue;
+        sumXX += newValueSquared;
+        n += 1;
+    }
+
+    public void clear() {
+        clear(true);
+    }
+
+    /**
+     * The SensorStatsCalculator four states:
+     * 1) Not calculating (statsLoggingEnable at the sensor level = 0)
+     * 2) calculating (statsLoggingEnable && (numSamples<maxSamples))
+     * 3) stats available and continuously updating (dataReady=true AND states of (2)
+     * 4) stats available and NOT updating (dataReady=true AND (statsLoggingEnable=false OR (numSamples<maxSamples))
+     * clear() only clears the variables used to compute stats, not the statistical results themselves
+     *
+     * @param all set to true to clear dataReady
+     */
+    public synchronized void clear(boolean all) {
+        mn = 9999;
+        mx = -9999;
+        sumX = 0;
+        sumXX = 0;
+        n = 0;
+        if (all) dataReady = false;
+    }
+
+    // Call compute after the tick on the last sample of a sequence
+    public synchronized void compute() {
+        mean = sumX / (float) n;
+        double temp = (n * sumXX - sumX * sumX) / (float) (n * (n - 1));
+        variance = (float) temp;
+        stddev = (float) Math.sqrt(temp);
+        min = mn;
+        max = mx;
+        clear(false);
+        dataReady = true;
+    }
+
+    public synchronized void snapshot(SensorStatsCalculator old) {
+        this.mean = old.mean;
+        this.min = old.min;
+        this.max = old.max;
+        this.variance = old.variance;
+        this.stddev = old.stddev;
+        this.dataReady = old.dataReady;
+    }
 }
