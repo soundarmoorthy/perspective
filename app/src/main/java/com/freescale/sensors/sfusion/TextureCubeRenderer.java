@@ -190,16 +190,6 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
 		   this.cubes[i].draw(gl); 
 	   }
 
-	   if (demo.dumpScreen) {
-		   // This may stall the refresh momentarily, but that's OK
-		   Uri uri = GraphicScreenDump.SavePNG(gl, screenWidth, screenHeight, "demo.png");
-		   if (uri == null) {
-			   A_FSL_Sensor_Demo.write(true, "Could not create graphic dump demo.png\n");
-		   } else {
-			   demo.sharePng(uri, "Freescale Sensor Fusion Room Screen Dump");
-		   }
-		   demo.dumpScreen=false;
-	   }
 	   demo.makeConsolesStale();
 
    }

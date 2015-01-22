@@ -83,10 +83,6 @@ public class DataSelector {
 		updateSelection();
 		return(choice.statsReady());
 	}
-	HtmlGenerator dumpStatsAsHtml() {
-		updateSelection();
-		return(choice.dumpStatsAsHtml());
-	}
 
 	synchronized void adjustForZero(RotationVector rv, DemoQuaternion q) {
 		if (demo.zeroPending) {

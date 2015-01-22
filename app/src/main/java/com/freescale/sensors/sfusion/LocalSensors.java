@@ -80,28 +80,9 @@ class LocalSensors extends SensorsWrapper {
 	}
 
 	void computeQuaternion(DemoQuaternion result, Algorithm algorithm) {
-		switch (algorithm) {
-		case ACC_ONLY:
-			float[] a = acc().array();
-			float[] axis = new float[3];
-			float[] baseline_axis = {0f, 0f, 1.0f}; 
-			float angle = MyUtils.axisAngle(axis, baseline_axis, a);
-			result.computeFromAxisAngle(angle, axis);			
-			break;
-		case ACC_MAG:
-			float[] rotationMatrix = new float[9];
-			SensorManager.getRotationMatrix(rotationMatrix, null, acc().array(), mag().array());
-			result.computeFromRM(rotationMatrix);
-			break;
-		case NINE_AXIS:
 			assert(hasLocalGyro());
 			result.set(super.quaternion());
 			result.reverse();
-			break;
-		case NONE:
-		default:
-			Log.i(A_FSL_Sensor_Demo.LOG_TAG, "Quaternion from UNKNOWN\n");
-		}
 	}
 
 	public boolean valsHaveBeenSet() {
@@ -308,25 +289,21 @@ class LocalSensors extends SensorsWrapper {
     					event.values[0]/(float) g, 
     					event.values[1]/(float) g, 
     					event.values[2]/(float) g);
-    			if (demo.legacyDumpEnabled) dump_acc();
      			break;
     		case Sensor.TYPE_GYROSCOPE:
     			gyro.update(	event.timestamp, 
     					event.values[0], 
     					event.values[1], 
     					event.values[2]);
-    			if (demo.legacyDumpEnabled) dump_gyro();
     			break;
     		case Sensor.TYPE_MAGNETIC_FIELD:
     			mag.update(	event.timestamp, 
     					event.values[0], 
     					event.values[1], 
     					event.values[2]);
-    			if (demo.legacyDumpEnabled) dump_mag();
     			break;
     		case Sensor.TYPE_ROTATION_VECTOR:
     			updateRotation(event.timestamp, event.values);
-    			if (demo.legacyDumpEnabled) dump_quaternion();
     			break;
     		}
     	}
@@ -335,24 +312,4 @@ class LocalSensors extends SensorsWrapper {
 			// Not needed for this application
 		}
     };
-    @Override
-	public String getSensorDescription(SensorType type) {
-		String str = null;
-		switch (type) {
-		case ACCEL:
-			str = getSensorDescription(localAcc, "accelerometer", "m/s^2", "g", (float) g);
-			break;
-		case MAG:
-			str = getSensorDescription(localMag, "magnetometer", "micro-Teslas", null, 1);
-			break;
-		case GYRO:
-			str = getSensorDescription(localGyro, "gyro", "radians/sec", "dps", (float) radiansPerDegree);
-			break;
-		case QUAT:
-			str = getSensorDescription(localRotationVectorSensor, "rotation vector sensor", "degrees", null, 1);
-			break;
-		}
-		return str;
-	}
-
-}    
+}

@@ -95,7 +95,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	public MyCanvas canvasApplet = null;            // Used to demonstrate air mouse features
 	public ViewGroup canvasFrame;                   
 	public enum GuiState {                          // GuiState defines the different states that the user interface can take on
-		LOGGING, DEVICE, PANORAMA, STATS, DOCS, CANVAS
+		DEVICE
 	}
 
 	public enum DataSource {                        // DataSource defines the various "sources" of sensor data
@@ -103,7 +103,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	}
 
 	public enum Algorithm {                         // These are the choices of algorithms that are supported by the embedded code
-		NONE, ACC_ONLY, MAG_ONLY, GYRO_ONLY, ACC_MAG, ACC_GYRO, NINE_AXIS
+		NONE, NINE_AXIS
 	}
 	
 	public enum DevelopmentBoard {                  // List of supported development boards.  Note that KL16Z is a placeholder.
@@ -155,20 +155,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	
 	// Options Menu definitions
 	private final int SET_PREFERENCES_MENU_ITEM = Menu.FIRST;
-	private final int VIEW_STATS_REPORT_MENU_ITEM = SET_PREFERENCES_MENU_ITEM + 1;
-	private final int TOGGLE_MENU_ITEM = VIEW_STATS_REPORT_MENU_ITEM + 1;
-	private final int TOGGLE_HEX_DISPLAY_ITEM = TOGGLE_MENU_ITEM + 1;
-	private final int TOGGLE_LEGACY_DISPLAY_ITEM = TOGGLE_HEX_DISPLAY_ITEM + 1;
-	private final int TOGGLE_CSV_DISPLAY_ITEM = TOGGLE_LEGACY_DISPLAY_ITEM + 1;
-	private final int TOGGLE_VIRTUAL_GYRO_ENABLE_ITEM = TOGGLE_CSV_DISPLAY_ITEM + 1;
-	private final int TOGGLE_RPC_ENABLE_ITEM = TOGGLE_VIRTUAL_GYRO_ENABLE_ITEM + 1;
-	private final int CLS_MENU_ITEM = TOGGLE_RPC_ENABLE_ITEM + 1;
-	private final int DUMP_CONFIG_MENU_ITEM = CLS_MENU_ITEM + 1;
-	private final int ABOUT_MENU_ITEM = DUMP_CONFIG_MENU_ITEM + 1;
-	private final int HELP_MENU_ITEM = ABOUT_MENU_ITEM + 1;
-	private final int FEEDBACK_MENU_ITEM = HELP_MENU_ITEM + 1;
-	private final int UNIT_TEST_MENU_ITEM = FEEDBACK_MENU_ITEM + 1;
-	
+
 	public final String PREF_NAME = "A_FSL_Sensor_Demo";  // String for retrieving shared preferences
 	public SharedPreferences myPrefs;                     // Structure for preferences
 	private float filterCoefficient = 0;                  // Used to control low pass filtering
@@ -211,22 +198,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	final private int WWW_PAGE = 15;
 
 	static void loadUrls() {
-		urls[0] = "file:///android_asset/index.html";	// Overview
-		urls[1] = "file:///android_asset/OrientationPart1.html"; 	// Rotations and Orientation: Part 1
-		urls[2] = "file:///android_asset/OrientationPart2.html";	// Rotations and Orientation: Part 2
-		urls[3] = "file:///android_asset/algorithms.html";	// Algorithms
-		urls[4] = "file:///android_asset/statistics.html";	// Gathering Statistics
-		urls[5] = "file:///android_asset/hardware.html";	// Hardware & Software Requirements
-		urls[6] = "file:///android_asset/packet_structure.html";	// Bluetooth Packet Structure
-		urls[7] = "file:///android_asset/logging.html";		// Data Logger
-		urls[8] = "file:///android_asset/device.html";		// Device View
-		urls[9] = "file:///android_asset/panorama.html";	// Panorama View
-		urls[10] = "file:///android_asset/canvas.html";			// Canvas View
-		urls[11] = "file:///android_asset/credits.html";		// Credits
-		urls[12] = "file:///android_asset/preferences.html";	// Setting Preferences
-		urls[13] = "file:///android_asset/change_log.html";		// Change Log
-		urls[14] = "http://www.freescale.com/sensors";			// Freescale Semiconductor Web Site
-		urls[15] = "http://www.google.com";						// General WWW
 	}
 
 	/**
@@ -287,8 +258,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		return(sts);
 	}
 	public boolean absoluteModeRequired() {
-		boolean sts = ((dataSource == DataSource.REMOTE))
-				&& (guiState==GuiState.CANVAS) && (absoluteRemoteView == true);
+		boolean sts = (dataSource == DataSource.REMOTE)&& (absoluteRemoteView == true);
 		return(sts);
 	}
 
@@ -409,19 +379,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	 *            String to be printed.
 	 * */
 	static public void write(Boolean always, String str) {
-		Message msg = Message.obtain();
-		if (always) {
-			msg.what = 1; // unconditional
-		} else {
-			msg.what = 2; // only posts if log window is visible
-		}
-		msg.obj = str;
-		msg.arg1 = fileLoggingEnabled; // 0=no, 1=yes
-		if (dataLogger!=null) {
-			dataLogger.getHandler().sendMessage(msg);
-		} else {
-		   Log.e(LOG_TAG, "Null datalogger pointer found in write() function.\n");
-		}
 	}
 
 	static private class MyHandler extends Handler {
@@ -447,15 +404,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	}
 
 	public MyHandler logHandler = new MyHandler(this);
-	static public Handler alertHandler = new Handler() {
-		// Messages to this handler are sent by class WiGo.
-		public void handleMessage(Message msg) {
-			if (msg.what == 1) { // the Logging Window needs an update
-				MyUtils.alert("External WiFi not visible!", msg.obj.toString()); 
-			}
-		}
-	};
-
 	/**
 	 * clears the logging window. Also sends a message to the dataLogger class
 	 * telling it to close the log file (if open).
@@ -479,10 +427,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	 * @return msg containing app name, copyright and program version.
 	 */
 	public String prompt() {
-		String msg = "Xtrinsic Sensor Fusion Demo\n"
-				+ "Copyright 2013 by Freescale Semiconductor\n"
-				+ "Program Version = " + appVersion() + "\n\n";
-		return (msg);
+		return ("It works, really");
 	}
 	public String appVersion() {
 		String versionName = "";
@@ -493,160 +438,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 			versionName = "unknown";
 		}
 		return (versionName);
-	}
-
-	/**
-	 * Function uses Android email intent to share the contents of the current
-	 * output file.
-	 * <P>
-	 * The user must have an Android email client that supports the standard
-	 * "intent" mechanism installed in order for this feature to work properly.
-	 * <P>
-	 * The "to" field of the email is pre-filled based on the Preferences
-	 * "my_email" field.
-	 */
-	public void shareLogFile() {
-		File f = MyUtils.getFile(DataLogger.fileName);
-		if (f.exists()) {
-			write(true, "\n\nThe absolute pathname for the log file is " + f.getAbsolutePath() + "\n");
-			Uri uri = Uri.fromFile(f);
-			String prefName = "A_FSL_Sensor_Demo";
-			SharedPreferences myPrefs = getSharedPreferences(prefName,
-					Activity.MODE_PRIVATE);
-			String feedbackEmailAddr  = A_FSL_Sensor_Demo.self.getString(R.string.feedbackEmailAddr);
-			String[] recipients = new String[] { myPrefs.getString("my_email", feedbackEmailAddr) };
-
-			Intent intent = new Intent(Intent.ACTION_SEND);
-			intent.setType("text/plain");
-			intent.putExtra(Intent.EXTRA_SUBJECT,
-					"Freescale Sensor Fusion Log File");
-			intent.putExtra(Intent.EXTRA_STREAM, uri);
-			intent.putExtra(Intent.EXTRA_EMAIL, recipients);
-			intent.putExtra(android.content.Intent.EXTRA_TEXT,
-					"Created by Freescale");
-			startActivity(Intent.createChooser(intent, "Email:"));
-		} else {
-			String msg = "Output file = " + f.getAbsolutePath()
-					+ " does not exist.";
-			MyUtils.alert("File does not exist", msg);
-		}
-	}
-	public void shareStatsReport() {
-		if (dataSelector.statsReady()) {
-			HtmlGenerator html = dataSelector.dumpStatsAsHtml();
-			if (html.ok) {
-				Uri uri = html.uri;
-				String prefName = "A_FSL_Sensor_Demo";
-				SharedPreferences myPrefs = getSharedPreferences(prefName,
-						Activity.MODE_PRIVATE);
-				String feedbackEmailAddr  = A_FSL_Sensor_Demo.self.getString(R.string.feedbackEmailAddr);
-				String[] recipients = new String[] { myPrefs.getString("my_email", feedbackEmailAddr) };
-
-				Intent intent = new Intent(Intent.ACTION_SEND);
-				intent.setType("text/html");
-				intent.putExtra(Intent.EXTRA_SUBJECT,
-						"Freescale Sensor Fusion Statistics File");
-				intent.putExtra(Intent.EXTRA_STREAM, uri);
-				intent.putExtra(Intent.EXTRA_EMAIL, recipients);
-				intent.putExtra(android.content.Intent.EXTRA_TEXT,
-						"Created by Freescale");
-				startActivity(Intent.createChooser(intent, "Email:"));
-			} else {
-				String msg = "HTML statistics file = " + html.fullFileName
-						+ " could not be created.";
-				MyUtils.alert("File does not exist", msg);
-			}
-		} else {
-			String msg = "You must be displaying the Statistic page and sufficient time must have " +
-					"elapsed to collect required samples before calling this function.";
-			MyUtils.alert("Too soon!", msg);
-		}
-	}
-	public void viewStatsReport() {
-		if (dataSelector.statsReady()) {
-			HtmlGenerator html = dataSelector.dumpStatsAsHtml();
-			if (html.ok) {
-				Uri uri = html.uri;
-				Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setDataAndType(uri, "text/html");
-				startActivity(Intent.createChooser(intent, "View HTML"));
-			} else {
-				String msg = "HTML statistics file = " + html.fullFileName
-						+ " could not be created.";
-				MyUtils.alert("File does not exist", msg);
-			}
-		} else {
-			String msg = "You must be displaying the Statistic page and sufficient time must have " +
-					"elapsed to collect required samples before calling this function.";
-			MyUtils.alert("Too soon!", msg);
-		}
-	}
-
-	/**
-	 * Function uses Android email intent to share the a dump of the graphic
-	 * screen.
-	 * <P>
-	 * The user must have an Android email client that supports the standard
-	 * "intent" mechanism installed in order for this feature to work properly.
-	 * <P>
-	 * The "to" field of the email is pre-filled based on the Preferences
-	 * "my_email" field.
-	 * 
-	 * @param uri
-	 *            a URI pointing to the previously created graphics file
-	 * @param description
-	 *            a string describing the item to be shared (used for subject
-	 *            line of the email).
-	 */
-	public void sharePng(Uri uri, String description) {
-		String prefName = "A_FSL_Sensor_Demo";
-		SharedPreferences myPrefs = getSharedPreferences(prefName,
-				Activity.MODE_PRIVATE);
-		String feedbackEmailAddr  = A_FSL_Sensor_Demo.self.getString(R.string.feedbackEmailAddr);
-		String[] recipients = new String[] { myPrefs.getString("my_email", feedbackEmailAddr) };
-
-		Intent intent = new Intent(Intent.ACTION_SEND);
-		intent.setType("image/png");
-		intent.putExtra(Intent.EXTRA_SUBJECT, description);
-		intent.putExtra(Intent.EXTRA_STREAM, uri);
-		intent.putExtra(Intent.EXTRA_EMAIL, recipients);
-		intent.putExtra(android.content.Intent.EXTRA_TEXT,
-				"Created by Freescale");
-		startActivity(Intent.createChooser(intent, "Email:"));
-	}
-
-	/**
-	 * Function uses Android email intent to share the a dump of the log window.
-	 * <P>
-	 * The user must have an Android email client that supports the standard
-	 * "intent" mechanism installed in order for this feature to work properly.
-	 * <P>
-	 * The "to" field of the email is pre-filled based on the Preferences
-	 * "my_email" field.
-	 * 
-	 * @param description
-	 *            a string describing the item to be shared (used for subject
-	 *            line of the email).
-	 */
-	public void shareTranscript(String description) {
-		// Long timestamp = System.currentTimeMillis();
-		String prefName = "A_FSL_Sensor_Demo";
-		SharedPreferences myPrefs = getSharedPreferences(prefName,
-				Activity.MODE_PRIVATE);
-		String feedbackEmailAddr  = A_FSL_Sensor_Demo.self.getString(R.string.feedbackEmailAddr);
-		String[] recipients = new String[] { myPrefs.getString("my_email", feedbackEmailAddr) };
-
-		Intent intent = new Intent(Intent.ACTION_SEND);
-		intent.setType("text/plain");
-		intent.putExtra(Intent.EXTRA_SUBJECT, description);
-		intent.putExtra(android.content.Intent.EXTRA_TEXT, tv1.getText());
-		if (!recipients[0].equals("")) {
-			// this is conditional because otherwise we get a "," in the email
-			// "to" field when
-			// there is no predefined email field in the preferences
-			intent.putExtra(Intent.EXTRA_EMAIL, recipients);
-		}
-		startActivity(Intent.createChooser(intent, "Email:"));
 	}
 
 	/**
@@ -686,10 +477,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		CheckBox lpfEnable = (CheckBox) findViewById(R.id.lpf_enable);
 		LinearLayout filterCoefWrapper = (LinearLayout) findViewById(R.id.filter_coef_wrapper);
 		//;
-		boolean b1 = (dataSource==DataSource.LOCAL) && (algorithm == Algorithm.ACC_MAG);
-		boolean b2 = (dataSource==DataSource.LOCAL) && (algorithm == Algorithm.ACC_ONLY);
-		boolean b3 = algorithm == Algorithm.ACC_ONLY;
-		boolean lpfAllowed = (guiState != GuiState.DOCS) && (b1 || b2 || b3);
+		boolean lpfAllowed = true;
 		if (lpfAllowed) {
 			lpfEnable.setVisibility(View.VISIBLE);
 			if (lpfEnable.isChecked()) {
@@ -751,25 +539,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		clearConsole2();
 		this.guiState = guiState;
 		switch (guiState) {
-		case LOGGING:
-			pcbGlview.setVisibility(View.GONE);
-			roomGlview.setVisibility(View.GONE);
-			graphicFrame.setVisibility(View.GONE);
-			canvasFrame.setVisibility(View.GONE);
-			absolute.setVisibility(View.GONE);
-			flEnable.setVisibility(View.VISIBLE);
-			zeroCheckBox.setVisibility(View.GONE);
-			disableZeroFunction(zeroCheckBox);
-			numMsgsField.setVisibility(View.VISIBLE);
-			loggingWindow.setVisibility(View.VISIBLE);
-			dataSourcePopup.setVisibility(View.VISIBLE);
-			statistics.show(false);
-			configureDocOptions(splitScreen);
-			if (localSensors != null) {
-				localSensors.clear(); // zero out acc, mag & gyro settings
-			}
-			configureConsoles(false);
-			break;
 		case DEVICE:
 			pcbGlview.setVisibility(View.VISIBLE);
 			roomGlview.setVisibility(View.GONE);
@@ -791,72 +560,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 			statistics.show(false);
 			configureConsoles(this.dataSource==DataSource.REMOTE);
 			break;
-		case PANORAMA:
-			absolute.setVisibility(View.GONE);
-			zeroCheckBox.setVisibility(View.GONE);
-			disableZeroFunction(zeroCheckBox);
-			pcbGlview.setVisibility(View.GONE);
-			roomGlview.setVisibility(View.VISIBLE);
-			graphicFrame.setVisibility(View.VISIBLE);
-			canvasFrame.setVisibility(View.GONE);
-			flEnable.setVisibility(View.GONE);
-			numMsgsField.setVisibility(View.GONE);
-			loggingWindow.setVisibility(View.GONE);
-			dataSourcePopup.setVisibility(View.VISIBLE);
-			configureDocOptions(splitScreen);
-			statistics.show(false);
-			configureConsoles(false);
-			break;
-		case STATS:
-			absolute.setVisibility(View.GONE);
-			zeroCheckBox.setVisibility(View.GONE);
-			disableZeroFunction(zeroCheckBox);
-			pcbGlview.setVisibility(View.GONE);
-			roomGlview.setVisibility(View.GONE);
-			graphicFrame.setVisibility(View.GONE);
-			canvasFrame.setVisibility(View.GONE);
-			flEnable.setVisibility(View.GONE);
-			numMsgsField.setVisibility(View.GONE);
-			loggingWindow.setVisibility(View.GONE);
-			dataSourcePopup.setVisibility(View.VISIBLE);
-			configureDocOptions(splitScreen);
-			Statistics.configureStatsPage();
-			statistics.show(true);
-			configureConsoles(false);
-			break;
-		case CANVAS:
-			absolute.setVisibility(View.VISIBLE);
-			zeroCheckBox.setVisibility(View.GONE);
-			disableZeroFunction(zeroCheckBox);
-			pcbGlview.setVisibility(View.GONE);
-			roomGlview.setVisibility(View.GONE);
-			graphicFrame.setVisibility(View.GONE);
-			canvasFrame.setVisibility(View.VISIBLE);
-			flEnable.setVisibility(View.GONE);
-			numMsgsField.setVisibility(View.GONE);
-			loggingWindow.setVisibility(View.GONE);
-			dataSourcePopup.setVisibility(View.VISIBLE);
-			configureDocOptions(splitScreen);
-			statistics.show(false);
-			configureConsoles(false);
-			canvasApplet.center();
-			break;
-		case DOCS:
-			absolute.setVisibility(View.GONE);
-			zeroCheckBox.setVisibility(View.GONE);
-			disableZeroFunction(zeroCheckBox);
-			pcbGlview.setVisibility(View.GONE);
-			roomGlview.setVisibility(View.GONE);
-			flEnable.setVisibility(View.GONE);
-			numMsgsField.setVisibility(View.GONE);
-			graphicFrame.setVisibility(View.GONE);
-			canvasFrame.setVisibility(View.GONE);
-			dataSourcePopup.setVisibility(View.GONE);
-			loggingWindow.setVisibility(View.GONE);
-			configureDocOptions(true);
-			statistics.show(false);
-			configureConsoles(false);
-			break;
 		}
 		updateSensors();
 		statistics.configureStatsGathering(statsSampleSize, statsOneShot, resetStats);
@@ -865,39 +568,13 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 
 
 	/**
-	 * creates and configures the popup for the "Source" button. Only options
-	 * supported by the current hardware are enabled
-	 * <P>
-	 * This callback is specified in activity_main.xml on the data_source_popup
-	 * button.
-	 * 
-	 * @param v
-	 *            a pointer to the object associated with this callback (in this
-	 *            case, the "Source" button)
+     * Add the source options menu to the dialog
 	 */
 	public void showDataSelector(View v) {
 		PopupMenu popup = new PopupMenu(this, v);
 		MenuInflater inflater = popup.getMenuInflater();
 		inflater.inflate(R.menu.data_source_options, popup.getMenu());
 		popup.setOnMenuItemClickListener(this);
-		if (!localSensors.hasLocalGyro()) {
-			popup.getMenu().getItem(3).setEnabled(false); // disable 9-axis
-															// local option on
-															// menu
-		}
-		if ((imu!=null) && (!imu.isReady())) {
-			popup.getMenu().getItem(4).setEnabled(false); // disable IMU options
-			popup.getMenu().getItem(5).setEnabled(false);
-			popup.getMenu().getItem(6).setEnabled(false);
-			popup.getMenu().getItem(7).setEnabled(false);
-			popup.getMenu().getItem(8).setEnabled(false);
-			popup.getMenu().getItem(9).setEnabled(false);
-		}
-		if ((imu!=null) && (developmentBoard == DevelopmentBoard.KL46Z_Standalone)) {
-			popup.getMenu().getItem(6).setEnabled(false); // disable non-gyro options
-			popup.getMenu().getItem(8).setEnabled(false);
-			popup.getMenu().getItem(9).setEnabled(false);
-		}
 		popup.show();
 	}
 	public void showSampleSizeSelector(View v) {
@@ -962,53 +639,20 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		if (itemId == R.id.stopped) {
 			dataSource = DataSource.STOPPED;
 			algorithm = Algorithm.NONE;
-			menuButton.setText("Source = STOPPED");
-		} else if (itemId == R.id.local_accel) {
-			dataSource = DataSource.LOCAL;
-			algorithm = Algorithm.ACC_ONLY;
-			menuButton.setText("Source = Local Accel");
-		} else if (itemId == R.id.local_mag_accel) {
-			dataSource = DataSource.LOCAL;
-			algorithm = Algorithm.ACC_MAG;
-			menuButton.setText("Source = Local Mag/Accel");
+			menuButton.setText("STOPPED");
 		} else if (itemId == R.id.local_9_axis) {
 			dataSource = DataSource.LOCAL;
 			algorithm = Algorithm.NINE_AXIS;
-			menuButton.setText("Source = Local 9-Axis");
-		} else if (itemId == R.id.remote_acc) {
-			dataSource = DataSource.REMOTE;
-			algorithm = Algorithm.ACC_ONLY;
-			menuButton.setText("Source = Remote Accel");
-			if (imu!=null) imu.useQ3();
-		} else if (itemId == R.id.remote_mag) {
-			dataSource = DataSource.REMOTE;
-			algorithm = Algorithm.MAG_ONLY;
-			menuButton.setText("Source = Remote Mag (2D algorithm)");
-			if (imu!=null) imu.useQ3M();
-		} else if (itemId == R.id.remote_gyro) {
-			dataSource = DataSource.REMOTE;
-			algorithm = Algorithm.GYRO_ONLY;
-			menuButton.setText("Source = Remote Gyro");
-			if (imu!=null) imu.useQ3G();
-		} else if (itemId == R.id.remote_accel_mag) {
-			dataSource = DataSource.REMOTE;
-			algorithm = Algorithm.ACC_MAG;
-			menuButton.setText("Source = Remote Accel/Mag");
-			if (imu!=null) imu.useQ6MA();
-		} else if (itemId == R.id.remote_accel_gyro) {
-			dataSource = DataSource.REMOTE;
-			algorithm = Algorithm.ACC_GYRO;
-			menuButton.setText("Source = Remote Accel/Gyro");
-			if (imu!=null) imu.useQ6AG();
+			menuButton.setText("LOCAL 9 AXIS");
 		} else if (itemId == R.id.remote_9_axis) {
 			dataSource = DataSource.REMOTE;
 			algorithm = Algorithm.NINE_AXIS;
-			menuButton.setText("Source = Remote 9-Axis");
+			menuButton.setText("REMOTE 9 AXIS");
 			if (imu!=null) imu.useQ9();
 		} else if (itemId == R.id.fixed) {
 			dataSource = DataSource.FIXED;
 			algorithm = Algorithm.NONE;
-			menuButton.setText("Source = Fixed Rotation");
+			menuButton.setText("FIXED");
 		} else if (itemId == R.id.stats_sample_size_10) {
 			statsSampleSize=10;
 		} else if (itemId == R.id.stats_sample_size_100) {
@@ -1022,7 +666,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		} else if (itemId == R.id.stats_one_shot) {
 			statsOneShot=true;
 			MyUtils.waitALittle(2000);
-			MyUtils.beep();
 		} else if (itemId == R.id.stats_continuous) {
 			statsOneShot=false;
 		} else {
@@ -1042,7 +685,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		boolean loadImu = true;
-		//dumpStates("calling onCreate()"); // Just a bunch of Log.i's
 		Log.i(LOG_TAG, "calling onCreate()");
 		myPrefs = getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
 		int orientationChoice = myPrefs.getInt("orientation", 0);
@@ -1294,51 +936,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(0, SET_PREFERENCES_MENU_ITEM, 0, "Preferences");
-		menu.add(0, VIEW_STATS_REPORT_MENU_ITEM, 0, "View Statistics Report");
-		menu.add(0, TOGGLE_MENU_ITEM, 0, "Toggle Split Screen");
-		
-		hexDumpMenuItem = menu.add(0, TOGGLE_HEX_DISPLAY_ITEM, 0, "Toggle Hex Dump (Remote/WiGo only)");
-		legacyDumpMenuItem = menu.add(0, TOGGLE_LEGACY_DISPLAY_ITEM, 0, "Toggle Legacy Dump");
-		csvDumpMenuItem = menu.add(0, TOGGLE_CSV_DISPLAY_ITEM, 0, "Toggle CSV Dump (Remote/WiGo only)");
-		changeHexMenuLabel(hexDumpEnabled);
-		changeLegacyMenuLabel(legacyDumpEnabled);
-		changeCsvMenuLabel(csvDumpEnabled);
-		
-		menu.add(0, CLS_MENU_ITEM, 0, "Clear Log Window");
-		menu.add(0, DUMP_CONFIG_MENU_ITEM, 0, "Dump Android Configuration");
-		menu.add(0, ABOUT_MENU_ITEM, 0, "About");
-		menu.add(0, HELP_MENU_ITEM, 0, "Help");
-		menu.add(0, FEEDBACK_MENU_ITEM, 0, "Feedback");
-		/*
-		menu.add(0, UNIT_TEST_MENU_ITEM, 0, "Unit Test A");
-		menu.add(0, UNIT_TEST_MENU_ITEM+1, 0, "Unit Test D");
-		menu.add(0, UNIT_TEST_MENU_ITEM+2, 0, "Unit Test Q");
-		menu.add(0, UNIT_TEST_MENU_ITEM+3, 0, "Unit Test R");
-		*/
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.navigator, menu);
 		return super.onCreateOptionsMenu(menu);
-	}
-	void changeLegacyMenuLabel(boolean enabled) {
-		if (enabled) {
-			legacyDumpMenuItem.setTitle("Disable legacy dump");
-		} else {
-			legacyDumpMenuItem.setTitle("Enable legacy dump");			
-		}
-	}
-	void changeHexMenuLabel(boolean enabled) {
-		if (enabled) {
-			hexDumpMenuItem.setTitle("Disable hex dump (Remote/Wi-Go only)");
-		} else {
-			hexDumpMenuItem.setTitle("Enable hex dump (Remote/Wi-Go only)");			
-		}
-	}
-	void changeCsvMenuLabel(boolean enabled) {
-		if (enabled) {
-			csvDumpMenuItem.setTitle("Disable csv dump (Remote/Wi-Go only)");
-		} else {
-			csvDumpMenuItem.setTitle("Enable csv dump (Remote/Wi-Go only)");			
-		}
 	}
 
 	/**
@@ -1351,131 +949,10 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		case SET_PREFERENCES_MENU_ITEM:
 			startActivity(new Intent(this, Settings.class));
 			return true;
-		case VIEW_STATS_REPORT_MENU_ITEM:
-			viewStatsReport();
-			return true;
-		case TOGGLE_MENU_ITEM:
-			splitScreen = !splitScreen;
-			configureApplicationViews(guiState, false);
-			return true;
-		case TOGGLE_HEX_DISPLAY_ITEM:
-			hexDumpEnabled = ! hexDumpEnabled;
-			changeHexMenuLabel(hexDumpEnabled);
-			return true;
-		case TOGGLE_LEGACY_DISPLAY_ITEM:
-			legacyDumpEnabled = ! legacyDumpEnabled;
-			changeLegacyMenuLabel(legacyDumpEnabled);
-			return true;
-		case TOGGLE_CSV_DISPLAY_ITEM:
-			csvDumpEnabled = ! csvDumpEnabled;
-			changeCsvMenuLabel(csvDumpEnabled);
-			return true;
-		case CLS_MENU_ITEM:
-			cls();
-			return true;
-		case DUMP_CONFIG_MENU_ITEM:
-			localSensors.dump();
-			return true;
-		case ABOUT_MENU_ITEM: // still need to add ABOUT screen
-			String title = "About";
-			String versionName = "";
-			try {
-				versionName = getPackageManager().getPackageInfo(
-						getPackageName(), 0).versionName;
-			} catch (Throwable t) {
-				versionName = "unknown";
-			}
-			String msg = "Copyright 2013 by Freescale Semiconductor\nProgram Version = "
-					+ versionName
-					+ "\n"
-					+ "This sensor fusion demo is provided as is for the convenience of the sensor design "
-					+ "community and Freescale does not warrant the accuracy of the results or their "
-					+ "suitability for any specific purpose. Users are responsible for validating the "
-					+ "accuracy and appropriateness of the results before using them in their designs and analyses.";
-			MyUtils.popupAlert(title, msg);
-			break;
-		case HELP_MENU_ITEM:
-			currentDocPage = 0;
-			configureApplicationViews(GuiState.DOCS, false);
-			return true;
-		case FEEDBACK_MENU_ITEM: // This is just a convenient spot to add unit
-									// tests during development
-			configureApplicationViews(GuiState.LOGGING, false);
-			cls();
-			write(true, "-------------------------\n");
-			write(true, " I like:\n");
-			write(true, " I don't like:\n");
-			write(true, " Could you add:\n");
-			write(true, "-------------------------\n");
-			write(true, "My Android configuration is:\n\n");
-			localSensors.dump();
-			// now wait for the print queue to clear
-			Handler h = new Handler();
-			h.postDelayed(new Runnable() {
-				public void run() {
-					shareTranscript("Feedback on Freescale Sensor Fusion App for Android");
-				}
-			}, 2 * DataLogger.refreshInterval);
-			return true;
-		case UNIT_TEST_MENU_ITEM:
-			if (imu!=null) imu.sendTo("A   ");
-			MyUtils.beep();
-			return true;
-		case UNIT_TEST_MENU_ITEM+1:
-			if (imu!=null) imu.sendTo("D   ");
-			MyUtils.beep();
-			return true;
-		case UNIT_TEST_MENU_ITEM+2:
-			if (imu!=null) imu.sendTo("Q   ");
-			MyUtils.beep();
-			return true;
-		case UNIT_TEST_MENU_ITEM+3:
-			if (imu!=null) imu.sendTo("R   ");
-			MyUtils.beep();
-			return true;
-		case R.id.logger:
-			configureApplicationViews(GuiState.LOGGING, false);
-			return true;
-		case R.id.canvas:
-			configureApplicationViews(GuiState.CANVAS, false);
-			return true;
-		case R.id.dev:
+            default:
 			configureApplicationViews(GuiState.DEVICE, false);
 			return true;
-		case R.id.pan:
-			// Panorama View
-			configureApplicationViews(GuiState.PANORAMA, false);
-			return true;
-		case R.id.stats:
-			// Statistics Screen
-			configureApplicationViews(GuiState.STATS, true);
-			return true;
-		case R.id.doc:
-			// Documentation View
-			configureApplicationViews(GuiState.DOCS, false);
-			return true;
-		case R.id.share_screen:
-			// Share
-			dumpScreen = true; // Flag to request render to dump a PNG file of
-								// the graphic screen
-			return true;
-		case R.id.share_transcript:
-			// Share Transcript
-			shareTranscript("Freescale demo transcript");
-			return true;
-		case R.id.share_output_file:
-			// Share output file
-			shareLogFile();
-			return true;
-		case R.id.share_stats:
-			// Share output file
-			shareStatsReport();
-			return true;
 		}
-		return false;
-	}
-	void unitTest() {
-		write(true, "Unit test currently tests NOTHING\n");
 	}
 
 	/**
@@ -1490,11 +967,8 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		configureApplicationViews(guiState, true); // Override default set in
 		// activity_main.xml
 		// previously used imu_names include "Gen5" and "Motorola"
-		boolean remote_enable = myPrefs.getBoolean("remote_enable", false);
-		if (remote_enable) {
 			if ((imu!=null) && (!imu.isListening())) {
 				imu.startBluetooth();
-			}
 		}
 	}
 	@Override
@@ -1554,8 +1028,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		//Log.v(LOG_TAG, "begin onDestroy() from A_FSL_Sensor_Demo");	
-		//dumpStates("calling onDestroy()");
 		if (imu!=null) {
 			imu.stop(true); // release BT threads 
 		}
@@ -1568,7 +1040,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	 */
 	@Override
 	public void onPause() {
-		//dumpStates("calling onPause()");
 		super.onPause();
 	}
 
@@ -1579,8 +1050,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	 */
 	@Override
 	public void onResume() {
-		//dumpStates("calling onResume(), updating sensors.");
-		updateSensors(); // sensors are disabled onStop(). This gets them back.
+		updateSensors();
 		super.onResume();
 	}
 
@@ -1590,7 +1060,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	 */
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		//dumpStates("calling onRestoreInstanceState()");
 
 		super.onRestoreInstanceState(savedInstanceState);
 		if (savedInstanceState != null) {
@@ -1600,5 +1069,4 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 			developmentBoard = DevelopmentBoard.values()[savedInstanceState.getInt(DEVBOARD)];
 		}
 	}
-
 }

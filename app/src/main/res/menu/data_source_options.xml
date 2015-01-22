@@ -6,37 +6,9 @@
         android:orderInCategory="1"
         android:title="Stopped"/>
     <item
-        android:id="@+id/local_accel"
-        android:orderInCategory="2"
-        android:title="Local accel"/>
-    <item
-        android:id="@+id/local_mag_accel"
-        android:orderInCategory="3"
-        android:title="Local mag/accel"/>
-    <item
         android:id="@+id/local_9_axis"
         android:orderInCategory="4"
         android:title="Local 9-axis"/>
-    <item
-        android:id="@+id/remote_acc"
-        android:orderInCategory="5"
-        android:title="Remote accel"/>
-    <item
-        android:id="@+id/remote_mag"
-        android:orderInCategory="6"
-        android:title="Remote mag (2D algorithm)"/>
-    <item
-        android:id="@+id/remote_gyro"
-        android:orderInCategory="7"
-        android:title="Remote gyroscope"/>
-    <item
-        android:id="@+id/remote_accel_mag"
-        android:orderInCategory="8"
-        android:title="Remote accel/mag"/>
-    <item
-        android:id="@+id/remote_accel_gyro"
-        android:orderInCategory="9"
-        android:title="Remote accel/gyro"/>
     <item
         android:id="@+id/remote_9_axis"
         android:orderInCategory="10"

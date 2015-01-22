@@ -84,60 +84,9 @@ public class DataLogger extends Thread{
 	}
 	@Override
 	public synchronized void run() {
-		// Message format:
-		// what=1: unconditional log statement
-		// what=2: log only when the GUI is set to LOGGING
-		// what=3: clear the buffer, close the output file
-		// arg1: 0=no file logging, anything else=file logging
-		Looper.prepare();
-		handlerFromUi = new Handler() {
-			public void handleMessage(Message msg) {
-				String s = null;
-				synchronized(lock) {
-					fileLoggingEnabled = (msg.arg1!=0);
-					switch (msg.what) {
-					case 1: // always log
-						s = msg.obj.toString();
-						updateLoggingWindowQueue(s); 
-						writeToFile(s);	// file may or may not be updated depending upon other factors						
-						break;
-					case 2: // log only if logging window is active
-						s = msg.obj.toString();
-						if (demo.guiState==GuiState.LOGGING) {  // only update when the log window is visible
-							updateLoggingWindowQueue(s);
-						}
-						writeToFile(s);	// file may or may not be updated depending upon other factors					
-						break;
-					case 3: // Clear
-						numMsgs=0;
-						messageStrings.clear();
-						loggingWindowUpToDate = true;
-						closeFile(); // will automatically be reopened & overwritten later if needed
-						numMsgsLoggedToFile = 0;
-						break;
-					default: // not currently used
-					}
-				}
-			}
-		};
-		Looper.loop();
 	}
+
 	private void updateLoggingWindowQueue(String str) {
-		try {
-			if (numMsgs < maxMessages) {
-				numMsgs = numMsgs + 1;
-			} else {
-				messageStrings.remove(0);
-			}
-			messageStrings.add(str);
-		} catch (Throwable t) {
-			// We'll just loose any message with problems
-			t.printStackTrace();
-		}
-		if (loggingWindowUpToDate) {
-			periodicHandler.postDelayed(logUpdaterTask,  refreshInterval);
-			loggingWindowUpToDate = false;
-		}
 	}
 
 	private Runnable logUpdaterTask = new Runnable() {

@@ -197,9 +197,6 @@ public class TimedQuaternion extends DemoQuaternion {
 				magStats.compute();
 				angleStats.compute();
 				rateStats.compute();
-				if (statsOneShot) {
-					MyUtils.beep();
-				}
 				// status period is complete.  Finish out the calculations
 			} 
 		}	

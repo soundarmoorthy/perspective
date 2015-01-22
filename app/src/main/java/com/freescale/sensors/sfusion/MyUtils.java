@@ -49,19 +49,7 @@ public class MyUtils {
 	MyUtils(A_FSL_Sensor_Demo demo) {
 		MyUtils.demo=demo;
 	}
-	static public void beep() {
-		demo.toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 1000);
-	}
-	static public void alert(String title, String msg) {
-		if (demo.guiState==GuiState.LOGGING) {
-			A_FSL_Sensor_Demo.write(true, msg);
-		} else {
-			AlertDialog.Builder builder = new AlertDialog.Builder(demo);
-			builder.setTitle(title).setMessage(msg).setCancelable(true);
-			builder.setNegativeButton("OK", null);
-			builder.show();
-		}	
-	}
+
 	static public float[] transpose(float[] orig_rm) {
 		// Input matrix is of the form:
 		// rm0 rm1 rm2

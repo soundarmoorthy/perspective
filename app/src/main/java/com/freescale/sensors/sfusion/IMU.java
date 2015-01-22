@@ -171,11 +171,6 @@ class IMU extends SensorsWrapper {
     }
 	void computeQuaternion(DemoQuaternion result, Algorithm algorithm) {
 		switch (algorithm) {
-		case ACC_ONLY: // As of 13 August 2013, the development board will send any of 3, 6 or 9-axis quaternions
-		case MAG_ONLY: // added 10 Jan 2014
-		case GYRO_ONLY: // added 10 Jan 2014
-		case ACC_MAG:
-		case ACC_GYRO:
 		case NINE_AXIS:
 			result.set(super.quaternion());
 			break;
@@ -221,11 +216,6 @@ class IMU extends SensorsWrapper {
 				quatInputs[1] = (float) bb.getShort(26)/30000f;
 				quatInputs[2] = (float) bb.getShort(28)/30000f;
 				quatInputs[3] = (float) bb.getShort(30)/30000f;
-			} else if (demo.algorithm==Algorithm.ACC_MAG) {
-				quatInputs[0] = (float) bb.getShort(32)/30000f;
-				quatInputs[1] = (float) bb.getShort(34)/30000f;
-				quatInputs[2] = (float) bb.getShort(36)/30000f;
-				quatInputs[3] = (float) bb.getShort(38)/30000f;
 			}
 			if (recordSize<41) {
 				flags = (int)   bb.get(32);
@@ -278,18 +268,6 @@ class IMU extends SensorsWrapper {
 			acc.set(timestamp, acc_lsb*ax, acc_lsb*ay, acc_lsb*az);
 			mag.set(timestamp, mag_lsb*mx, mag_lsb*my, mag_lsb*mz);
 			gyro.set(timestamp, gyro_lsb*gx, gyro_lsb*gy, gyro_lsb*gz);
-			if (demo.legacyDumpEnabled) {
-				dump_acc();
-				dump_mag();
-				dump_gyro();
-				dump_quaternion();
-			}
-			if (demo.csvDumpEnabled) {
-				dump9AxisCsv();
-			}
-			if (demo.guiState==GuiState.CANVAS) {
-				demo.canvasApplet.invalidate();
-			}
 			break;
 		case 2:
 			retVal = ImuRecordType.DEBUG;
@@ -401,16 +379,6 @@ class IMU extends SensorsWrapper {
 	String expectedPacketDescriptor() {
 		String str = "unknown";
 		switch(demo.algorithm) {
-		case ACC_ONLY: str = "ACC only";
-			break;
-		case MAG_ONLY: str = "MAG only";
-			break;
-		case GYRO_ONLY: str = "GYRO only";
-			break;
-		case ACC_MAG: str = "ACC+MAG";
-			break;
-		case ACC_GYRO: str = "ACC+GYRO";
-			break;
 		case NINE_AXIS: str = "9-axis";
 			break;
 		case NONE: // included only to eliminate compiler warning
@@ -425,29 +393,7 @@ class IMU extends SensorsWrapper {
 		flags = flags & 0xF;
 		String str="";
 		switch(flags) {
-		case 1: 
-			if (demo.algorithm==A_FSL_Sensor_Demo.Algorithm.ACC_ONLY) sts=true;
-			else if (demo.algorithm==A_FSL_Sensor_Demo.Algorithm.GYRO_ONLY) sts=true;
-			else str = "Got GYRO or ACC only packet, expected " + expectedPacketDescriptor();
-			break;
-		case 2: 
-			if (demo.algorithm==A_FSL_Sensor_Demo.Algorithm.ACC_MAG) sts=true;
-			else if (demo.algorithm==A_FSL_Sensor_Demo.Algorithm.MAG_ONLY) sts=true;
-			else str = "Got MAG only or ACC+MAG packet, expected " + expectedPacketDescriptor();
-			break;
-		case 3:
-			if (demo.algorithm==A_FSL_Sensor_Demo.Algorithm.GYRO_ONLY) sts=true;
-			else str = "Got GYRO only packet, expected " + expectedPacketDescriptor();
-			break;
-		case 4: 
-			if (demo.algorithm==A_FSL_Sensor_Demo.Algorithm.ACC_GYRO) sts=true;
-			else str = "Got ACC+GYRO packet, expected " + expectedPacketDescriptor();
-			break;
-		case 6:
-			if (demo.algorithm==A_FSL_Sensor_Demo.Algorithm.MAG_ONLY) sts=true;
-			else str = "Got MAG only packet, expected " + expectedPacketDescriptor();
-			break;
-		case 8: 
+		case 8:
 			if (demo.algorithm==A_FSL_Sensor_Demo.Algorithm.NINE_AXIS) sts=true;
 			else str = "Got 9-axis packet, expected " + expectedPacketDescriptor();
 			break;
@@ -460,7 +406,6 @@ class IMU extends SensorsWrapper {
 			if (numWrongPackets>3) { 
 				// the choice of 3 wrong packets is somewhat arbitrary.
 				// seeing 1 or 2 when switching packet types is reasonable.
-				MyUtils.beep();
 				A_FSL_Sensor_Demo.write(true, str+"\n");
 			}
 		}
