@@ -61,7 +61,6 @@ public class DataSelector {
 		switch (demo.dataSource) {
 		case LOCAL: choice=demo.localSensors; break;
 		case REMOTE: choice=demo.imu; break;
-		case WIGO:   choice=demo.wigo; break;
 		case STOPPED: choice=this.stopped; break;
 		case FIXED: choice=this.fixed; break;
 		default:
@@ -122,17 +121,6 @@ public class DataSelector {
 				adjustForZero(rv, workingQuaternion2);
 			}
 			break;
-		case WIGO:
-			demo.wigo.computeQuaternion(workingQuaternion2, demo.algorithm);
-			if (demo.dualModeRequired()) {
-				workingQuaternion3.set(demo.localSensors.quaternion());
-				workingQuaternion3.reverse();
-				workingQuaternion1.eqPxQ(workingQuaternion3, workingQuaternion2);
-				adjustForZero(rv, workingQuaternion1);
-			} else {
-				adjustForZero(rv, workingQuaternion2);
-			}
-			break;			
 		case STOPPED:
 			if (demo.guiState == GuiState.DEVICE) {
 				rv.set(MyUtils.AngleUnits.DEGREES, 0, 0, 0, 1);
@@ -167,9 +155,6 @@ public class DataSelector {
 		case REMOTE:
 			demo.imu.computeQuaternion(q, demo.algorithm);
 			break;
-		case WIGO:
-			demo.wigo.computeQuaternion(q, demo.algorithm);
-			break;			
 		case STOPPED:
 		case FIXED:
 		default:

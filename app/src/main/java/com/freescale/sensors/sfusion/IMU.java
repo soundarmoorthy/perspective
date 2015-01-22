@@ -326,8 +326,6 @@ class IMU extends SensorsWrapper {
 						str += String.format("\nBoard = KL46Z Standalone");
 						break;
 					case KL16Z:
-					case WIGO:
-						// these are not supported in the IMU.  Case options included strictly to remove compiler warnings.
 					}
 					for (i=6; i<recordSize; i+=2) {
 						shortInt = bb.getShort(i); 

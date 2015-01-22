@@ -42,14 +42,6 @@
         android:orderInCategory="10"
         android:title="Remote 9-axis"/>
     <item
-        android:id="@+id/wigo_acc"
-        android:orderInCategory="11"
-        android:title="WiGo accel"/>
-    <item
-        android:id="@+id/wigo_mag_accel"
-        android:orderInCategory="12"
-        android:title="WiGo mag/accel"/>
-    <item
         android:id="@+id/fixed"
         android:orderInCategory="13"
         android:title="Fixed Rotation"/>

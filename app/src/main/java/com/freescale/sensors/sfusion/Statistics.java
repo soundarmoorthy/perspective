@@ -528,25 +528,17 @@ public class Statistics {
 			if (demo.dataSource==DataSource.REMOTE) {
 				demo.localSensors.enableLogging(false, statsSampleSize, oneShot, resetStats);
 				if (demo.imu!=null) demo.imu.enableLogging(true, statsSampleSize, oneShot, resetStats);
-				demo.wigo.enableLogging(false, statsSampleSize, oneShot, resetStats);
 			} else if (demo.dataSource==DataSource.LOCAL) {
 				demo.localSensors.enableLogging(true, statsSampleSize, oneShot, resetStats);
 				if (demo.imu!=null) demo.imu.enableLogging(false, statsSampleSize, oneShot, resetStats);				
-				demo.wigo.enableLogging(false, statsSampleSize, oneShot, resetStats);
-			} else if (demo.dataSource==DataSource.WIGO) {
-				demo.localSensors.enableLogging(false, statsSampleSize, oneShot, resetStats);
-				if (demo.imu!=null) demo.imu.enableLogging(false, statsSampleSize, oneShot, resetStats);				
-				demo.wigo.enableLogging(true, statsSampleSize, oneShot, resetStats);
 			} else {
 				demo.localSensors.enableLogging(false, statsSampleSize, oneShot, resetStats);
 				if (demo.imu!=null) demo.imu.enableLogging(false, statsSampleSize, oneShot, resetStats);				
-				demo.wigo.enableLogging(false, statsSampleSize, oneShot, resetStats);
 			}
 			break;
 		default:
 			demo.localSensors.enableLogging(false, statsSampleSize, oneShot, resetStats);
 			if (demo.imu!=null) demo.imu.enableLogging(false, statsSampleSize, oneShot, resetStats);
-			demo.wigo.enableLogging(false, statsSampleSize, oneShot, resetStats);
 		}
 		if (demo.guiState==GuiState.STATS) {
 			String str = String.format("(%d/", statsSampleSize);

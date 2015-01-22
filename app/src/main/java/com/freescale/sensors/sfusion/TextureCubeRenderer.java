@@ -163,7 +163,6 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
 			switch (demo.dataSource) {
 			case LOCAL:
 			case REMOTE: 
-			case WIGO:
 				break;
 			case STOPPED:
 			case FIXED: 
@@ -185,8 +184,7 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
 				} else {
 					gl.glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);  // correct for portrait
 				}
-			case WIGO: // No action
-			}		   
+			}
 	   }
 	   for (int i = this.firstDisplayedCube; i<= this.lastDisplayedCube; i++) {
 		   this.cubes[i].draw(gl); 

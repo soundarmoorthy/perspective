@@ -1,5 +1,4 @@
-/*
-Copyright (c) 2013, 2014, Freescale Semiconductor, Inc.
+/*Copyright (c) 2013, 2014, Freescale Semiconductor, Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -93,7 +92,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	static public String[] urls = new String[16];   // List of HTML pages for the help
 	public MyUtils myUtils = null;                  // This class is used as a "home" for misc. utility functions
 	public IMU imu = null;                          // The IMU class encapsulates sensor boards which communicate via Bluetooth
-	public WiGo wigo = null;                        // The WiGo class encapsulates WiGo boards from Avnet, plus the WiFi communications for same
 	public MyCanvas canvasApplet = null;            // Used to demonstrate air mouse features
 	public ViewGroup canvasFrame;                   
 	public enum GuiState {                          // GuiState defines the different states that the user interface can take on
@@ -101,7 +99,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	}
 
 	public enum DataSource {                        // DataSource defines the various "sources" of sensor data
-		STOPPED, LOCAL, REMOTE, WIGO, FIXED
+		STOPPED, LOCAL, REMOTE, FIXED
 	}
 
 	public enum Algorithm {                         // These are the choices of algorithms that are supported by the embedded code
@@ -109,7 +107,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	}
 	
 	public enum DevelopmentBoard {                  // List of supported development boards.  Note that KL16Z is a placeholder.
-		REV5, KL25Z, K20D50M, WIGO, KL26Z, K64F, KL16Z, KL46Z, KL46Z_Standalone
+		REV5, KL25Z, K20D50M, KL26Z, K64F, KL16Z, KL46Z, KL46Z_Standalone
 	}
 
 	// Centralized state variables
@@ -194,38 +192,13 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 	final int pcbSurfaces[] = { R.drawable.pcb_sides, R.drawable.pcb_sides,
 			R.drawable.pcb_sides, R.drawable.pcb_sides, R.drawable.rev5_pcb_top,
 			R.drawable.rev5_pcb_bottom };
-	final int wigoSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
-			R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.wigo_top,
-			R.drawable.wigo_bottom };
-	final int kl25zMultiSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
-			R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
-			R.drawable.kl25z_bottom };
-	final int kl26zMultiSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
-			R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
-			R.drawable.kl26z_bottom };
-	final int kl46zMultiSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
-			R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
-			R.drawable.kl46z_bottom };
-	final int kl46zSingleSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
-			R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.kl46z_top,
-			R.drawable.kl46z_bottom };
-	final int k64fMultiSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
-			R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
-			R.drawable.k64f_bottom };
-	final int k20d50mMultiSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
-			R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
-			R.drawable.k20d50m_bottom };
-	
-	// define standard dimensions for the graphics files above
-	final float roomDimensions[] = { 4.8f, 4.8f, 1.456f, 0.0f }; // width, length,
-															// height and Z
-															// offset. Room
-															// dimensions are
-															// twice these
-															// numbers
-	final float pcbDimensions[] = { 0.96f, 1.5f, 0.05f, -2.5f }; 
+
+    final int k20d50mMultiSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
+            R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
+            R.drawable.k20d50m_bottom };
+
+	final float pcbDimensions[] = { 0.96f, 1.5f, 0.05f, -2.5f };
 	final float freedomDimensions[] = { 1.05f, 1.55f, 0.05f, -2.5f }; 
-	final float wigoDimensions[] = { 1.05f, 1.875f, 0.05f, -2.5f }; 
 
 	/**
 	 * Initializes an array of strings which define the documentation pages for
@@ -309,12 +282,12 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		return ((dataSource != DataSource.FIXED) && (dataSource != DataSource.STOPPED));
 	}
 	public boolean dualModeRequired() {
-		boolean sts = ((dataSource == DataSource.REMOTE)||(dataSource == DataSource.WIGO)) 
+		boolean sts = ((dataSource == DataSource.REMOTE))
 				&& (guiState==GuiState.DEVICE) && (absoluteRemoteView == false);
 		return(sts);
 	}
 	public boolean absoluteModeRequired() {
-		boolean sts = ((dataSource == DataSource.REMOTE)||(dataSource == DataSource.WIGO)) 
+		boolean sts = ((dataSource == DataSource.REMOTE))
 				&& (guiState==GuiState.CANVAS) && (absoluteRemoteView == true);
 		return(sts);
 	}
@@ -715,24 +688,21 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		//;
 		boolean b1 = (dataSource==DataSource.LOCAL) && (algorithm == Algorithm.ACC_MAG);
 		boolean b2 = (dataSource==DataSource.LOCAL) && (algorithm == Algorithm.ACC_ONLY);
-		boolean b3 = (algorithm == Algorithm.ACC_ONLY) && (dataSource == DataSource.WIGO);
+		boolean b3 = algorithm == Algorithm.ACC_ONLY;
 		boolean lpfAllowed = (guiState != GuiState.DOCS) && (b1 || b2 || b3);
 		if (lpfAllowed) {
 			lpfEnable.setVisibility(View.VISIBLE);
 			if (lpfEnable.isChecked()) {
 				filterCoefWrapper.setVisibility(View.VISIBLE);
 				localSensors.enableLowPassFilters(true);
-				wigo.enableLowPassFilters(true);
 			} else {
 				filterCoefWrapper.setVisibility(View.GONE);
 				localSensors.enableLowPassFilters(false);
-				wigo.enableLowPassFilters(false);
 			}
 		} else {
 			lpfEnable.setVisibility(View.GONE);
 			filterCoefWrapper.setVisibility(View.GONE);
 			localSensors.enableLowPassFilters(false);
-			wigo.enableLowPassFilters(false);
 		}
 	}
 	void disableZeroFunction(CheckBox zeroCheckBox) {
@@ -806,7 +776,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 			graphicFrame.setVisibility(View.VISIBLE);
 			canvasFrame.setVisibility(View.GONE);
 			flEnable.setVisibility(View.GONE);
-			if ((this.dataSource==DataSource.REMOTE)||(this.dataSource==DataSource.WIGO)) {
+			if (this.dataSource==DataSource.REMOTE) {
 				absolute.setVisibility(View.VISIBLE);				
 				zeroCheckBox.setVisibility(View.VISIBLE);
 			} else {
@@ -955,7 +925,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		case LOCAL:
 			localSensors.run();
 			if (imu!=null) imu.stop(false);
-			wigo.stop();
 			pcbRenderer.selectCube(0);
 			break;
 		case REMOTE:
@@ -965,24 +934,12 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 				localSensors.stop();
 			}
 			if (imu!=null) imu.start();
-			wigo.stop();
 			pcbRenderer.selectCube(0);
-			break;
-		case WIGO:
-			if (dualModeRequired()) {
-				localSensors.run();
-			} else {
-				localSensors.stop();
-			}
-			if (imu!=null) imu.stop(false);
-			wigo.run();
-			pcbRenderer.selectCube(3);
 			break;
 		case STOPPED:
 		case FIXED:
 			localSensors.stop();
 			if (imu!=null) imu.stop(false);
-			wigo.stop();
 			pcbRenderer.selectCube(0);
 			break;
 		}
@@ -1048,14 +1005,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 			algorithm = Algorithm.NINE_AXIS;
 			menuButton.setText("Source = Remote 9-Axis");
 			if (imu!=null) imu.useQ9();
-		} else if (itemId == R.id.wigo_acc) {
-			dataSource = DataSource.WIGO;
-			algorithm = Algorithm.ACC_ONLY;
-			menuButton.setText("Source = WiGo Accel");
-		} else if (itemId == R.id.wigo_mag_accel) {
-			dataSource = DataSource.WIGO;
-			algorithm = Algorithm.ACC_MAG;
-			menuButton.setText("Source = WiGo Mag/Accel");
 		} else if (itemId == R.id.fixed) {
 			dataSource = DataSource.FIXED;
 			algorithm = Algorithm.NONE;
@@ -1116,8 +1065,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		}
 
 		self = this;
-		wigo = new WiGo(this);
-		
+
 		imuName = myPrefs.getString("btPrefix", getString(R.string.btPrefix));
 		if (loadImu) imu = IMU.getInstance(this, imuName);
 
@@ -1214,26 +1162,16 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		int screenRotation = display.getRotation();
 
 		GLSurfaceView pcbGlview = (GLSurfaceView) findViewById(R.id.pcb_glview);
-		GLSurfaceView roomGlview = (GLSurfaceView) findViewById(R.id.room_glview);
 //		pcbGlview.setRenderer(new TextureCubeRenderer(this, screenRotation,
 //				pcbSurfaces, pcbDimensions));
+
 		
 		pcbRenderer = new TextureCubeRenderer(this, screenRotation);
 		pcbRenderer.addCube(pcbSurfaces, pcbDimensions, "Rev5 board")	;	
-		pcbRenderer.addCube(kl25zMultiSurfaces, freedomDimensions, "KL25Z with MULTI-sensor board")	;	
-		pcbRenderer.addCube(k20d50mMultiSurfaces, freedomDimensions, "K20D50M with MULTI-sensor board")	;	
-		pcbRenderer.addCube(wigoSurfaces, wigoDimensions, "WiGo board")	;	
-		pcbRenderer.addCube(kl26zMultiSurfaces, freedomDimensions, "KL26Z with MULTI-sensor board")	;	
-		pcbRenderer.addCube(k64fMultiSurfaces, freedomDimensions, "K64F with MULTI-sensor board")	;	
+		pcbRenderer.addCube(k20d50mMultiSurfaces, freedomDimensions, "K20D50M with MULTI-sensor board")	;
 		pcbRenderer.addCube(pcbSurfaces, pcbDimensions, "Rev5 board")	;	// This is a dummy for the space reserved for KL16Z
-		pcbRenderer.addCube(kl46zMultiSurfaces, freedomDimensions, "KL46Z with MULTI-sensor board")	;	
-		pcbRenderer.addCube(kl46zSingleSurfaces, freedomDimensions, "Standalone KL46Z board")	;	
-		
-		pcbGlview.setRenderer(pcbRenderer);
 
-		TextureCubeRenderer roomRenderer = new TextureCubeRenderer(this, screenRotation);
-		roomRenderer.addCube(roomSurfaces, roomDimensions, "Fusion Board Room")	;	
-		roomGlview.setRenderer(roomRenderer);
+		pcbGlview.setRenderer(pcbRenderer);
 
 		Button exitButton = (Button) findViewById(R.id.exit_button);
 		exitButton.setOnClickListener(new View.OnClickListener() {
@@ -1280,11 +1218,9 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 				if (((CheckBox) v).isChecked()) {
 					filterCoefWrapper.setVisibility(View.VISIBLE);
 					localSensors.enableLowPassFilters(true);
-					wigo.enableLowPassFilters(true);
 				} else {
 					filterCoefWrapper.setVisibility(View.GONE);
 					localSensors.enableLowPassFilters(false);
-					wigo.enableLowPassFilters(false);
 				}
 			}
 		});
@@ -1315,8 +1251,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 				setSts("  (filter coef = " + filterCoefficient + ")");
 				localSensors.enableLowPassFilters(true);
 				localSensors.setFilterCoef(filterCoefficient);
-				wigo.enableLowPassFilters(true);
-				wigo.setFilterCoef(filterCoefficient);
 			}
 
 			@Override
@@ -1607,8 +1541,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 		//Log.v(LOG_TAG, "begin onStop() from A_FSL_Sensor_Demo");	
 		//dumpStates("calling onStop().");
 		localSensors.stop();
-		wigo.stop();
-		if (imu!=null) imu.stop(false); 
+		if (imu!=null) imu.stop(false);
 			// Threads are NOT stopped, as the settings shown keep things working after
 			// accessing the preferences screen.
 		super.onStop();
