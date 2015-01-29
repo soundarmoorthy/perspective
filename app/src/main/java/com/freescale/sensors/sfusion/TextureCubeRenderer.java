@@ -48,12 +48,9 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
     private RotationVector rv = new RotationVector();
 
     // Constructor
-    public TextureCubeRenderer(A_FSL_Sensor_Demo demo, int screenRotation) {
+    public TextureCubeRenderer(A_FSL_Sensor_Demo demo, int screenRotation,int[] surfaces, float[] dimensions, String desc) {
         this.demo = demo;
         this.screenRotation = screenRotation;
-    }
-
-    public void addCube(int[] surfaces, float[] dimensions, String desc) {
         this.cube = new TextureCube(surfaces, dimensions, desc);
     }
 

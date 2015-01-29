@@ -502,8 +502,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 //				pcbSurfaces, pcbDimensions));
 
 
-        pcbRenderer = new TextureCubeRenderer(this, screenRotation);
-        pcbRenderer.addCube(pcbSurfaces, pcbDimensions, "Rev5 board");
+        pcbRenderer = new TextureCubeRenderer(this, screenRotation, pcbSurfaces, pcbDimensions, "Rev5 board");
 
         pcbGlview.setRenderer(pcbRenderer);
 
@@ -655,7 +654,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
      */
     @Override
     public void onRestart() {
-        //dumpStates("calling onRestart()");
         super.onRestart();
     }
 
