@@ -93,7 +93,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
     public enum DevelopmentBoard {                  // List of supported development boards.  Note that KL16Z is a placeholder.
         REV5, KL25Z, K20D50M, KL26Z, K64F, KL16Z, KL46Z, KL46Z_Standalone
     }
-
     // Centralized state variables
     public GuiState guiState = GuiState.DEVICE;
     public DataSource dataSource = DataSource.STOPPED;
@@ -159,12 +158,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
             R.drawable.pcb_sides, R.drawable.pcb_sides, R.drawable.rev5_pcb_top,
             R.drawable.rev5_pcb_bottom};
 
-    final int k20d50mMultiSurfaces[] = {R.drawable.wigo_sides, R.drawable.wigo_sides,
-            R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
-            R.drawable.k20d50m_bottom};
-
     final float pcbDimensions[] = {0.96f, 1.5f, 0.05f, -2.5f};
-    final float freedomDimensions[] = {1.05f, 1.55f, 0.05f, -2.5f};
 
     /**
      * utility library used to quickly determine whether or not we should be
@@ -374,21 +368,18 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
             case LOCAL:
                 localSensors.run();
                 if (imu != null) imu.stop(false);
-                pcbRenderer.selectCube(0);
                 break;
             case REMOTE:
                 localSensors.stop();
                 if (imu != null) {
                     imu.start();
                 }
-                pcbRenderer.selectCube(0);
                 break;
             case STOPPED:
             case FIXED:
                 localSensors.stop();
                 if (imu != null)
                     imu.stop(false);
-                pcbRenderer.selectCube(0);
                 break;
         }
         dataSelector.updateSelection();
@@ -521,8 +512,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 
         pcbRenderer = new TextureCubeRenderer(this, screenRotation);
         pcbRenderer.addCube(pcbSurfaces, pcbDimensions, "Rev5 board");
-        pcbRenderer.addCube(k20d50mMultiSurfaces, freedomDimensions, "K20D50M with MULTI-sensor board");
-        pcbRenderer.addCube(pcbSurfaces, pcbDimensions, "Rev5 board");    // This is a dummy for the space reserved for KL16Z
 
         pcbGlview.setRenderer(pcbRenderer);
 

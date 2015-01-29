@@ -282,7 +282,6 @@ class IMU extends SensorsWrapper {
                 // There will often be a lag of one or two packets before newly selected packet types take affect.
                 // This is considered OK.
                 checkFlags(flags);
-                demo.pcbRenderer.selectCube(boardId);
                 acc.set(timestamp, acc_lsb * ax, acc_lsb * ay, acc_lsb * az);
                 mag.set(timestamp, mag_lsb * mx, mag_lsb * my, mag_lsb * mz);
                 gyro.set(timestamp, gyro_lsb * gx, gyro_lsb * gy, gyro_lsb * gz);
@@ -395,7 +394,6 @@ class IMU extends SensorsWrapper {
                         break;
                 }
                 alreadySniffed = true;
-                demo.pcbRenderer.selectCube(boardId);
         }
     }
 

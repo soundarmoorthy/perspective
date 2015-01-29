@@ -43,14 +43,12 @@ import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.GuiState;
  */
 public class TextureCubeRenderer implements GLSurfaceView.Renderer {
 
-    private TextureCube[] cubes = new TextureCube[20];
+    private TextureCube cube;
     private A_FSL_Sensor_Demo demo;
     private int screenHeight;
     private int screenWidth;
     private int screenRotation = 0;
     private int lastCube = -1;
-    private int firstDisplayedCube = -1;
-    private int lastDisplayedCube = -1;
     private float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
     private RotationVector rv = new RotationVector();
 
@@ -62,36 +60,7 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
     }
 
     public void addCube(int[] surfaces, float[] dimensions, String desc) {
-        this.lastCube = this.lastCube + 1;
-        this.cubes[this.lastCube] = new TextureCube(surfaces, dimensions, desc);
-        this.firstDisplayedCube = this.lastCube; // default value
-        this.lastDisplayedCube = this.lastCube; // default value
-    }
-
-    public boolean selectCube(int choice) {
-        boolean sts = false;
-        if (choice < 0) {
-            Log.e(A_FSL_Sensor_Demo.LOG_TAG, "ERROR in selectCube() function call.  New cube choice for = " + choice + "\n");
-        } else if ((choice == this.firstDisplayedCube) && (choice == this.lastDisplayedCube)) {
-            // no change
-            sts = true;
-        } else {
-            sts = (choice <= this.lastCube);
-            if (sts) {
-                this.firstDisplayedCube = choice;
-                this.lastDisplayedCube = choice;
-            }
-        }
-        return (sts);
-    }
-
-    public boolean selectCubes(int first, int last) {
-        boolean sts = ((first <= this.lastCube) && (last <= this.lastCube));
-        if (sts) {
-            this.firstDisplayedCube = first;
-            this.lastDisplayedCube = last;
-        }
-        return (sts);
+        this.cube = new TextureCube(surfaces, dimensions, desc);
     }
 
     // Call back when the surface is first created or re-created.
@@ -104,11 +73,7 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
         gl.glDepthFunc(GL10.GL_LEQUAL);    // The type of depth testing to do
         gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);  // nice perspective view
 
-        // Setup Texture, each time the surface is created
-        for (int i = 0; i <= this.lastCube; i++) {
-            c = this.cubes[i];
-            c.loadTextures(gl, demo);
-        }
+            cube.loadTextures(gl, demo);
     }
 
     // Call back after onSurfaceCreated() or whenever the window's size changes.
@@ -154,10 +119,9 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
 
         demo.dataSelector.getData(rv, this.screenRotation);  // screenRotation only affects fixed rotations
 
-        gl.glTranslatef(0.0f, 0.0f, 2 * cubes[this.lastDisplayedCube].offset);   // Translate into the screen
+        gl.glTranslatef(0.0f, 0.0f, 2 * cube.offset);   // Translate into the screen
         gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
         gl.glRotatef(rv.a, rv.x, rv.y, rv.z); // parameters are angle and axis of rotation
-
 
         // Do fixed corrections based on portrait/landscape and Device/Panorama
         if (demo.guiState == GuiState.DEVICE) {
@@ -187,10 +151,6 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
                     }
             }
         }
-        for (int i = this.firstDisplayedCube; i <= this.lastDisplayedCube; i++) {
-            this.cubes[i].draw(gl);
-        }
+            this.cube.draw(gl);
     }
-
-
 }
