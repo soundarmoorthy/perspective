@@ -26,14 +26,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.freescale.sensors.sfusion;
 
-import java.io.File;
-
 import android.app.AlertDialog;
-import android.media.ToneGenerator;
 import android.net.Uri;
 import android.os.Environment;
 
-import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.GuiState;
+import java.io.File;
 
 /**
  * Basically a set of utility functions, many of which need a pointer to the main application instance.

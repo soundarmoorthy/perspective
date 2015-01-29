@@ -38,9 +38,6 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.DataSource;
-import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.GuiState;
-
 /**
  * The Statistics class is responsible for measuring basic statistics on sensor outputs.
  * Results are presented in the "Statistics" view of the application.  The user can

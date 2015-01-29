@@ -27,8 +27,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.freescale.sensors.sfusion;
 
 import android.hardware.SensorManager;
-import android.os.Build;
-import android.util.DisplayMetrics;
 
 /**
  * Base class to define basic data which needs to be stored from sensors.  This includes x/y/z

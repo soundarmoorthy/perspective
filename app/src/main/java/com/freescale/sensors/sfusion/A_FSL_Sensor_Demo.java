@@ -26,9 +26,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package com.freescale.sensors.sfusion;
 
-import java.io.File;
-import java.lang.ref.WeakReference;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
@@ -37,7 +34,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,21 +47,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
-import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.lang.ref.WeakReference;
 
 public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListener {
     static public String LOG_TAG = null;            // This string is used to uniquely identify Android log messages
@@ -93,6 +84,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
     public enum DevelopmentBoard {                  // List of supported development boards.  Note that KL16Z is a placeholder.
         REV5, KL25Z, K20D50M, KL26Z, K64F, KL16Z, KL46Z, KL46Z_Standalone
     }
+
     // Centralized state variables
     public GuiState guiState = GuiState.DEVICE;
     public DataSource dataSource = DataSource.STOPPED;

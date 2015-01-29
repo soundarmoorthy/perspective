@@ -34,12 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package com.freescale.sensors.sfusion;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.util.Set;
-import java.util.UUID;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
@@ -53,7 +47,12 @@ import android.os.Message;
 import android.util.Log;
 
 import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.Algorithm;
-import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.GuiState;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.util.Set;
+import java.util.UUID;
 
 
 class IMU extends SensorsWrapper {

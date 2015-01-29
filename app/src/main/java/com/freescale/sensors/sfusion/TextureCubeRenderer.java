@@ -26,15 +26,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.freescale.sensors.sfusion;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
-
-import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
-import android.util.Log;
 
-import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.GuiState;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 /**
  * Renders cubes defined by the TextureCube class.  Used for both device and panorama views.
@@ -54,7 +50,6 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
 
     // Constructor
     public TextureCubeRenderer(A_FSL_Sensor_Demo demo, int screenRotation) {
-        assert ((screenRotation >= 0) && (screenRotation <= 3));
         this.demo = demo;
         this.screenRotation = screenRotation;
     }
@@ -73,14 +68,14 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
         gl.glDepthFunc(GL10.GL_LEQUAL);    // The type of depth testing to do
         gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);  // nice perspective view
 
-            cube.loadTextures(gl, demo);
+        cube.loadTextures(gl, demo);
     }
 
     // Call back after onSurfaceCreated() or whenever the window's size changes.
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
        /* Called when the surface changed size.
-   	 * Called after the surface is created and whenever the OpenGL ES surface size changes. 
+        * Called after the surface is created and whenever the OpenGL ES surface size changes.
    	 * Typically you will set your viewport here. If your camera is fixed then you could also set your projection matrix here
    	 */
         this.screenWidth = width;
@@ -124,33 +119,16 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
         gl.glRotatef(rv.a, rv.x, rv.y, rv.z); // parameters are angle and axis of rotation
 
         // Do fixed corrections based on portrait/landscape and Device/Panorama
-        if (demo.guiState == GuiState.DEVICE) {
-            switch (demo.dataSource) {
-                case LOCAL:
-                case REMOTE:
-                    break;
-                case STOPPED:
-                case FIXED:
-                    if (this.screenRotation == 0) {
-                    } else {
-                        gl.glRotatef(+90.0f, 0.0f, 0.0f, 1.0f);  // correct for portrait
-                    }
-            }
-        } else { // Panorama mode
-            switch (demo.dataSource) {
-                case LOCAL:
-                case REMOTE:
-                    gl.glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);  // correct for portrait
-                    break;
-                case STOPPED:
-                case FIXED:
-                    if (this.screenRotation == 0) {
-                        gl.glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);  // correct for landscape
-                    } else {
-                        gl.glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);  // correct for portrait
-                    }
-            }
+        switch (demo.dataSource) {
+            case LOCAL:
+            case REMOTE:
+                break;
+            case STOPPED:
+            case FIXED:
+                if (this.screenRotation != 0) {
+                    gl.glRotatef(+90.0f, 0.0f, 0.0f, 1.0f);  // correct for portrait
+                }
         }
-            this.cube.draw(gl);
+        this.cube.draw(gl);
     }
 }

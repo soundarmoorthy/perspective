@@ -28,8 +28,6 @@ package com.freescale.sensors.sfusion;
 // preferences code based on example found at: http://www.javacodegeeks.com/2011/01/android-quick-preferences-tutorial.html
 // This class saves and restores application preferences from device storage.
 
-import com.freescale.sensors.sfusion.R;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;

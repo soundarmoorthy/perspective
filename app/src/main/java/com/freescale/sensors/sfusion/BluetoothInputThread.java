@@ -26,12 +26,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.freescale.sensors.sfusion;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.util.Log;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This is the definition for a separate thread to run Bluetooth communications.

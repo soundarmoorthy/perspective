@@ -31,9 +31,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
-import android.util.DisplayMetrics;
-import android.util.Log;
 
 import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.Algorithm;
 import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.DataSource;
