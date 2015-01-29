@@ -44,7 +44,6 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
     private int screenHeight;
     private int screenWidth;
     private int screenRotation = 0;
-    private int lastCube = -1;
     private float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
     private RotationVector rv = new RotationVector();
 
@@ -118,11 +117,8 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
         gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
         gl.glRotatef(rv.a, rv.x, rv.y, rv.z); // parameters are angle and axis of rotation
 
-        // Do fixed corrections based on portrait/landscape and Device/Panorama
+        // Do fixed corrections based on portrait/landscape
         switch (demo.dataSource) {
-            case LOCAL:
-            case REMOTE:
-                break;
             case STOPPED:
             case FIXED:
                 if (this.screenRotation != 0) {
