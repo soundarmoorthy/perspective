@@ -100,10 +100,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
     public int statsSampleSize = 100;                  // This is the number of sensor samples used to calculate sensor statistics
     public boolean statsOneShot = false;               // control variable for the stats view
     static public TextView tv1 = null;               // TextView variables are global pointers to fields in the GUI which can be
-    static private TextView stsTextView = null;      // access via various utility functions.
-    static private TextView console2 = null;
-    static private TextView console3 = null;
-    static private TextView console4 = null;
     static private TextView numMsgsField = null;
 
     static private int fileLoggingEnabled = 0;      // functional a boolean, but must be int for messaging purposes
@@ -164,14 +160,12 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
     }
 
     public boolean dualModeRequired() {
-        boolean sts = ((dataSource == DataSource.REMOTE))
-                && (guiState == GuiState.DEVICE) && (absoluteRemoteView == false);
-        return (sts);
+        return ((dataSource == DataSource.REMOTE))
+                && (guiState == GuiState.DEVICE) && (!absoluteRemoteView);
     }
 
     public boolean absoluteModeRequired() {
-        boolean sts = (dataSource == DataSource.REMOTE) && (absoluteRemoteView == true);
-        return (sts);
+        return (dataSource == DataSource.REMOTE) && (absoluteRemoteView);
     }
 
     /**
@@ -263,18 +257,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 
     // Configure visibility for text fields above the DEVICE view
     public void configureConsoles(boolean show) {
-        TextView console2 = (TextView) findViewById(R.id.console2); // console2 = debug
-        TextView console3 = (TextView) findViewById(R.id.console3); // console3 = virtual gyro
-        TextView console4 = (TextView) findViewById(R.id.console4); // console4 = roll pitch compass
-        boolean debugEnabled = myPrefs.getBoolean("enable_device_debug", false);
-        boolean virtualGyroEnabled = myPrefs.getBoolean("enable_virtual_gyro", false);
-        boolean rpcEnabled = myPrefs.getBoolean("enable_rpc", false);
-        if (show && debugEnabled) console2.setVisibility(View.VISIBLE);
-        else console2.setVisibility(View.GONE);
-        if (show && virtualGyroEnabled) console3.setVisibility(View.VISIBLE);
-        else console3.setVisibility(View.GONE);
-        if (show && rpcEnabled) console4.setVisibility(View.VISIBLE);
-        else console4.setVisibility(View.GONE);
     }
 
     /**
@@ -476,10 +458,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 
         numMsgsField = (TextView) findViewById(R.id.num_msgs);
         tv1 = (TextView) findViewById(R.id.console1);
-        stsTextView = (TextView) findViewById(R.id.sts);
-        console2 = (TextView) findViewById(R.id.console2);
-        console3 = (TextView) findViewById(R.id.console3);
-        console4 = (TextView) findViewById(R.id.console4);
 
         this.statistics = new Statistics(this, self);
         this.statistics.onCreate();
