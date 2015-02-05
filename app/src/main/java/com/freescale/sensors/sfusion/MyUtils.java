@@ -28,6 +28,7 @@ package com.freescale.sensors.sfusion;
 
 import android.app.AlertDialog;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 
 import java.io.File;
@@ -55,7 +56,7 @@ public class MyUtils {
         // rm0 rm1 rm2
         // rm3 rm4 rm5
         // rm6 rm7 rm8
-        assert (orig_rm.length == 9); // rm is assumed to be 3x3 matrix of form
+            assert (orig_rm.length == 9); // rm is assumed to be 3x3 matrix of form
         float[] rm = new float[9];
         rm[0] = orig_rm[0];
         rm[4] = orig_rm[4];
@@ -234,30 +235,6 @@ public class MyUtils {
         }
     }
 
-    static public File getFile(String name) {
-        File sdDir = null, testDir = null, filePlaceholder = null;
-        sdDir = new File(Environment.getExternalStorageDirectory().getPath());
-        testDir = new File(sdDir.getAbsolutePath() + java.io.File.separator + "Freescale_Demo");
-        filePlaceholder = new File(testDir.getAbsolutePath() + java.io.File.separator + name);
-        if (testDir.isDirectory()) {
-            // do nothing
-        } else {
-            testDir.mkdir();
-        }
-        return (filePlaceholder);
-    }
-
-    static public String getFilePath(String name) {
-        File filePlaceholder = getFile(name);
-        return (filePlaceholder.getAbsolutePath());
-    }
-
-    static public Uri getFileUri(String name) {
-        File filePlaceholder = getFile(name);
-        Uri uri = Uri.fromFile(filePlaceholder);
-        return (uri);
-    }
-
     static int limitI(int val, int lim) {
         if (val < -lim) {
             val = -lim;
@@ -284,6 +261,4 @@ public class MyUtils {
         }
         return (val);
     }
-
-
 }

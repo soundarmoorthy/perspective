@@ -190,7 +190,6 @@ class IMU extends SensorsWrapper {
         byte b;
         double n; // used for normalization functions
         ImuRecordType retVal = ImuRecordType.NONE;
-        ;
         ByteBuffer bb = payload.bb;
         short packetId = bb.get(0);
         int recordSize = bb.position();
