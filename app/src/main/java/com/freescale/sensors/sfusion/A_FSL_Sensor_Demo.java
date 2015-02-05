@@ -62,8 +62,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
     static public String LOG_TAG = null;            // This string is used to uniquely identify Android log messages
     public LocalSensors localSensors = null;        // Pointer to object for managing input from sensors local to your Android device
     public DataSelector dataSelector = null;        // Pointer to object which selects one of several different sensor sources
-    public Statistics statistics = null;            // Pointer to object which creates the "Status screen"
-    static public String[] urls = new String[16];   // List of HTML pages for the help
     public MyUtils myUtils = null;                  // This class is used as a "home" for misc. utility functions
     public IMU imu = null;                          // The IMU class encapsulates sensor boards which communicate via Bluetooth
     public MyCanvas canvasApplet = null;            // Used to demonstrate air mouse features
@@ -269,7 +267,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
      * @param gui_state the state of the application which we are about to configure.
      */
     public void configureApplicationViews(GuiState guiState, boolean resetStats) {
-        CheckBox flEnable = (CheckBox) findViewById(R.id.fl_enable);
         CheckBox absolute = (CheckBox) findViewById(R.id.absolute);
         CheckBox zeroCheckBox = (CheckBox) findViewById(R.id.zeroed);
 
@@ -284,7 +281,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
                 pcbGlview.setVisibility(View.VISIBLE);
                 graphicFrame.setVisibility(View.VISIBLE);
                 canvasFrame.setVisibility(View.GONE);
-                flEnable.setVisibility(View.GONE);
                 if (this.dataSource == DataSource.REMOTE) {
                     absolute.setVisibility(View.VISIBLE);
                     zeroCheckBox.setVisibility(View.VISIBLE);
@@ -295,12 +291,10 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
                 }
                 numMsgsField.setVisibility(View.GONE);
                 dataSourcePopup.setVisibility(View.VISIBLE);
-                statistics.show(false);
                 configureConsoles(this.dataSource == DataSource.REMOTE);
                 break;
         }
         updateSensors();
-        statistics.configureStatsGathering(statsSampleSize, statsOneShot, resetStats);
         configureLpfOptions();
     }
 
@@ -315,23 +309,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
         popup.setOnMenuItemClickListener(this);
         popup.show();
     }
-
-    public void showSampleSizeSelector(View v) {
-        PopupMenu popup = new PopupMenu(this, v);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.stats_sample_size, popup.getMenu());
-        popup.setOnMenuItemClickListener(this);
-        popup.show();
-    }
-
-    public void showStatsModeSelector(View v) {
-        PopupMenu popup = new PopupMenu(this, v);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.stats_calc_mode, popup.getMenu());
-        popup.setOnMenuItemClickListener(this);
-        popup.show();
-    }
-
 
     /**
      * Update both local and remote sensors based upon the current state of the
@@ -357,7 +334,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
                 break;
         }
         dataSelector.updateSelection();
-        Statistics.configureStatsPage();
     }
 
     /**
@@ -388,26 +364,10 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
             dataSource = DataSource.FIXED;
             algorithm = Algorithm.NONE;
             menuButton.setText("FIXED");
-        } else if (itemId == R.id.stats_sample_size_10) {
-            statsSampleSize = 10;
-        } else if (itemId == R.id.stats_sample_size_100) {
-            statsSampleSize = 100;
-        } else if (itemId == R.id.stats_sample_size_500) {
-            statsSampleSize = 500;
-        } else if (itemId == R.id.stats_sample_size_1000) {
-            statsSampleSize = 1000;
-        } else if (itemId == R.id.stats_sample_size_5000) {
-            statsSampleSize = 5000;
-        } else if (itemId == R.id.stats_one_shot) {
-            statsOneShot = true;
-            MyUtils.waitALittle(2000);
-        } else if (itemId == R.id.stats_continuous) {
-            statsOneShot = false;
         } else {
             sts = false;
         }
         updateSensors();
-        statistics.setSpinnersVisible(dataSource == DataSource.LOCAL);
         configureApplicationViews(guiState, true);
         return (sts);
     }
@@ -457,10 +417,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
         // onCreateOptionsMenu() creates the options menu.
 
         numMsgsField = (TextView) findViewById(R.id.num_msgs);
-        tv1 = (TextView) findViewById(R.id.console1);
 
-        this.statistics = new Statistics(this, self);
-        this.statistics.onCreate();
         this.toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 33);
 
         canvasApplet = new MyCanvas(this);
@@ -495,17 +452,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
             }
         });
 
-        CheckBox flEnable = (CheckBox) findViewById(R.id.fl_enable);
-        flEnable.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (((CheckBox) v).isChecked()) {
-                    fileLoggingEnabled = 1;
-                } else {
-                    fileLoggingEnabled = 0;
-                }
-            }
-        });
         CheckBox zeroCheckBox = (CheckBox) findViewById(R.id.zeroed);
         zeroCheckBox.setOnClickListener(new OnClickListener() {
             @Override
