@@ -64,8 +64,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
     public DataSelector dataSelector = null;        // Pointer to object which selects one of several different sensor sources
     public MyUtils myUtils = null;                  // This class is used as a "home" for misc. utility functions
     public IMU imu = null;                          // The IMU class encapsulates sensor boards which communicate via Bluetooth
-    public MyCanvas canvasApplet = null;            // Used to demonstrate air mouse features
-    public ViewGroup canvasFrame;
 
     public enum GuiState {                          // GuiState defines the different states that the user interface can take on
         DEVICE
@@ -95,31 +93,15 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
     private final String ALGORITHM = "Algorithm";
     private final String DEVBOARD = "DevtBoard";
 
-    public int statsSampleSize = 100;                  // This is the number of sensor samples used to calculate sensor statistics
-    public boolean statsOneShot = false;               // control variable for the stats view
     static public TextView tv1 = null;               // TextView variables are global pointers to fields in the GUI which can be
     static private TextView numMsgsField = null;
 
-    static private int fileLoggingEnabled = 0;      // functional a boolean, but must be int for messaging purposes
     private boolean absoluteRemoteView = false;     // set to true to NOT take into account Android device view when using remote IMU
 
-    private MenuItem legacyDumpMenuItem = null;     // variables for controlling logging functions
-    private MenuItem hexDumpMenuItem = null;
-    private MenuItem csvDumpMenuItem = null;
-    public boolean legacyDumpEnabled = true;        // set to true to enable legacy dump
     static public boolean hexDumpEnabled = false;   // set to true to enable hex display of BT input
-    public boolean csvDumpEnabled = false;          // set to true to enable CSV dump of remote (BT and WiFi) IMUs
 
-    static public boolean console2IsStale = true;   // used to throttle console2 updates to protect performance - debug
-    static public boolean console3IsStale = true;   // used to throttle console3 updates to protect performance - virtual gyro
-    static public boolean console4IsStale = true;   // used to throttle console4 updates to protect performance - roll pitch compass
     public boolean zeroPending = false;             // handshaking control for "Zero" function in the device view
     public boolean zeroed = false;
-    public boolean splitScreen = false;             // Boolean for turning on/off the split screen mode
-    public boolean dumpScreen = false;              // Set to true to request render to create a screen dump. Will be reset
-    // to false by render after done.
-
-    int currentDocPage = 0;                         // Index pointer to the current help page
 
     // Options Menu definitions
     private final int SET_PREFERENCES_MENU_ITEM = Menu.FIRST;
@@ -127,12 +109,11 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
     public final String PREF_NAME = "A_FSL_Sensor_Demo";  // String for retrieving shared preferences
     public SharedPreferences myPrefs;                     // Structure for preferences
     private float filterCoefficient = 0;                  // Used to control low pass filtering
-    public ToneGenerator toneGenerator = null;            // for sound effects
 
     static public A_FSL_Sensor_Demo self = null;
     // The self pointer is used in the body of one of the
     // listener functions, where "this" points to the
-    // listener, not the demo itself.
+    // listener, not the emo itself.
 
     public String imuName;
     // class variables, but need this early
@@ -416,27 +397,12 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
         // XML files set the background and Logo,
         // onCreateOptionsMenu() creates the options menu.
 
-        numMsgsField = (TextView) findViewById(R.id.num_msgs);
-
-        this.toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 33);
-
-        canvasApplet = new MyCanvas(this);
-        canvasFrame = (ViewGroup) findViewById(R.id.canvasFrame);
-        canvasFrame.addView(canvasApplet);
-
-        boolean enableJavascript = myPrefs.getBoolean("enable_javascript", true);
-        LinearLayout webframe = (LinearLayout) findViewById(R.id.webframe);
-
 
         Display display = ((WindowManager) this
                 .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         int screenRotation = display.getRotation();
 
         GLSurfaceView pcbGlview = (GLSurfaceView) findViewById(R.id.pcb_glview);
-//		pcbGlview.setRenderer(new TextureCubeRenderer(this, screenRotation,
-//				pcbSurfaces, pcbDimensions));
-
-
         pcbRenderer = new TextureCubeRenderer(this, screenRotation, pcbSurfaces, pcbDimensions, "Rev5 board");
 
         pcbGlview.setRenderer(pcbRenderer);
