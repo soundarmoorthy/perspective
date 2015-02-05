@@ -670,7 +670,6 @@ class IMU extends SensorsWrapper {
             }, "BluetoothInputThread");
             MyUtils.waitALittle(1000);
             background.start();
-        } else {
         }
     }
 

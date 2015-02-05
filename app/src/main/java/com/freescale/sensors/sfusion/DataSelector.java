@@ -112,12 +112,13 @@ public class DataSelector {
         }
     }
 
-    synchronized void getData(RotationVector rv, int screenRotation) {
+    synchronized void getData(RotationVector rv, TimedQuaternion q, int screenRotation) {
         updateSelection();
         switch (demo.dataSource) {
             case LOCAL:
                 demo.localSensors.computeQuaternion(workingQuaternion2, demo.algorithm);
                 rv.computeFromQuaternion(workingQuaternion2, MyUtils.AngleUnits.DEGREES);
+                q.set(workingQuaternion2);
                 break;
             case REMOTE:
                 demo.imu.computeQuaternion(workingQuaternion2, demo.algorithm);
@@ -126,8 +127,10 @@ public class DataSelector {
                     workingQuaternion3.reverse();
                     workingQuaternion1.eqPxQ(workingQuaternion3, workingQuaternion2);
                     adjustForZero(rv, workingQuaternion1);
+                    q.set(workingQuaternion2);
                 } else {
                     adjustForZero(rv, workingQuaternion2);
+                    q.set(workingQuaternion2);
                 }
                 break;
             case STOPPED:
@@ -153,7 +156,6 @@ public class DataSelector {
                 }
                 break;
         }
-        return;
     }
 
     synchronized void getQuaternion(DemoQuaternion q) {
