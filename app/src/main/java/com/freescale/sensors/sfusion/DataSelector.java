@@ -92,11 +92,6 @@ public class DataSelector {
         rv.computeFromQuaternion(quat, MyUtils.AngleUnits.DEGREES);
     }
 
-    public boolean statsReady() {
-        updateSelection();
-        return (choice.statsReady());
-    }
-
     synchronized void adjustForZero(RotationVector rv, DemoQuaternion q) {
         if (demo.zeroPending) {
             zeroPosition.set(q);

@@ -63,10 +63,6 @@ class SensorsWrapper {
         gyro = null;
     }
 
-    public boolean statsReady() {
-        return (acc.statsReady() && mag.statsReady() && ((!gyro.enabled) || gyro.statsReady()) && quaternion.statsReady());
-    }
-
     synchronized public void enableLowPassFilters(boolean state) {
         acc.enableLpf(state);
         mag.enableLpf(state);
