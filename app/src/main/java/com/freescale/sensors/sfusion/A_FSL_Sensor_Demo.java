@@ -252,16 +252,13 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
         CheckBox zeroCheckBox = (CheckBox) findViewById(R.id.zeroed);
 
         LinearLayout graphicFrame = (LinearLayout) findViewById(R.id.graphicFrame);
-        LinearLayout canvasFrame = (LinearLayout) findViewById(R.id.canvasFrame);
         GLSurfaceView pcbGlview = (GLSurfaceView) findViewById(R.id.pcb_glview);
         Button dataSourcePopup = (Button) findViewById(R.id.data_source_popup);
-        TextView numMsgsField = (TextView) findViewById(R.id.num_msgs);
         this.guiState = guiState;
         switch (guiState) {
             case DEVICE:
                 pcbGlview.setVisibility(View.VISIBLE);
                 graphicFrame.setVisibility(View.VISIBLE);
-                canvasFrame.setVisibility(View.GONE);
                 if (this.dataSource == DataSource.REMOTE) {
                     absolute.setVisibility(View.VISIBLE);
                     zeroCheckBox.setVisibility(View.VISIBLE);
@@ -270,7 +267,6 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
                     absolute.setVisibility(View.GONE);
                     disableZeroFunction(zeroCheckBox);
                 }
-                numMsgsField.setVisibility(View.GONE);
                 dataSourcePopup.setVisibility(View.VISIBLE);
                 configureConsoles(this.dataSource == DataSource.REMOTE);
                 break;
