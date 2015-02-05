@@ -1,3 +1,5 @@
 app/build
 build/
 freescale-sensor-fusion.iml
+.gradle
+.idea
