@@ -28,7 +28,6 @@ package com.freescale.sensors.sfusion;
 
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
-import android.opengl.Matrix;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -41,7 +40,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class TextureCubeRenderer implements GLSurfaceView.Renderer {
 
     private TextureCube cube;
-    private A_FSL_Sensor_Demo demo;
+    private FlicqActivity demo;
     private int screenHeight;
     private int screenWidth;
     private int screenRotation = 0;
@@ -49,7 +48,7 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
     private RotationVector rv = new RotationVector();
 
     // Constructor
-    public TextureCubeRenderer(A_FSL_Sensor_Demo demo, int screenRotation,int[] surfaces, float[] dimensions, String desc) {
+    public TextureCubeRenderer(FlicqActivity demo, int screenRotation,int[] surfaces, float[] dimensions, String desc) {
         this.demo = demo;
         this.screenRotation = screenRotation;
         this.cube = new TextureCube(surfaces, dimensions, desc);

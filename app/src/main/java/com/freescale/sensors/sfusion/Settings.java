@@ -47,9 +47,9 @@ import android.widget.TextView;
 public class Settings extends Activity {
 
     // Usage to read settings:
-    // public static final String PREF_NAME = "A_FSL_Sensor_Demo";
+    // public static final String PREF_NAME = "FlicqActivity";
     // SharedPreferences myPrefs = getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE); OR
-    // SharedPreferences myPrefs = getSharedPreferences("A_FSL_Sensor_Demo", Activity.MODE_PRIVATE);
+    // SharedPreferences myPrefs = getSharedPreferences("FlicqActivity", Activity.MODE_PRIVATE);
     // String my_email = myPrefs.getString("my_email", "")
     // boolean remote_enable = myPrefs.getBoolean("remote_enable", false)
     // boolean scroll_disable = myPrefs.getBoolean("scroll_disable", false)
@@ -57,7 +57,7 @@ public class Settings extends Activity {
     // boolean local_use_6_axis = myPrefs.getBoolean("local_use_6_axis", false)
     // Int sample_rate_option = myPrefs.getInt("sample_rate", 0)
 
-    public static final String PREF_NAME = "A_FSL_Sensor_Demo";
+    public static final String PREF_NAME = "FlicqActivity";
     public static final String defaultMaxFileMsgs = new String("10000");
 
     public SharedPreferences myPrefs;
@@ -181,13 +181,13 @@ public class Settings extends Activity {
         Spinner rotationVectorRateSpinner = (Spinner) findViewById(R.id.rotaton_vector_rate_spinner);
         Spinner orientationSpinner = (Spinner) findViewById(R.id.orientation_spinner);
 
-        String feedbackEmailAddr = A_FSL_Sensor_Demo.self.getString(R.string.feedbackEmailAddr);
+        String feedbackEmailAddr = FlicqActivity.self.getString(R.string.feedbackEmailAddr);
         myEmail.setText(myPrefs.getString("my_email", feedbackEmailAddr));
-        String defaultFileName = A_FSL_Sensor_Demo.self.getString(R.string.defaultOutputFile);
-        String defaultStatsFileName = A_FSL_Sensor_Demo.self.getString(R.string.statsOutputFile);
-        String defaultIpCode = A_FSL_Sensor_Demo.self.getString(R.string.ipCode);
-        String defaultIpPort = A_FSL_Sensor_Demo.self.getString(R.string.ipPort);
-        String defaultBtPrefix = A_FSL_Sensor_Demo.self.getString(R.string.btPrefix);
+        String defaultFileName = FlicqActivity.self.getString(R.string.defaultOutputFile);
+        String defaultStatsFileName = FlicqActivity.self.getString(R.string.statsOutputFile);
+        String defaultIpCode = FlicqActivity.self.getString(R.string.ipCode);
+        String defaultIpPort = FlicqActivity.self.getString(R.string.ipPort);
+        String defaultBtPrefix = FlicqActivity.self.getString(R.string.btPrefix);
         fileName.setText(myPrefs.getString("fileName", defaultFileName));
         statsFileName.setText(myPrefs.getString("statsFileName", defaultStatsFileName));
         ipCode.setText(myPrefs.getString("ipCode", defaultIpCode));

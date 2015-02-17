@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.freescale.sensors.sfusion;
 
-import com.freescale.sensors.sfusion.MyUtils.AngleUnits;
+import com.freescale.sensors.sfusion.FlicqUtils.AngleUnits;
 
 /**
  * Defines a basic "rotation vector" which is comprised of an axis of rotation defined as the vector
@@ -74,7 +74,7 @@ public class RotationVector {
         z = rv[3];
     }
 
-    synchronized void computeFromQuaternion(DemoQuaternion q, AngleUnits units) {
+    synchronized void computeFromQuaternion(FlicqQuaternion q, AngleUnits units) {
         float theta = (float) Math.acos(q.q0);
         a = 2 * theta;
         if (q.q0 == 1) {
@@ -92,10 +92,10 @@ public class RotationVector {
     synchronized void convert(AngleUnits units) {
         if ((this.units == AngleUnits.RADIANS) && (units == AngleUnits.DEGREES)) {
             this.units = units;
-            this.a = this.a * MyUtils.degreesPerRadian;
+            this.a = this.a * FlicqUtils.degreesPerRadian;
         } else if ((this.units == AngleUnits.RADIANS) && (units == AngleUnits.DEGREES)) {
             this.units = units;
-            this.a = this.a * MyUtils.radiansPerDegree;
+            this.a = this.a * FlicqUtils.radiansPerDegree;
         }
     }
 

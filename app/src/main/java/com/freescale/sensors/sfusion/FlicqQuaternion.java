@@ -36,7 +36,7 @@ import android.opengl.Matrix;
  *
  * @author Michael Stanley
  */
-public class DemoQuaternion {
+public class FlicqQuaternion {
     public float q0, q1, q2, q3;
     float[] pm = null; // p Matrix
     float[] qv = null;  // q Vector
@@ -54,17 +54,17 @@ public class DemoQuaternion {
         return (str);
     }
 
-    DemoQuaternion() {
+    FlicqQuaternion() {
         initialize();
         this.setIdentity();
     }
 
-    DemoQuaternion(float[] q) {
+    FlicqQuaternion(float[] q) {
         initialize();
         this.set(q);
     }
 
-    DemoQuaternion(DemoQuaternion q) {
+    FlicqQuaternion(FlicqQuaternion q) {
         initialize();
         this.set(q);
     }
@@ -113,7 +113,7 @@ public class DemoQuaternion {
         q3 = q[3];
     }
 
-    synchronized void set(DemoQuaternion q) {
+    synchronized void set(FlicqQuaternion q) {
         this.q0 = q.q0;
         this.q1 = q.q1;
         this.q2 = q.q2;
@@ -128,7 +128,7 @@ public class DemoQuaternion {
         q3 = 0;
     }
 
-    void eqPxQ(DemoQuaternion p, DemoQuaternion q) {
+    void eqPxQ(FlicqQuaternion p, FlicqQuaternion q) {
         // This is a direct coding of equation 5.3 on page 109 of Quaternions and Rotation Sequences
         q.toVector(qv);  // this works
         //sQ[0]=q0; sQ[1]=q1; sQ[2]=q2; sQ[3]=q3;  // this does not
@@ -149,7 +149,7 @@ public class DemoQuaternion {
         q0 = -q0;
     }
 
-    void toRotationVector(RotationVector rv, MyUtils.AngleUnits unit) {
+    void toRotationVector(RotationVector rv, FlicqUtils.AngleUnits unit) {
         float theta = (float) Math.acos(q0);
         float x, y, z, sinTheta;
         float scale_factor = 1;
@@ -161,8 +161,8 @@ public class DemoQuaternion {
             y = q2 / sinTheta;
             z = q3 / sinTheta;
         }
-        if (unit == MyUtils.AngleUnits.DEGREES) {
-            scale_factor = MyUtils.degreesPerRadian;
+        if (unit == FlicqUtils.AngleUnits.DEGREES) {
+            scale_factor = FlicqUtils.degreesPerRadian;
         }
         rv.set(unit, 2 * theta * scale_factor, x, y, z);
     }

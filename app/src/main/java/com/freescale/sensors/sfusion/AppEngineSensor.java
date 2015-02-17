@@ -1,33 +1,15 @@
 
 package com.freescale.sensors.sfusion;
 
-        import android.content.BroadcastReceiver;
-        import android.content.Context;
-        import android.content.Intent;
-        import android.content.IntentFilter;
-        import android.net.NetworkInfo;
-        import android.os.Handler;
-        import android.os.Message;
-        import android.util.Log;
-
-        import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.Algorithm;
-
-        import java.io.IOException;
-        import java.io.OutputStream;
-        import java.net.NetworkInterface;
-        import java.nio.ByteBuffer;
-        import java.util.Set;
-        import java.util.UUID;
-
 /**
  * Created by soundararajan on 2/6/2015.
  */
-public class AppEngineSensorStream extends SensorsWrapper{
+public class AppEngineSensor extends SensorsWrapper{
 
     private boolean stream;
     static float[] quatInputs = null;
 
-    private AppEngineSensorStream(A_FSL_Sensor_Demo demo) {
+    private AppEngineSensor(FlicqActivity demo) {
         super(demo);
 
          stream = false;
@@ -45,11 +27,11 @@ public class AppEngineSensorStream extends SensorsWrapper{
         quaternion.setDescription("");
     }
 
-    static private AppEngineSensorStream self;
-    static public AppEngineSensorStream Instance(A_FSL_Sensor_Demo demo)
+    static private AppEngineSensor self;
+    static public AppEngineSensor Instance(FlicqActivity demo)
     {
         if(self == null){
-            self = new AppEngineSensorStream(demo);
+            self = new AppEngineSensor(demo);
         }
         return self;
     }

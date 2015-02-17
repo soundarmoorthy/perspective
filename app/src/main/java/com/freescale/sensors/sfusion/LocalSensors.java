@@ -32,14 +32,14 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.Algorithm;
-import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.DataSource;
+import com.freescale.sensors.sfusion.FlicqActivity.Algorithm;
+import com.freescale.sensors.sfusion.FlicqActivity.DataSource;
 
 
 /**
  * Wrapper for control of local (on Android device) sensors.
  * This class extends the more generic SensorsWrapper class, which is also used as a base class
- * for the remote IMU.
+ * for the remote FlicqDevice.
  *
  * @author Michael Stanley
  */
@@ -51,7 +51,7 @@ class LocalSensors extends SensorsWrapper {
     private boolean sensorsEnabled = false;
     float[] workingQuaternion = null;
 
-    public LocalSensors(A_FSL_Sensor_Demo demo) {
+    public LocalSensors(FlicqActivity demo) {
         super(demo);
         this.demo = demo;
         workingQuaternion = new float[4];
@@ -79,7 +79,7 @@ class LocalSensors extends SensorsWrapper {
         sensorsEnabled = false;
     }
 
-    void computeQuaternion(DemoQuaternion result, Algorithm algorithm) {
+    void computeQuaternion(FlicqQuaternion result, Algorithm algorithm) {
         assert (hasLocalGyro());
         result.set(super.quaternion());
         result.reverse();
@@ -101,7 +101,7 @@ class LocalSensors extends SensorsWrapper {
         if ((local_gyro == null) && (demo.dataSource == DataSource.LOCAL)) {
             String title = "Warning!";
             msg = "This Android device does not include a gyroscope.";
-            MyUtils.popupAlert(title, msg);
+            FlicqUtils.popupAlert(title, msg);
         }
     }
 

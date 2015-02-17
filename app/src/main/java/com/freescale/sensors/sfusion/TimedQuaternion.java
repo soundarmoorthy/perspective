@@ -1,8 +1,6 @@
 // Copyright 2013 by Freescale Semiconductor
 package com.freescale.sensors.sfusion;
 
-import android.util.Log;
-
 
 /*
 Copyright (c) 2013, 2014, Freescale Semiconductor, Inc.
@@ -30,10 +28,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-* This class is an extension to the DemoQuaternion class which adds a timestamp.
+* This class is an extension to the FlicqQuaternion class which adds a timestamp.
 * @author Michael Stanley
 */
-public class TimedQuaternion extends DemoQuaternion {
+public class TimedQuaternion extends FlicqQuaternion {
     private long t = -1;  // sample time
     private long lastT = -1;
     private float axisScale = 1.0f;
@@ -71,11 +69,11 @@ public class TimedQuaternion extends DemoQuaternion {
         this.set(time, q);
     }
 
-    TimedQuaternion(long time, DemoQuaternion q) {
+    TimedQuaternion(long time, FlicqQuaternion q) {
         this.set(time, q);
     }
 
-    public synchronized void set(long time, DemoQuaternion q) {
+    public synchronized void set(long time, FlicqQuaternion q) {
         super.set(q);
         this.lastT = this.t;
         this.t = time;

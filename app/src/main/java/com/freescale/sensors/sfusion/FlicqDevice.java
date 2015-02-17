@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * This class implements the command interpreter for external Inertial Measurement Unit (IMU)
+ * This class implements the command interpreter for external Inertial Measurement Unit (FlicqDevice)
  * communicating via Bluetooth.  It interacts with Bluetooth via BluetoothInputThread class.
  * Interactions to those boards is completely encapsulated via this function.
  * @author Michael Stanley
@@ -46,7 +46,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.freescale.sensors.sfusion.A_FSL_Sensor_Demo.Algorithm;
+import com.freescale.sensors.sfusion.FlicqActivity.Algorithm;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -55,13 +55,13 @@ import java.util.Set;
 import java.util.UUID;
 
 
-class IMU extends SensorsWrapper {
+class FlicqDevice extends SensorsWrapper {
     // This class implements the state machine to decode bluetooth data records for ImuInterface data
     // The parser should work for quaternion data, but will need updates for error checking and
     // extended packet formats.  Consider this a rough draft.
 
     // Parser assumes all numbers are in 16 bit format
-    static IMU self = null;
+    static FlicqDevice self = null;
 
     private enum ImuRecordType {NONE, DEBUG, ONE, THREE, FOUR}
 
@@ -102,11 +102,11 @@ class IMU extends SensorsWrapper {
 
     // private static final int REQUEST_ENABLE_BT = 3;
 
-    // The IMU is structured using a "SingtonPattern" pattern, which enforces the fact that only one instance
+    // The FlicqDevice is structured using a "SingtonPattern" pattern, which enforces the fact that only one instance
     // of the class can exist.  See http://www.tutorialspoint.com/design_pattern/singleton_pattern.htm for details.
-    private IMU(A_FSL_Sensor_Demo demo, String pattern) {
+    private FlicqDevice(FlicqActivity demo, String pattern) {
         super(demo);
-        IMU.pattern = pattern;
+        FlicqDevice.pattern = pattern;
         quatInputs = new float[4];
         enableDebugPacket = demo.myPrefs.getBoolean("enable_device_debug", false);
         acc.setTimeScale(timeScale);
@@ -122,9 +122,9 @@ class IMU extends SensorsWrapper {
         quaternion.setDescription("Quaternion sensor fusion by Freescale Semiconductor.\nQuaternions are displayed in ENU form,\nregardless of how they were transmitted..");
     }
 
-    static public IMU getInstance(A_FSL_Sensor_Demo demo, String pattern) {
+    static public FlicqDevice getInstance(FlicqActivity demo, String pattern) {
         if (self == null) {
-            self = new IMU(demo, pattern);
+            self = new FlicqDevice(demo, pattern);
         }
         return (self);
     }
@@ -134,7 +134,7 @@ class IMU extends SensorsWrapper {
     }
 
     private class MyHandler extends Handler {
-        public MyHandler(A_FSL_Sensor_Demo activity) {
+        public MyHandler(FlicqActivity activity) {
         }
 
         public synchronized void handleMessage(Message msg) {
@@ -173,7 +173,7 @@ class IMU extends SensorsWrapper {
         str += s;
     }
 
-    void computeQuaternion(DemoQuaternion result, Algorithm algorithm) {
+    void computeQuaternion(FlicqQuaternion result, Algorithm algorithm) {
         switch (algorithm) {
             case NINE_AXIS:
                 result.set(super.quaternion());
@@ -244,28 +244,28 @@ class IMU extends SensorsWrapper {
                 quaternion.set(timestamp, quatInputs);
                 switch (boardId) {
                     case 0:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.REV5;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.REV5;
                         break;
                     case 1:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.KL25Z;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL25Z;
                         break;
                     case 2:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.K20D50M;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.K20D50M;
                         break;
                     case 4:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.KL26Z;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL26Z;
                         break;
                     case 5:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.K64F;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.K64F;
                         break;
                     case 6:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.KL16Z;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL16Z;
                         break;
                     case 7:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.KL46Z;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z;
                         break;
                     case 8:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.KL46Z_Standalone;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z_Standalone;
                         break;
                 }
                 // checkFlags() is just a unit test to ensure that we are getting expected packet types
@@ -359,28 +359,28 @@ class IMU extends SensorsWrapper {
                 }
                 switch (boardId) {
                     case 0:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.REV5;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.REV5;
                         break;
                     case 1:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.KL25Z;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL25Z;
                         break;
                     case 2:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.K20D50M;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.K20D50M;
                         break;
                     case 4:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.KL26Z;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL26Z;
                         break;
                     case 5:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.K64F;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.K64F;
                         break;
                     case 6:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.KL16Z;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL16Z;
                         break;
                     case 7:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.KL46Z;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z;
                         break;
                     case 8:
-                        demo.developmentBoard = A_FSL_Sensor_Demo.DevelopmentBoard.KL46Z_Standalone;
+                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z_Standalone;
                         break;
                 }
                 alreadySniffed = true;
@@ -408,7 +408,7 @@ class IMU extends SensorsWrapper {
         String str = "";
         switch (flags) {
             case 8:
-                if (demo.algorithm == A_FSL_Sensor_Demo.Algorithm.NINE_AXIS) sts = true;
+                if (demo.algorithm == FlicqActivity.Algorithm.NINE_AXIS) sts = true;
                 else str = "Got 9-axis packet, expected " + expectedPacketDescriptor();
                 break;
             default:
@@ -518,7 +518,7 @@ class IMU extends SensorsWrapper {
 
     public void sendTo(String str) {
         if (isReady()) {
-            // A_FSL_Sensor_Demo.write(true, "Sending \"" + str + "\" to BT device.\n");
+            // FlicqActivity.write(true, "Sending \"" + str + "\" to BT device.\n");
             byte[] bytes = null;
             try {
                 bytes = str.getBytes("UTF-8");
@@ -591,14 +591,14 @@ class IMU extends SensorsWrapper {
             Set<BluetoothDevice> pairedDevices = myBluetooth.getBondedDevices(); // Get set of currently paired devices
             if (pairedDevices.size() > 0) {
                 for (BluetoothDevice device : pairedDevices) {
-                    //A_FSL_Sensor_Demo.write("Already paired: " + device.getName() + " : " + device.getAddress() + "\n");
+                    //FlicqActivity.write("Already paired: " + device.getName() + " : " + device.getAddress() + "\n");
                     name = device.getName();
                     String address = device.getAddress();
                     dev = device;
                     uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
                     sts = name.startsWith(pattern);
                     if (sts) {
-                        setBtSts(BtStatus.PAIRED, "Found IMU.");
+                        setBtSts(BtStatus.PAIRED, "Found FlicqDevice.");
                         return;
                     }
                 }
@@ -659,7 +659,7 @@ class IMU extends SensorsWrapper {
                     }
                 }
             }, "BluetoothInputThread");
-            MyUtils.waitALittle(1000);
+            FlicqUtils.waitALittle(1000);
             background.start();
         }
     }

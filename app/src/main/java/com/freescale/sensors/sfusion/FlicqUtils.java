@@ -27,19 +27,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.freescale.sensors.sfusion;
 
 import android.app.AlertDialog;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-
-import java.io.File;
 
 /**
  * Basically a set of utility functions, many of which need a pointer to the main application instance.
  *
  * @author Michael Stanley
  */
-public class MyUtils {
-    static private A_FSL_Sensor_Demo demo;
+public class FlicqUtils {
+    static private FlicqActivity activity;
     static public final float degreesPerRadian = (float) (180.0f / 3.14159f);
     static public final float radiansPerDegree = (float) (3.14159f / 180.0f);
 
@@ -47,8 +42,8 @@ public class MyUtils {
 
     static public float unitScaler = 32768.0f;
 
-    MyUtils(A_FSL_Sensor_Demo demo) {
-        MyUtils.demo = demo;
+    FlicqUtils(FlicqActivity demo) {
+        FlicqUtils.activity = demo;
     }
 
     static public float[] transpose(float[] orig_rm) {
@@ -222,7 +217,7 @@ public class MyUtils {
     }
 
     static public void popupAlert(String title, String msg) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(demo);
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(title).setMessage(msg).setCancelable(true);
         builder.setNegativeButton("OK", null);
         builder.show();

@@ -56,12 +56,12 @@ public class PayloadPool {
             if (pl.claim()) {
                 if (i > maxClaimed) {
                     maxClaimed = i; // track the maximum payload claimed.
-                    //Log.i(A_FSL_Sensor_Demo.LOG_TAG, "Payload pool usage extended to index " + maxClaimed);
+                    //Log.i(FlicqActivity.LOG_TAG, "Payload pool usage extended to index " + maxClaimed);
                 }
                 return (pl);
             }
         }
-        //Log.w(A_FSL_Sensor_Demo.LOG_TAG, "Demand exceeded size of payload pool = " + maxPayloads + "\n");
+        //Log.w(FlicqActivity.LOG_TAG, "Demand exceeded size of payload pool = " + maxPayloads + "\n");
         return (null);
     }
 }

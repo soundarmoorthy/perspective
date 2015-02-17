@@ -25,7 +25,7 @@
         android:allowBackup="false"
         android:logo="@drawable/fsl_logo_127x31" >
         <activity
-            android:name=".A_FSL_Sensor_Demo"
+            android:name=".FlicqActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" >
             <intent-filter>

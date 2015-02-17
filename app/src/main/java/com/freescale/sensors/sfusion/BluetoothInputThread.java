@@ -60,7 +60,7 @@ class BluetoothInputThread extends Thread {
         try {    // Get the input streams, using temp object because  member streams are final
             tmpIn = socket.getInputStream();
         } catch (IOException e) {
-            Log.e(A_FSL_Sensor_Demo.LOG_TAG, "Problem in BluetoothInputThread constructor");
+            Log.e(FlicqActivity.LOG_TAG, "Problem in BluetoothInputThread constructor");
         }
         myBluetoothSocketInputStream = tmpIn;
     }
@@ -79,7 +79,7 @@ class BluetoothInputThread extends Thread {
                 } else {
                     // drop this packet and re-use the payload
                     payload.clear();
-                    //Log.v(A_FSL_Sensor_Demo.LOG_TAG, "dropping Bluetooth packet because system could not keep up.");
+                    //Log.v(FlicqActivity.LOG_TAG, "dropping Bluetooth packet because system could not keep up.");
                 }
             }
         } else {
@@ -99,7 +99,7 @@ class BluetoothInputThread extends Thread {
 
     public synchronized void run() {
         int num;
-        //Log.v(A_FSL_Sensor_Demo.LOG_TAG, "begin run() from BluetoothInputThread");
+        //Log.v(FlicqActivity.LOG_TAG, "begin run() from BluetoothInputThread");
         while (true) {
             try {
                 messageNumber++;
@@ -115,10 +115,10 @@ class BluetoothInputThread extends Thread {
     }
 
     public void cancel() {
-        //Log.v(A_FSL_Sensor_Demo.LOG_TAG, "begin cancel() from BluetoothInputThread");
+        //Log.v(FlicqActivity.LOG_TAG, "begin cancel() from BluetoothInputThread");
         try {
             myBluetoothSocket.close();
-            //Log.v(A_FSL_Sensor_Demo.LOG_TAG, "Closed Bluetooth socket.");
+            //Log.v(FlicqActivity.LOG_TAG, "Closed Bluetooth socket.");
         } catch (IOException e) {
         }
     }

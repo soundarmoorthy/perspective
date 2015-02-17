@@ -32,8 +32,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,7 +43,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -58,12 +55,12 @@ import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 
-public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListener {
+public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     static public String LOG_TAG = null;            // This string is used to uniquely identify Android log messages
     public LocalSensors localSensors = null;        // Pointer to object for managing input from sensors local to your Android device
     public DataSelector dataSelector = null;        // Pointer to object which selects one of several different sensor sources
-    public MyUtils myUtils = null;                  // This class is used as a "home" for misc. utility functions
-    public IMU imu = null;                          // The IMU class encapsulates sensor boards which communicate via Bluetooth
+    public FlicqUtils myUtils = null;                  // This class is used as a "home" for misc. utility functions
+    public FlicqDevice imu = null;                          // The FlicqDevice class encapsulates sensor boards which communicate via Bluetooth
 
     public enum GuiState {                          // GuiState defines the different states that the user interface can take on
         DEVICE
@@ -96,7 +93,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
     static public TextView tv1 = null;               // TextView variables are global pointers to fields in the GUI which can be
     static private TextView numMsgsField = null;
 
-    private boolean absoluteRemoteView = false;     // set to true to NOT take into account Android device view when using remote IMU
+    private boolean absoluteRemoteView = false;     // set to true to NOT take into account Android device view when using remote FlicqDevice
 
     static public boolean hexDumpEnabled = false;   // set to true to enable hex display of BT input
 
@@ -106,11 +103,11 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
     // Options Menu definitions
     private final int SET_PREFERENCES_MENU_ITEM = Menu.FIRST;
 
-    public final String PREF_NAME = "A_FSL_Sensor_Demo";  // String for retrieving shared preferences
+    public final String PREF_NAME = "FlicqActivity";  // String for retrieving shared preferences
     public SharedPreferences myPrefs;                     // Structure for preferences
     private float filterCoefficient = 0;                  // Used to control low pass filtering
 
-    static public A_FSL_Sensor_Demo self = null;
+    static public FlicqActivity self = null;
     // The self pointer is used in the body of one of the
     // listener functions, where "this" points to the
     // listener, not the emo itself.
@@ -160,10 +157,10 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 
     static private class MyHandler extends Handler {
         @SuppressWarnings("unused")
-        private final WeakReference<A_FSL_Sensor_Demo> myActivity;
+        private final WeakReference<FlicqActivity> myActivity;
 
-        public MyHandler(A_FSL_Sensor_Demo activity) {
-            myActivity = new WeakReference<A_FSL_Sensor_Demo>(activity);
+        public MyHandler(FlicqActivity activity) {
+            myActivity = new WeakReference<FlicqActivity>(activity);
             // this construct is used to help the JAVA garbage collector.
             // making the handler static and using a weak reference to the
             // activity is supposed to make it easier to recycle objects
@@ -316,7 +313,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
     /**
      * provides callback capability for menus residing on the "Source" selector.
      * This works because we have used "implements OnMenuItemClickListener" in
-     * the definition of the A_FSL_Sensor_Demo class. The callback was
+     * the definition of the FlicqActivity class. The callback was
      * previously set back in showDataSelector().
      */
     public boolean onMenuItemClick(MenuItem item) {
@@ -365,7 +362,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
             //Log.i(LOG_TAG, "Current orientation = " + currentOrientation + " desired " + orientationChoice);
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             if (currentOrientation != 2) {
-                // this piece of code ensures that we initialize the IMU only the 2nd time
+                // this piece of code ensures that we initialize the FlicqDevice only the 2nd time
                 // through onCreate for the case where we are in landscale mode.
                 loadImu = false;
             }
@@ -381,9 +378,9 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
         self = this;
 
         imuName = myPrefs.getString("btPrefix", getString(R.string.btPrefix));
-        if (loadImu) imu = IMU.getInstance(this, imuName);
+        if (loadImu) imu = FlicqDevice.getInstance(this, imuName);
 
-        myUtils = new MyUtils(this); // Register utility class
+        myUtils = new FlicqUtils(this); // Register utility class
         localSensors = new LocalSensors(this);
         dataSelector = new DataSelector(this);
 
@@ -524,9 +521,9 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == IMU.requestCode) {
+        if (requestCode == FlicqDevice.requestCode) {
             if (resultCode == RESULT_OK) {
-                IMU.setBtSts(IMU.BtStatus.ENABLED, "Bluetooth enabled from onActivityResult().");
+                FlicqDevice.setBtSts(FlicqDevice.BtStatus.ENABLED, "Bluetooth enabled from onActivityResult().");
                 imu.getPairedDevice();
                 imu.initializeConnection();
             }
@@ -563,7 +560,7 @@ public class A_FSL_Sensor_Demo extends Activity implements OnMenuItemClickListen
      */
     @Override
     public void onStop() {
-        //Log.v(LOG_TAG, "begin onStop() from A_FSL_Sensor_Demo");
+        //Log.v(LOG_TAG, "begin onStop() from FlicqActivity");
         //dumpStates("calling onStop().");
         localSensors.stop();
         if (imu != null) imu.stop(false);

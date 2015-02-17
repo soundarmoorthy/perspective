@@ -47,9 +47,9 @@ class SensorsWrapper {
     protected final float radiansPerDegree = (float) (3.14159f / 180.0f);
     protected final double g = SensorManager.GRAVITY_EARTH;
     String LOG_TAG = null;
-    A_FSL_Sensor_Demo demo;  // a back pointer to the master application
+    FlicqActivity demo;  // a back pointer to the master application
 
-    public SensorsWrapper(A_FSL_Sensor_Demo demo) {
+    public SensorsWrapper(FlicqActivity demo) {
         this.demo = demo;
         acc = new TimedTriad();
         mag = new TimedTriad();
@@ -93,12 +93,12 @@ class SensorsWrapper {
         return (gyro);
     }
 
-    public DemoQuaternion quaternion() {
+    public FlicqQuaternion quaternion() {
         return (quaternion);
     }
 
     public synchronized void toDegreesRotation(RotationVector rv) {
-        this.quaternion().toRotationVector(rv, MyUtils.AngleUnits.DEGREES);
+        this.quaternion().toRotationVector(rv, FlicqUtils.AngleUnits.DEGREES);
     }
 
     public boolean valsHaveBeenSet() {
