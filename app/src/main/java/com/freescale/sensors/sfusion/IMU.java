@@ -194,14 +194,6 @@ class IMU extends SensorsWrapper {
         short packetId = bb.get(0);
         int recordSize = bb.position();
 
-        if (A_FSL_Sensor_Demo.hexDumpEnabled) {
-            hexString = "";
-            for (i = 0; i < recordSize; i++) {
-                b = bb.get(i);
-                hexString += String.format("%02X ", b);
-            }
-            //A_FSL_Sensor_Demo.write(false, hexString + "\n");
-        }
         switch (packetId) {
             case 1:
                 retVal = ImuRecordType.ONE;
@@ -678,7 +670,7 @@ class IMU extends SensorsWrapper {
 
     public void stop(boolean cancel_existing_threads) {
         if (cancel_existing_threads) {
-            if (btReceiverRegistered == true) {
+            if (btReceiverRegistered) {
                 demo.unregisterReceiver(myReceiver);
             }
 
