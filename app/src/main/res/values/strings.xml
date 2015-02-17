@@ -1,6 +1,8 @@
-<resources><string name="app_name">A_FSL_Sensor_Demo</string>
+<resources>
+    <string name="app_name">Flicq</string>
     <!--  <string name="default_imu">Smith</string> -->
     <string name="about">About</string>
+    <string name="app_title">Flicq</string>
     <string name="absoluteLabel">Absolute</string>
     <string name="accRateLabel">Accelerometer sample rate: </string>
     <string name="angle">Angle</string>
@@ -21,7 +23,7 @@
     <string name="enable_remote">Automatically enable Bluetooth on entry</string>
     <string name="enable_virtual_gyro">Enable angular rate display</string>
     <string name="exit">Exit</string>
-    <string name="feedbackEmailAddr">sfusion@freescale.com</string>
+    <string name="feedbackEmailAddr">soundararajan.dhakshinamoorthy@flicq.com</string>
     <string name="fileNameLabel">Logger output filename:</string>
     <string name="fileNamePrompt">Enter your output filename here</string>
     <string name="fl_enable">File logging enable </string>

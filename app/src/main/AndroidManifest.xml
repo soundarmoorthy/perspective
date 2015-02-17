@@ -19,13 +19,13 @@
 	    android:xlargeScreens="true"
 	    />
     <application
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/logo"
         android:theme="@style/AppTheme"
-        android:label="SensorFusion"
+        android:label="@string/app_title"
         android:allowBackup="false"
-        android:logo="@drawable/fsl_logo_127x31" >
+        android:logo="@drawable/logo" >
         <activity
-            android:name=".FlicqActivity"
+            android:name="FlicqActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" >
             <intent-filter>
