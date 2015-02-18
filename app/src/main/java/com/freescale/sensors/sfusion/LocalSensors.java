@@ -33,7 +33,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import com.freescale.sensors.sfusion.FlicqActivity.Algorithm;
-import com.freescale.sensors.sfusion.FlicqActivity.DataSource;
 
 
 /**
@@ -45,15 +44,13 @@ import com.freescale.sensors.sfusion.FlicqActivity.DataSource;
  */
 class LocalSensors extends SensorsWrapper {
     private SensorManager localSensorManager;
-    private Sensor localAcc, localMag, localGyro, localPressure, localRotationVectorSensor;
-    private Sensor localLight, localProximity, localTemperature;
-    private Sensor localLinearAccelerometer, localOrientation;
+    private Sensor localAcc, localMag, localGyro, localRotationVectorSensor;
     private boolean sensorsEnabled = false;
     float[] workingQuaternion = null;
 
-    public LocalSensors(FlicqActivity demo) {
-        super(demo);
-        this.demo = demo;
+    public LocalSensors(FlicqActivity activity) {
+        super(activity);
+        this.activity = activity;
         workingQuaternion = new float[4];
         acc.setTimeScale(1e-9f);
         mag.setTimeScale(1e-9f);
@@ -62,13 +59,13 @@ class LocalSensors extends SensorsWrapper {
         acc.setName("Accelerometer");
         mag.setName("Magnetometer");
         gyro.setName("Gyroscope");
-        localSensorManager = (SensorManager) demo.getSystemService(Context.SENSOR_SERVICE);
+        localSensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
     }
 
 
     public synchronized void updateRotation(long time, float[] values) {
         SensorManager.getQuaternionFromVector(workingQuaternion, values);
-        setQuaternion(time, workingQuaternion);
+        this.quaternion.set(time, workingQuaternion);
     }
 
     void enable() {
@@ -107,9 +104,7 @@ class LocalSensors extends SensorsWrapper {
         }
     }
 
-    @Override
-    public void setSensorRateBySensorType(SensorType type, int rate) {
-    }
+
 
     public synchronized void run(boolean register_listeners) {
         boolean writeRates = !register_listeners;

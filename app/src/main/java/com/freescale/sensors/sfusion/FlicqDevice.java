@@ -162,7 +162,7 @@ class FlicqDevice extends SensorsWrapper {
         }
     }
 
-    MyHandler handler = new MyHandler(demo);
+    MyHandler handler = new MyHandler(activity);
 
 
     static public void setBtSts(BtStatus sts, String s) {
@@ -208,7 +208,7 @@ class FlicqDevice extends SensorsWrapper {
                 short gx = bb.getShort(18);
                 short gy = bb.getShort(20);
                 short gz = bb.getShort(22);
-                if ((demo.algorithm == Algorithm.NINE_AXIS) || (recordSize < 41)) {
+                if ((activity.algorithm == Algorithm.NINE_AXIS) || (recordSize < 41)) {
                     quatInputs[0] = (float) bb.getShort(24) / 30000f;
                     quatInputs[1] = (float) bb.getShort(26) / 30000f;
                     quatInputs[2] = (float) bb.getShort(28) / 30000f;
@@ -244,28 +244,28 @@ class FlicqDevice extends SensorsWrapper {
                 quaternion.set(timestamp, quatInputs);
                 switch (boardId) {
                     case 0:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.REV5;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.REV5;
                         break;
                     case 1:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL25Z;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL25Z;
                         break;
                     case 2:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.K20D50M;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.K20D50M;
                         break;
                     case 4:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL26Z;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL26Z;
                         break;
                     case 5:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.K64F;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.K64F;
                         break;
                     case 6:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL16Z;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL16Z;
                         break;
                     case 7:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z;
                         break;
                     case 8:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z_Standalone;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z_Standalone;
                         break;
                 }
                 // checkFlags() is just a unit test to ensure that we are getting expected packet types
@@ -290,7 +290,7 @@ class FlicqDevice extends SensorsWrapper {
                         else systicks = shortInt;
                         systicks = systicks * 20;
                         str += String.format("\nSysticks/Orientation: %08d", systicks);
-                        switch (demo.developmentBoard) {
+                        switch (activity.developmentBoard) {
                             case REV5:
                                 break;
                             case KL25Z:
@@ -359,28 +359,28 @@ class FlicqDevice extends SensorsWrapper {
                 }
                 switch (boardId) {
                     case 0:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.REV5;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.REV5;
                         break;
                     case 1:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL25Z;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL25Z;
                         break;
                     case 2:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.K20D50M;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.K20D50M;
                         break;
                     case 4:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL26Z;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL26Z;
                         break;
                     case 5:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.K64F;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.K64F;
                         break;
                     case 6:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL16Z;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL16Z;
                         break;
                     case 7:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z;
                         break;
                     case 8:
-                        demo.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z_Standalone;
+                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z_Standalone;
                         break;
                 }
                 alreadySniffed = true;
@@ -390,7 +390,7 @@ class FlicqDevice extends SensorsWrapper {
     // utility function used by checkFlags()
     String expectedPacketDescriptor() {
         String str = "unknown";
-        switch (demo.algorithm) {
+        switch (activity.algorithm) {
             case NINE_AXIS:
                 str = "9-axis";
                 break;
@@ -408,7 +408,7 @@ class FlicqDevice extends SensorsWrapper {
         String str = "";
         switch (flags) {
             case 8:
-                if (demo.algorithm == FlicqActivity.Algorithm.NINE_AXIS) sts = true;
+                if (activity.algorithm == FlicqActivity.Algorithm.NINE_AXIS) sts = true;
                 else str = "Got 9-axis packet, expected " + expectedPacketDescriptor();
                 break;
             default:
@@ -494,9 +494,9 @@ class FlicqDevice extends SensorsWrapper {
     }
 
     void configureStartupBehavior() {
-        enableDebugPacket = demo.myPrefs.getBoolean("enable_device_debug", false);
-        virtualGyroEnabled = demo.myPrefs.getBoolean("enable_virtual_gyro", false);
-        rpcEnabled = demo.myPrefs.getBoolean("enable_rpc", false);
+        enableDebugPacket = activity.myPrefs.getBoolean("enable_device_debug", false);
+        virtualGyroEnabled = activity.myPrefs.getBoolean("enable_virtual_gyro", false);
+        rpcEnabled = activity.myPrefs.getBoolean("enable_rpc", false);
         turnDebugOn(); // always on (see note above)
         if (virtualGyroEnabled) enableVirtualGyro();
         else disableVirtualGyro();
@@ -550,7 +550,7 @@ class FlicqDevice extends SensorsWrapper {
             } else {
                 stop(true);
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                demo.startActivityForResult(enableIntent, requestCode);
+                activity.startActivityForResult(enableIntent, requestCode);
             }
         }
     }
@@ -558,23 +558,23 @@ class FlicqDevice extends SensorsWrapper {
     public void scheduleBtIntents() {
         if ((myBluetooth != null) && (myBluetooth.isEnabled())) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            demo.startActivity(enableIntent);
+            activity.startActivity(enableIntent);
             IntentFilter filter = null;
 
             filter = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
-            demo.registerReceiver(myReceiver, filter);
+            activity.registerReceiver(myReceiver, filter);
             filter = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-            demo.registerReceiver(myReceiver, filter);
+            activity.registerReceiver(myReceiver, filter);
 
             filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-            demo.registerReceiver(myReceiver, filter);
+            activity.registerReceiver(myReceiver, filter);
 
             filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            demo.registerReceiver(myReceiver, filter);
+            activity.registerReceiver(myReceiver, filter);
             filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-            demo.registerReceiver(myReceiver, filter);
+            activity.registerReceiver(myReceiver, filter);
             filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-            demo.registerReceiver(myReceiver, filter);
+            activity.registerReceiver(myReceiver, filter);
             btReceiverRegistered = true;
         }
     }
@@ -665,7 +665,7 @@ class FlicqDevice extends SensorsWrapper {
     public void stop(boolean cancel_existing_threads) {
         if (cancel_existing_threads) {
             if (btReceiverRegistered) {
-                demo.unregisterReceiver(myReceiver);
+                activity.unregisterReceiver(myReceiver);
             }
 
             if (myBluetoothInputThread != null) {

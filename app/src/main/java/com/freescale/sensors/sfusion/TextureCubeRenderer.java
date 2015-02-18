@@ -40,7 +40,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class TextureCubeRenderer implements GLSurfaceView.Renderer {
 
     private TextureCube cube;
-    private FlicqActivity demo;
+    private FlicqActivity activity;
     private int screenHeight;
     private int screenWidth;
     private int screenRotation = 0;
@@ -48,8 +48,8 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
     private RotationVector rv = new RotationVector();
 
     // Constructor
-    public TextureCubeRenderer(FlicqActivity demo, int screenRotation,int[] surfaces, float[] dimensions, String desc) {
-        this.demo = demo;
+    public TextureCubeRenderer(FlicqActivity activity, int screenRotation,int[] surfaces, float[] dimensions, String desc) {
+        this.activity = activity;
         this.screenRotation = screenRotation;
         this.cube = new TextureCube(surfaces, dimensions, desc);
     }
@@ -65,7 +65,7 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
         gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);  // nice perspective view
         gl.glDisable(GL10.GL_DITHER);
 
-        cube.loadTextures(gl, demo);
+        cube.loadTextures(gl, activity);
     }
 
     // Call back after onSurfaceCreated() or whenever the window's size changes.
@@ -109,14 +109,14 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
         gl.glLoadIdentity();  // replace the current matrix with the identity matrix
 
         TimedQuaternion q  = new TimedQuaternion();
-        demo.dataSelector.getData(rv, q, this.screenRotation);  // screenRotation only affects fixed rotations
+        activity.dataSelector.getData(rv, q, this.screenRotation);  // screenRotation only affects fixed rotations
         gl.glTranslatef(q.q1 * 4.0f, q.q2 * 4.0f,4*cube.offset);
 
         gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
         gl.glRotatef(rv.a ,rv.x,rv.y,rv.z);
 
         // Do fixed corrections based on portrait/landscape
-        switch (demo.dataSource) {
+        switch (activity.dataSource) {
             case STOPPED:
             case FIXED:
                 if (this.screenRotation != 0) {

@@ -35,7 +35,7 @@ import com.freescale.sensors.sfusion.FlicqActivity.GuiState;
  * @author Michael Stanley
  */
 public class DataSelector {
-    FlicqActivity demo;
+    FlicqActivity activity;
     SensorsWrapper choice = null;
     SensorsWrapper stopped = null;
     SensorsWrapper fixed = null;
@@ -45,14 +45,12 @@ public class DataSelector {
     FlicqQuaternion workingQuaternion3 = null;
     float myBoxRotation;
 
-    DataSelector(FlicqActivity demo) {
-        this.demo = demo;
+    DataSelector(FlicqActivity activity) {
+        this.activity = activity;
         myBoxRotation = 0;
         zeroPosition = new FlicqQuaternion();
-        stopped = new SensorsWrapper(demo);
-        fixed = new SensorsWrapper(demo);
-        stopped.setSensorDescriptions("Placeholder for STOPPED sensors");
-        fixed.setSensorDescriptions("Placeholder for FIXED sensors");
+        stopped = new SensorsWrapper(activity);
+        fixed = new SensorsWrapper(activity);
         choice = stopped;
         workingQuaternion1 = new FlicqQuaternion();
         workingQuaternion2 = new FlicqQuaternion();
@@ -60,12 +58,12 @@ public class DataSelector {
     }
 
     public void updateSelection() {
-        switch (demo.dataSource) {
+        switch (activity.dataSource) {
             case LOCAL:
-                choice = demo.localSensors;
+                choice = activity.localSensors;
                 break;
             case REMOTE:
-                choice = demo.imu;
+                choice = activity.flicqDevice;
                 break;
             case STOPPED:
                 choice = this.stopped;
@@ -83,23 +81,14 @@ public class DataSelector {
         return choice.gyro.enabled;
     }
 
-    void getSensorsSnapshot(TimedTriad acc, TimedTriad mag, TimedTriad gyro, TimedQuaternion quat, RotationVector rv) {
-        updateSelection();
-        acc.snapshot(choice.acc);
-        mag.snapshot(choice.mag);
-        gyro.snapshot(choice.gyro);
-        quat.snapshot(choice.quaternion);
-        rv.computeFromQuaternion(quat, FlicqUtils.AngleUnits.DEGREES);
-    }
-
     synchronized void adjustForZero(RotationVector rv, FlicqQuaternion q) {
-        if (demo.zeroPending) {
+        if (activity.zeroPending) {
             zeroPosition.set(q);
             zeroPosition.reverse();
-            demo.zeroPending = false;
-            demo.zeroed = true;
+            activity.zeroPending = false;
+            activity.zeroed = true;
             rv.setIdentity();
-        } else if (demo.zeroed) {
+        } else if (activity.zeroed) {
             workingQuaternion1.eqPxQ(zeroPosition, q);
             rv.computeFromQuaternion(workingQuaternion1, FlicqUtils.AngleUnits.DEGREES);
         } else {
@@ -109,16 +98,16 @@ public class DataSelector {
 
     synchronized void getData(RotationVector rv, TimedQuaternion q, int screenRotation) {
         updateSelection();
-        switch (demo.dataSource) {
+        switch (activity.dataSource) {
             case LOCAL:
-                demo.localSensors.computeQuaternion(workingQuaternion2, demo.algorithm);
+                activity.localSensors.computeQuaternion(workingQuaternion2, activity.algorithm);
                 rv.computeFromQuaternion(workingQuaternion2, FlicqUtils.AngleUnits.DEGREES);
                 q.set(workingQuaternion2);
                 break;
             case REMOTE:
-                demo.imu.computeQuaternion(workingQuaternion2, demo.algorithm);
-                if (demo.dualModeRequired()) {
-                    workingQuaternion3.set(demo.localSensors.quaternion());
+                activity.flicqDevice.computeQuaternion(workingQuaternion2, activity.algorithm);
+                if (activity.dualModeRequired()) {
+                    workingQuaternion3.set(activity.localSensors.quaternion());
                     workingQuaternion3.reverse();
                     workingQuaternion1.eqPxQ(workingQuaternion3, workingQuaternion2);
                     adjustForZero(rv, workingQuaternion1);
@@ -129,7 +118,7 @@ public class DataSelector {
                 }
                 break;
             case STOPPED:
-                if (demo.guiState == GuiState.DEVICE) {
+                if (activity.guiState == GuiState.DEVICE) {
                     rv.set(FlicqUtils.AngleUnits.DEGREES, 0, 0, 0, 1);
                 } else {
                     rv.set(FlicqUtils.AngleUnits.DEGREES, 0, 0, 0, 1);
@@ -137,7 +126,7 @@ public class DataSelector {
                 break;
             case FIXED:
             default:
-                if (demo.guiState == GuiState.DEVICE) {
+                if (activity.guiState == GuiState.DEVICE) {
                     rv.set(FlicqUtils.AngleUnits.DEGREES, myBoxRotation, 0.1f, 0.1f, 0.1f);
                     myBoxRotation += 1.0f;
                 } else {
@@ -155,12 +144,12 @@ public class DataSelector {
 
     synchronized void getQuaternion(FlicqQuaternion q) {
         updateSelection();
-        switch (demo.dataSource) {
+        switch (activity.dataSource) {
             case LOCAL:
-                demo.localSensors.computeQuaternion(q, demo.algorithm);
+                activity.localSensors.computeQuaternion(q, activity.algorithm);
                 break;
             case REMOTE:
-                demo.imu.computeQuaternion(q, demo.algorithm);
+                activity.flicqDevice.computeQuaternion(q, activity.algorithm);
                 break;
             case STOPPED:
             case FIXED:

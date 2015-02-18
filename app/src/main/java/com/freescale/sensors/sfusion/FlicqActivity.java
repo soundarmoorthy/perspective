@@ -60,7 +60,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     public LocalSensors localSensors = null;        // Pointer to object for managing input from sensors local to your Android device
     public DataSelector dataSelector = null;        // Pointer to object which selects one of several different sensor sources
     public FlicqUtils myUtils = null;                  // This class is used as a "home" for misc. utility functions
-    public FlicqDevice imu = null;                          // The FlicqDevice class encapsulates sensor boards which communicate via Bluetooth
+    public FlicqDevice flicqDevice = null;                          // The FlicqDevice class encapsulates sensor boards which communicate via Bluetooth
 
     public enum GuiState {                          // GuiState defines the different states that the user interface can take on
         DEVICE
@@ -290,19 +290,19 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         switch (dataSource) {
             case LOCAL:
                 localSensors.run();
-                if (imu != null) imu.stop(false);
+                if (flicqDevice != null) flicqDevice.stop(false);
                 break;
             case REMOTE:
                 localSensors.stop();
-                if (imu != null) {
-                    imu.start();
+                if (flicqDevice != null) {
+                    flicqDevice.start();
                 }
                 break;
             case STOPPED:
             case FIXED:
                 localSensors.stop();
-                if (imu != null)
-                    imu.stop(false);
+                if (flicqDevice != null)
+                    flicqDevice.stop(false);
                 break;
         }
         dataSelector.updateSelection();
@@ -331,7 +331,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
             dataSource = DataSource.REMOTE;
             algorithm = Algorithm.NINE_AXIS;
             menuButton.setText("REMOTE 9 AXIS");
-            if (imu != null) imu.useQ9();
+            if (flicqDevice != null) flicqDevice.useQ9();
         } else if (itemId == R.id.fixed) {
             dataSource = DataSource.FIXED;
             algorithm = Algorithm.NONE;
@@ -376,7 +376,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         self = this;
 
         imuName = myPrefs.getString("btPrefix", getString(R.string.btPrefix));
-        if (loadImu) imu = FlicqDevice.getInstance(this, imuName);
+        if (loadImu) flicqDevice = FlicqDevice.getInstance(this, imuName);
 
         myUtils = new FlicqUtils(this); // Register utility class
         localSensors = new LocalSensors(this);
@@ -512,8 +512,8 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         configureApplicationViews(guiState, true); // Override default set in
         // activity_main.xml
         // previously used imu_names include "Gen5" and "Motorola"
-        if ((imu != null) && (!imu.isListening())) {
-            imu.startBluetooth();
+        if ((flicqDevice != null) && (!flicqDevice.isListening())) {
+            flicqDevice.startBluetooth();
         }
     }
 
@@ -521,8 +521,8 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FlicqDevice.requestCode) {
             if (resultCode == RESULT_OK) {
-                imu.getPairedDevice();
-                imu.initializeConnection();
+                flicqDevice.getPairedDevice();
+                flicqDevice.initializeConnection();
             }
         }
     }
@@ -560,7 +560,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         //Log.v(LOG_TAG, "begin onStop() from FlicqActivity");
         //dumpStates("calling onStop().");
         localSensors.stop();
-        if (imu != null) imu.stop(false);
+        if (flicqDevice != null) flicqDevice.stop(false);
         // Threads are NOT stopped, as the settings shown keep things working after
         // accessing the preferences screen.
         super.onStop();
@@ -573,8 +573,8 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (imu != null) {
-            imu.stop(true); // release BT threads
+        if (flicqDevice != null) {
+            flicqDevice.stop(true); // release BT threads
         }
     }
 

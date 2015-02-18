@@ -47,16 +47,16 @@ class SensorsWrapper {
     protected final float radiansPerDegree = (float) (3.14159f / 180.0f);
     protected final double g = SensorManager.GRAVITY_EARTH;
     String LOG_TAG = null;
-    FlicqActivity demo;  // a back pointer to the master application
+    FlicqActivity activity;  // a back pointer to the master application
 
-    public SensorsWrapper(FlicqActivity demo) {
-        this.demo = demo;
+    public SensorsWrapper(FlicqActivity activity) {
+        this.activity = activity;
         acc = new TimedTriad();
         mag = new TimedTriad();
         gyro = new TimedTriad();
         quaternion = new TimedQuaternion();
         clear();
-        LOG_TAG = demo.getString(R.string.log_tag);
+        LOG_TAG = activity.getString(R.string.log_tag);
     }
 
     public void setNoGyro() {
@@ -76,29 +76,8 @@ class SensorsWrapper {
         gyro.setFilterCoef(fc);
     }
 
-    public void setQuaternion(long time, float[] q) {
-        assert (q.length == 4);
-        this.quaternion.set(time, q);
-    }
-
-    public TimedTriad mag() {
-        return (mag);
-    }
-
-    public TimedTriad acc() {
-        return (acc);
-    }
-
-    public TimedTriad gyro() {
-        return (gyro);
-    }
-
     public FlicqQuaternion quaternion() {
-        return (quaternion);
-    }
-
-    public synchronized void toDegreesRotation(RotationVector rv) {
-        this.quaternion().toRotationVector(rv, FlicqUtils.AngleUnits.DEGREES);
+        return quaternion;
     }
 
     public boolean valsHaveBeenSet() {
@@ -110,24 +89,4 @@ class SensorsWrapper {
         mag.zero();
         gyro.zero();
     }
-
-    synchronized public void outdate() {
-        acc.outdate();
-        mag.outdate();
-        gyro.outdate();
-    }
-
-    public synchronized void enableLogging(boolean en, int maxSamples, boolean oneShot, boolean resetStats) {
-    }
-
-    public void setSensorDescriptions(String s) {
-        acc.setDescription(s);
-        mag.setDescription(s);
-        gyro.setDescription(s);
-        quaternion.setDescription(s);
-    }
-
-    public void setSensorRateBySensorType(SensorType type, int rate) {
-        // nothing is the default.  Will be Overridden in derived classes
-    }
-}    
+}
