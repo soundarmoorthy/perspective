@@ -80,10 +80,6 @@ class SensorsWrapper {
         return quaternion;
     }
 
-    public boolean valsHaveBeenSet() {
-        return (acc.hasBeenSet() && mag.hasBeenSet() && gyro.hasBeenSet());
-    }
-
     synchronized public void clear() {
         acc.zero();
         mag.zero();

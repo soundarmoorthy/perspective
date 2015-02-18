@@ -21,10 +21,6 @@ public class AppEngineSensor extends SensorsWrapper{
         acc.setName("Accelerometer");
         mag.setName("Magnetometer");
         gyro.setName("Gyroscope");
-        acc.setDescription("");
-        mag.setDescription("");
-        gyro.setDescription("");
-        quaternion.setDescription("");
     }
 
     static private AppEngineSensor self;

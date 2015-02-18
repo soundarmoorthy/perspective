@@ -222,5 +222,4 @@ public class FlicqQuaternion {
         Triad t = new Triad(w1, w2, w3);
         return (t);
     }
-
 }

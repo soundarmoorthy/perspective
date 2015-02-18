@@ -28,6 +28,7 @@ package com.freescale.sensors.sfusion;
 
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -66,6 +67,10 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
         gl.glDisable(GL10.GL_DITHER);
 
         cube.loadTextures(gl, activity);
+        current = new TimedQuaternion();
+        previous = new TimedQuaternion();
+        previous.setIdentity();
+        current.setIdentity();
     }
 
     // Call back after onSurfaceCreated() or whenever the window's size changes.
@@ -102,18 +107,22 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
         gl.glLoadIdentity();
     }
 
+    static TimedQuaternion previous = null;
+    static TimedQuaternion current = null;
     @Override
     public void onDrawFrame(GL10 gl) {
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);  // clear buffers to preset values
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();  // replace the current matrix with the identity matrix
 
-        TimedQuaternion q  = new TimedQuaternion();
-        activity.dataSelector.getData(rv, q, this.screenRotation);  // screenRotation only affects fixed rotations
-        gl.glTranslatef(q.q1 * 4.0f, q.q2 * 4.0f,4*cube.offset);
+        activity.dataSelector.getData(rv, current, this.screenRotation);  // screenRotation only affects fixed rotations
 
-        gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
-        gl.glRotatef(rv.a ,rv.x,rv.y,rv.z);
+        float x = previous.q1 - current.q1;
+        float y = previous.q2 - current.q2;
+        gl.glTranslatef(x * 10,y * 10, 8*cube.offset);
+
+        //gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
+        //gl.glRotatef(rv.a ,rv.x,rv.y,rv.z);
 
         // Do fixed corrections based on portrait/landscape
         switch (activity.dataSource) {
@@ -122,7 +131,7 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
                 if (this.screenRotation != 0) {
                     gl.glRotatef(+90.0f, 0.0f, 0.0f, 1.0f);  // correct for portrait
                 }
-                gl.glTranslatef(0.0f,0.0f, 4 * cube.offset );
+                gl.glTranslatef(0.0f,0.0f, 8 * cube.offset );
         }
         cube.draw(gl);
     }

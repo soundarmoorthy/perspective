@@ -100,10 +100,6 @@ class FlicqDevice extends SensorsWrapper {
 
     final int keepAliveInterval = 100;
 
-    // private static final int REQUEST_ENABLE_BT = 3;
-
-    // The FlicqDevice is structured using a "SingtonPattern" pattern, which enforces the fact that only one instance
-    // of the class can exist.  See http://www.tutorialspoint.com/design_pattern/singleton_pattern.htm for details.
     private FlicqDevice(FlicqActivity demo, String pattern) {
         super(demo);
         FlicqDevice.pattern = pattern;
@@ -116,10 +112,6 @@ class FlicqDevice extends SensorsWrapper {
         acc.setName("Accelerometer");
         mag.setName("Magnetometer");
         gyro.setName("Gyroscope");
-        acc.setDescription("Remote accelerometer = Freescale FXOS8700CQ or MMA8652.\n+/-4 gravities full range.\n");
-        mag.setDescription("Remote magnetometer = Freescale MAG3110 (+/- 1000 microTeslas full range)\nor FXOS8700CQ.\n+/-1200 microTeslas full range.\n");
-        gyro.setDescription("Remote gyroscope = Freescale FXAS21000.\n+/-1600 dps full range.\n");
-        quaternion.setDescription("Quaternion sensor fusion by Freescale Semiconductor.\nQuaternions are displayed in ENU form,\nregardless of how they were transmitted..");
     }
 
     static public FlicqDevice getInstance(FlicqActivity demo, String pattern) {

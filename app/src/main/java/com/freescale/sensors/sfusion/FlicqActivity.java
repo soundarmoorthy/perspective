@@ -124,35 +124,9 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
 
     final float pcbDimensions[] = {0.96f, 1.5f, 0.05f, -2.5f};
 
-    /**
-     * utility library used to quickly determine whether or not we should be
-     * sampling sensor data.
-     *
-     * @return true unless the current data source is specified to be FIXED or
-     * STOPPED.
-     */
-    public boolean dataIsLive() {
-        return ((dataSource != DataSource.FIXED) && (dataSource != DataSource.STOPPED));
-    }
-
     public boolean dualModeRequired() {
         return ((dataSource == DataSource.REMOTE))
                 && (guiState == GuiState.DEVICE) && (!absoluteRemoteView);
-    }
-
-    public boolean absoluteModeRequired() {
-        return (dataSource == DataSource.REMOTE) && (absoluteRemoteView);
-    }
-
-    /**
-     * The App-specific settings bar contains a text field which is used to
-     * display how many messages have been written to date. This function is
-     * used to update that field.
-     *
-     * @param num
-     */
-    static public void setNumMsgs(Long num) {
-        numMsgsField.setText(String.format(" (%d) ", num));
     }
 
     static private class MyHandler extends Handler {
@@ -172,30 +146,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
                 tv1.setText(msg.obj.toString());
             }
             long numLogged = 1024 * msg.arg1 + msg.arg2;
-            setNumMsgs(numLogged);
         }
-    }
-
-    public MyHandler logHandler = new MyHandler(this);
-
-    /**
-     * Computes a string with the app name, copyright and program version.
-     *
-     * @return msg containing app name, copyright and program version.
-     */
-    public String prompt() {
-        return ("It works, really");
-    }
-
-    public String appVersion() {
-        String versionName = "";
-        try {
-            versionName = getPackageManager().getPackageInfo(getPackageName(),
-                    0).versionName;
-        } catch (Throwable t) {
-            versionName = "unknown";
-        }
-        return (versionName);
     }
 
     /**
@@ -229,10 +180,6 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         zeroPending = false;
     }
 
-    // Configure visibility for text fields above the DEVICE view
-    public void configureConsoles(boolean show) {
-    }
-
     /**
      * top level function used to configure visibility of various GUI
      * components.
@@ -263,7 +210,6 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
                     disableZeroFunction(zeroCheckBox);
                 }
                 dataSourcePopup.setVisibility(View.VISIBLE);
-                configureConsoles(this.dataSource == DataSource.REMOTE);
                 break;
         }
         updateSensors();
@@ -357,11 +303,8 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         int orientationChoice = myPrefs.getInt("orientation", 0);
         if (orientationChoice == 1) {
             int currentOrientation = getResources().getConfiguration().orientation;
-            //Log.i(LOG_TAG, "Current orientation = " + currentOrientation + " desired " + orientationChoice);
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             if (currentOrientation != 2) {
-                // this piece of code ensures that we initialize the FlicqDevice only the 2nd time
-                // through onCreate for the case where we are in landscale mode.
                 loadImu = false;
             }
         }
@@ -374,7 +317,6 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         }
 
         self = this;
-
         imuName = myPrefs.getString("btPrefix", getString(R.string.btPrefix));
         if (loadImu) flicqDevice = FlicqDevice.getInstance(this, imuName);
 
@@ -385,9 +327,6 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         setContentView(R.layout.activity_main);
         ActionBar bar = getActionBar();
         bar.setDisplayShowTitleEnabled(false);
-        // XML files set the background and Logo,
-        // onCreateOptionsMenu() creates the options menu.
-
 
         Display display = ((WindowManager) this
                 .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();

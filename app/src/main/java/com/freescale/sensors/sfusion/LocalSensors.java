@@ -104,8 +104,6 @@ class LocalSensors extends SensorsWrapper {
         }
     }
 
-
-
     public synchronized void run(boolean register_listeners) {
         boolean writeRates = !register_listeners;
         // Now let's access local sensors

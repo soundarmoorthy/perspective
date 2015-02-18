@@ -76,11 +76,6 @@ public class DataSelector {
         }
     }
 
-    public boolean gyroEnabled() {
-        updateSelection();
-        return choice.gyro.enabled;
-    }
-
     synchronized void adjustForZero(RotationVector rv, FlicqQuaternion q) {
         if (activity.zeroPending) {
             zeroPosition.set(q);
@@ -140,61 +135,5 @@ public class DataSelector {
                 }
                 break;
         }
-    }
-
-    synchronized void getQuaternion(FlicqQuaternion q) {
-        updateSelection();
-        switch (activity.dataSource) {
-            case LOCAL:
-                activity.localSensors.computeQuaternion(q, activity.algorithm);
-                break;
-            case REMOTE:
-                activity.flicqDevice.computeQuaternion(q, activity.algorithm);
-                break;
-            case STOPPED:
-            case FIXED:
-            default:
-                q.setIdentity();
-                break;
-        }
-        return;
-    }
-
-    public boolean accSaysUpRight() {
-        float z = choice.acc.z;
-        if (z > 0) return true;
-        return false;
-    }
-
-    public String getAccelName() {
-        return choice.acc.getName();
-    }
-
-    public String getMagName() {
-        return choice.mag.getName();
-    }
-
-    public String getGyroName() {
-        return choice.gyro.getName();
-    }
-
-    public String getQuatName() {
-        return choice.quaternion.getName();
-    }
-
-    public String getAccelDescription() {
-        return choice.acc.getDescription();
-    }
-
-    public String getMagDescription() {
-        return choice.mag.getDescription();
-    }
-
-    public String getGyroDescription() {
-        return choice.gyro.getDescription();
-    }
-
-    public String getQuatDescription() {
-        return choice.quaternion.getDescription();
     }
 }

@@ -46,25 +46,6 @@ public class FlicqUtils {
         FlicqUtils.activity = demo;
     }
 
-    static public float[] transpose(float[] orig_rm) {
-        // Input matrix is of the form:
-        // rm0 rm1 rm2
-        // rm3 rm4 rm5
-        // rm6 rm7 rm8
-            assert (orig_rm.length == 9); // rm is assumed to be 3x3 matrix of form
-        float[] rm = new float[9];
-        rm[0] = orig_rm[0];
-        rm[4] = orig_rm[4];
-        rm[8] = orig_rm[8];
-        rm[3] = orig_rm[1];
-        rm[1] = orig_rm[3];
-        rm[6] = orig_rm[2];
-        rm[2] = orig_rm[6];
-        rm[7] = orig_rm[5];
-        rm[5] = orig_rm[7];
-        return (rm);
-    }
-
     static public float dotProduct(float[] a, float[] b) {
         // a and b are assumed to be the same length
         assert (a.length == b.length);
@@ -120,140 +101,10 @@ public class FlicqUtils {
         return (angle); // Angle is in radians
     }
 
-
-    static public float axisAngleD(float[] axis, float[] v1, float[] v2) {
-        return (degreesPerRadian * axisAngle(axis, v1, v2));
-    }
-
-    static public float vectorAngle(float[] v1, float[] v2) {
-        assert (v1.length == 3);
-        assert (v2.length == 3);
-        float[] nv1 = new float[3]; // normalized version of v1
-        float[] nv2 = new float[3]; // normalized version of v2
-        normalize(nv1, v1);
-        normalize(nv2, v2);
-        float cosAngle = dotProduct(nv1, nv2);
-        float angle = (float) Math.acos(cosAngle);
-        return (angle); // Angle is in radians
-    }
-
-
-    static public float vectorAngleD(float[] v1, float[] v2) {
-        return (degreesPerRadian * vectorAngle(v1, v2));
-    }
-
-    static public float vectorAngleD(Triad v1, Triad v2) {
-        return (degreesPerRadian * vectorAngle(v1.array(), v2.array()));
-    }
-
-
-    // Xtrinsic Android accelerometer 3DOF tilt function computing rotation matrix RM
-    // This is an alternate implementation which can be used for the "local 3-axis" solution.
-    // Currently not used, but kept for future reference.
-    static void f3DOFTiltAndroid(float[][] RM, float[] accelReading) {
-        // local variables
-        int X = 0;
-        int Y = 1;
-        int Z = 2;
-        int i;
-        float g[] = new float[3];        // normalized accelerometer readings
-        float fmodGxyz;                  // modulus of the x, y, z accelerometer readings
-        float fmodGyz;                   // modulus of the y, z accelerometer readings
-        float ftmp;                      // scratch variable
-
-        // compute the accelerometer magnitude and R00
-        fmodGyz = accelReading[Y] * accelReading[Y] + accelReading[Z] * accelReading[Z];
-        fmodGxyz = fmodGyz + accelReading[X] * accelReading[X];
-        fmodGyz = (float) Math.sqrt(fmodGyz);
-        fmodGxyz = (float) Math.sqrt(fmodGxyz);
-
-        // check for freefall and gimbal lock
-        if ((fmodGxyz != 0.0F) && (fmodGyz != 0.0F)) {
-            // normalize the accelerometer reading and R00
-            for (i = X; i <= Z; i++) {
-                g[i] = accelReading[i] / fmodGxyz;
-            }
-
-            // construct the orientation matrix
-            RM[X][X] = fmodGyz / fmodGxyz;
-            ftmp = 1.0F / RM[X][X];
-            RM[Y][X] = -g[X] * g[Y] * ftmp;
-            RM[Z][X] = -g[X] * g[Z] * ftmp;
-
-            RM[X][Y] = 0.0F;
-            RM[Y][Y] = g[Z] * ftmp;
-            RM[Z][Y] = -g[Y] * ftmp;
-
-            RM[X][Z] = g[X];
-            RM[Y][Z] = g[Y];
-            RM[Z][Z] = g[Z];
-        } else {
-            RM[0][0] = 1.0f;
-            RM[0][1] = 0.0f;
-            RM[0][2] = 0.0f;
-            RM[1][0] = 0.0f;
-            RM[1][1] = 1.0f;
-            RM[1][2] = 0.0f;
-            RM[2][0] = 0.0f;
-            RM[2][1] = 0.0f;
-            RM[2][2] = 1.0f;
-        }
-        return;
-    }
-
-
-    static void toFloatArray(float[] dataOut, double[] dataIn) {
-        assert (dataIn.length == dataOut.length);
-        for (int i = 0; i < dataOut.length; i++) {
-            dataOut[i] = (float) dataIn[i];
-        }
-    }
-
-    static void toDoubleArray(double[] dataOut, float[] dataIn) {
-        assert (dataIn.length == dataOut.length);
-        for (int i = 0; i < dataOut.length; i++) {
-            dataOut[i] = (double) dataIn[i];
-        }
-    }
-
-    static public void popupAlert(String title, String msg) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle(title).setMessage(msg).setCancelable(true);
-        builder.setNegativeButton("OK", null);
-        builder.show();
-    }
-
     static public void waitALittle(int delay) {
         try {
             Thread.sleep(delay);
         } catch (Throwable t) {
         }
-    }
-
-    static int limitI(int val, int lim) {
-        if (val < -lim) {
-            val = -lim;
-        } else if (val > lim) {
-            val = lim;
-        }
-        return (val);
-    }
-
-    static long limitL(long val, long lim) {
-        if (val < -lim) {
-            val = -lim;
-        } else if (val > lim) {
-            val = lim;
-        }
-        return (val);
-    }
-
-    static double limitD(double val, double lim) {
-        if (val < -lim) {
-            val = -lim;
-        } else if (val > lim) {
-            val = lim;
-        }
-        return (val);
     }
 }

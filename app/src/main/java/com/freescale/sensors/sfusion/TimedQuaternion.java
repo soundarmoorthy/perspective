@@ -48,14 +48,6 @@ public class TimedQuaternion extends FlicqQuaternion {
     public boolean statsLoggingEnabled = false;
     private float timeScaleFactor = 1;
 
-    public void setDescription(String desc) {
-        this.sensorDescription = new String(desc);
-    }
-
-    public String getDescription() {
-        return (this.sensorDescription);
-    }
-
     public String getName() {
         return (this.sensorName);
     }
@@ -107,10 +99,6 @@ public class TimedQuaternion extends FlicqQuaternion {
 
     public synchronized void setTimeScale(float scaleFactor) {
         timeScaleFactor = scaleFactor;
-    }
-
-    public synchronized void outdate() {
-        t = -1; // time=-1 can never occur, so treat as "outdated value"
     }
 
     public boolean hasBeenSet() {
