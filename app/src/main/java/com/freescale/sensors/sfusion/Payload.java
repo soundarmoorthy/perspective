@@ -58,11 +58,11 @@ public class Payload {
     }
 
     boolean claim() {
-        if (inUse == false) {
+        if (!inUse) {
             inUse = true;
-            return (true);
+            return true;
         }
-        return (false);
+        return false;
     }
 
 }

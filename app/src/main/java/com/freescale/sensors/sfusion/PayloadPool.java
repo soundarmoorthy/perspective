@@ -37,31 +37,29 @@ import java.util.ArrayList;
 public class PayloadPool {
     public int maxPayloads;
     int maxClaimed;
-    ArrayList<Payload> PayloadPool = new ArrayList<Payload>();
+    ArrayList<Payload> payloadPool = new ArrayList<Payload>();
 
     PayloadPool(int size) {
         maxPayloads = size;
         int i;
         maxClaimed = -1;
         for (i = 0; i < size; i++) {
-            PayloadPool.add(new Payload(i));
+            payloadPool.add(new Payload(i));
         }
     }
 
     public Payload getInstance() {
-        int size = PayloadPool.size();
+        int size = payloadPool.size();
         Payload pl = null;
         for (int i = 0; i < size; i++) {
-            pl = PayloadPool.get(i);
+            pl = payloadPool.get(i);
             if (pl.claim()) {
                 if (i > maxClaimed) {
-                    maxClaimed = i; // track the maximum payload claimed.
-                    //Log.i(FlicqActivity.LOG_TAG, "Payload pool usage extended to index " + maxClaimed);
+                        maxClaimed = i; // track the maximum payload claimed.
                 }
                 return (pl);
             }
         }
-        //Log.w(FlicqActivity.LOG_TAG, "Demand exceeded size of payload pool = " + maxPayloads + "\n");
         return (null);
     }
 }

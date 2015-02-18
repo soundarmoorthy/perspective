@@ -49,7 +49,4 @@ public class AppEngineSensor extends SensorsWrapper{
     {
          stream = false;
     }
-
-
-
 }

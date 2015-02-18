@@ -171,8 +171,6 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
             if (msg.what == 1) { // the Logging Window needs an update
                 tv1.setText(msg.obj.toString());
             }
-            // arg1 = int upper = (int) numMsgsLoggedToFile/1024;
-            // arg2 = int lower = (int) numMsgsLoggedToFile - 1024*upper;
             long numLogged = 1024 * msg.arg1 + msg.arg2;
             setNumMsgs(numLogged);
         }
@@ -523,7 +521,6 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FlicqDevice.requestCode) {
             if (resultCode == RESULT_OK) {
-                FlicqDevice.setBtSts(FlicqDevice.BtStatus.ENABLED, "Bluetooth enabled from onActivityResult().");
                 imu.getPairedDevice();
                 imu.initializeConnection();
             }

@@ -543,18 +543,14 @@ class FlicqDevice extends SensorsWrapper {
         } else {
             if (myBluetooth.isEnabled()) {
 
-                setBtSts(BtStatus.ENABLED, "Bluetooth previously initialized.  Restarting...");
                 stop(true);
                 scheduleBtIntents();
                 getPairedDevice();
                 initializeConnection();
             } else {
                 stop(true);
-                setBtSts(BtStatus.ENABLED, "Bluetooth is available on this device.  Beginning initialization...");
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 demo.startActivityForResult(enableIntent, requestCode);
-                setBtSts(BtStatus.STARTING, "Starting Bluetooth.");
-                // scheduleBtIntents & getPairedDevice will be called from onActivityResult in the main program
             }
         }
     }
@@ -626,9 +622,7 @@ class FlicqDevice extends SensorsWrapper {
         // http://code.google.com/p/android/issues/detail?id=29039
         int i = 0;
         boolean sts = false;
-        //Log.v(LOG_TAG, "begin multiPassCreateSocket()");
         while ((!sts) && i < 6) {
-            //Log.v(LOG_TAG, "begin startBluetooth() pass: " + i);
             sts = imuCreateSocket();
             i += 1;
         }
