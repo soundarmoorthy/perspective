@@ -159,10 +159,6 @@ class FlicqDevice extends SensorsWrapper {
 
     static public void setBtSts(BtStatus sts, String s) {
         btStatus = sts;
-        String str = new String("Bluetooth Status: ");
-        str += sts;
-        str += " : ";
-        str += s;
     }
 
     void computeQuaternion(FlicqQuaternion result, Algorithm algorithm) {
@@ -534,15 +530,17 @@ class FlicqDevice extends SensorsWrapper {
             setBtSts(BtStatus.NOT_SUPPORTED, "Bluetooth is not available on this device");
         } else {
             if (myBluetooth.isEnabled()) {
-
+                setBtSts(BtStatus.ENABLED, "Bluetooth previously initialized.  Restarting...");
                 stop(true);
                 scheduleBtIntents();
                 getPairedDevice();
                 initializeConnection();
             } else {
                 stop(true);
+                setBtSts(BtStatus.ENABLED, "Bluetooth is available on this device.  Beginning initialization...");
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 activity.startActivityForResult(enableIntent, requestCode);
+                setBtSts(BtStatus.STARTING, "Starting Bluetooth.");
             }
         }
     }
@@ -679,33 +677,6 @@ class FlicqDevice extends SensorsWrapper {
     public final BroadcastReceiver myReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            String msg = new String("BT Receiver: ");
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                BluetoothClass btclass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
-                msg += device.getName() + " : " + device.getAddress() + "\n" +
-                        device.getName() + " : " + device.getAddress() + "\n" +
-                        btclass.toString() + " = BT Class\n";
-            } else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
-                msg += "Bluetooth ACL Connection established.\n";
-                //initializeBluetoothConnection();
-            } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-                msg += "Bluetooth ACL disconnected.\n";
-            } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
-                int bondState = dev.getBondState();
-                if (bondState == BluetoothDevice.BOND_BONDING) {
-                    msg += "Pairing state changed: Pairing with remote device.\n";
-                } else if (bondState == BluetoothDevice.BOND_BONDED) {
-                    msg += "Pairing state changed: Paired with remote device\n";
-                } else if (bondState == BluetoothDevice.BOND_NONE) {
-                    msg += "Pairing state changed: Not paired with any device.\n";
-                } else {
-                    msg += "ACTION_BOND_STATE_CHANGED but unknown";
-                }
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-                msg += "Bluetooth discovery started\n";
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                msg += "Bluetooth discovery finished\n";
             }
         }
     };

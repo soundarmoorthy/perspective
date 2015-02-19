@@ -318,7 +318,8 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
 
         self = this;
         imuName = myPrefs.getString("btPrefix", getString(R.string.btPrefix));
-        if (loadImu) flicqDevice = FlicqDevice.getInstance(this, imuName);
+        if (loadImu)
+            flicqDevice = FlicqDevice.getInstance(this, imuName);
 
         myUtils = new FlicqUtils(this); // Register utility class
         localSensors = new LocalSensors(this);

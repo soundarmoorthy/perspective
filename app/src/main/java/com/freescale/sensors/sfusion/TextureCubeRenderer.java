@@ -117,12 +117,10 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
 
         activity.dataSelector.getData(rv, current, this.screenRotation);  // screenRotation only affects fixed rotations
 
-        float x = previous.q1 - current.q1;
-        float y = previous.q2 - current.q2;
-        gl.glTranslatef(x * 10,y * 10, 8*cube.offset);
+        gl.glTranslatef(current.q1 * 4,current.q2 * 4, 8*cube.offset);
 
-        //gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
-        //gl.glRotatef(rv.a ,rv.x,rv.y,rv.z);
+        gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
+        gl.glRotatef(rv.a ,rv.x,rv.y,rv.z);
 
         // Do fixed corrections based on portrait/landscape
         switch (activity.dataSource) {
