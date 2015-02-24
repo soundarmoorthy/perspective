@@ -91,30 +91,19 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     private final String DEVBOARD = "DevtBoard";
 
     static public TextView tv1 = null;               // TextView variables are global pointers to fields in the GUI which can be
-    static private TextView numMsgsField = null;
 
     private boolean absoluteRemoteView = false;     // set to true to NOT take into account Android device view when using remote FlicqDevice
-
-    static public boolean hexDumpEnabled = false;   // set to true to enable hex display of BT input
 
     public boolean zeroPending = false;             // handshaking control for "Zero" function in the device view
     public boolean zeroed = false;
 
-    // Options Menu definitions
     private final int SET_PREFERENCES_MENU_ITEM = Menu.FIRST;
 
     public final String PREF_NAME = "FlicqActivity";  // String for retrieving shared preferences
     public SharedPreferences myPrefs;                     // Structure for preferences
     private float filterCoefficient = 0;                  // Used to control low pass filtering
-
     static public FlicqActivity self = null;
-    // The self pointer is used in the body of one of the
-    // listener functions, where "this" points to the
-    // listener, not the emo itself.
-
     public String imuName;
-    // class variables, but need this early
-    // in onCreate().
 
     // Definition for graphics files used to render various 3D displays
     public TextureCubeRenderer pcbRenderer = null;
@@ -298,7 +287,6 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         boolean loadImu = true;
-        Log.i(LOG_TAG, "calling onCreate()");
         myPrefs = getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
         int orientationChoice = myPrefs.getInt("orientation", 0);
         if (orientationChoice == 1) {
@@ -497,12 +485,8 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
      */
     @Override
     public void onStop() {
-        //Log.v(LOG_TAG, "begin onStop() from FlicqActivity");
-        //dumpStates("calling onStop().");
         localSensors.stop();
         if (flicqDevice != null) flicqDevice.stop(false);
-        // Threads are NOT stopped, as the settings shown keep things working after
-        // accessing the preferences screen.
         super.onStop();
     }
 

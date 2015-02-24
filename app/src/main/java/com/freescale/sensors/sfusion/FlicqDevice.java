@@ -677,9 +677,6 @@ class FlicqDevice extends SensorsWrapper {
     public final BroadcastReceiver myReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            }
         }
     };
-
-
 }
