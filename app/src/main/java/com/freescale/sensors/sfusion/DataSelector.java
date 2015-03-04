@@ -91,13 +91,12 @@ public class DataSelector {
         }
     }
 
-    synchronized void getData(RotationVector rv, TimedQuaternion q, int screenRotation) {
+    synchronized void getData(RotationVector rv, int screenRotation) {
         updateSelection();
         switch (activity.dataSource) {
             case LOCAL:
                 activity.localSensors.computeQuaternion(workingQuaternion2, activity.algorithm);
                 rv.computeFromQuaternion(workingQuaternion2, FlicqUtils.AngleUnits.DEGREES);
-                q.set(workingQuaternion2);
                 break;
             case REMOTE:
                 activity.flicqDevice.computeQuaternion(workingQuaternion2, activity.algorithm);
@@ -106,10 +105,8 @@ public class DataSelector {
                     workingQuaternion3.reverse();
                     workingQuaternion1.eqPxQ(workingQuaternion3, workingQuaternion2);
                     adjustForZero(rv, workingQuaternion1);
-                    q.set(workingQuaternion2);
                 } else {
                     adjustForZero(rv, workingQuaternion2);
-                    q.set(workingQuaternion2);
                 }
                 break;
             case STOPPED:

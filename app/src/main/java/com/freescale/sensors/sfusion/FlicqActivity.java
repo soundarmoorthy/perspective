@@ -111,7 +111,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
             R.drawable.pcb_sides, R.drawable.pcb_sides, R.drawable.rev5_pcb_top,
             R.drawable.rev5_pcb_bottom};
 
-    final float pcbDimensions[] = {0.96f, 1.5f, 0.05f, -2.5f};
+    final float pcbDimensions[] = {0.03f, 1.2f, 0.03f, -2.5f};
 
     public boolean dualModeRequired() {
         return ((dataSource == DataSource.REMOTE))
