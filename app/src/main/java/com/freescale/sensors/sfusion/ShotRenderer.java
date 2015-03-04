@@ -67,16 +67,26 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         gl.glViewport(0, 0, width, height);
         gl.glMatrixMode(GL10.GL_PROJECTION);
         gl.glLoadIdentity();
-        GLU.gluPerspective(gl, 45.0f, (float)width / (float)height, 0.1f, 100.0f);
+        GLU.gluPerspective(gl, 60.0f, (float)width / (float)height, 0.1f, 30.0f);
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
+        //setup
         gl.glClear(GL10.GL_DEPTH_BUFFER_BIT | GL10.GL_COLOR_BUFFER_BIT);
+        gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
-        gl.glTranslatef(0.0f, 0.0f, -5.0f);
+
+        //get data
+        activity.dataSelector.getData(rv, this.screenRotation);  // screenRotation only affects fixed rotations
+
+        //setup coordinates
+        gl.glTranslatef(0.0f, 0.0f, -8.0f);
+
+        gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
+        gl.glRotatef(rv.a, rv.x, rv.y, rv.z);
         line.draw(gl);
     }
 }
