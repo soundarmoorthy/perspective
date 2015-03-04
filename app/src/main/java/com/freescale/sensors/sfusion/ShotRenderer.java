@@ -28,19 +28,18 @@ package com.freescale.sensors.sfusion;
 
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
-import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * Renders cubes defined by the TextureCube class.  Used for both device and panorama views.
+ * Renders cubes defined by the Line class.  Used for both device and panorama views.
  *
  * @author Michael Stanley
  */
-public class TextureCubeRenderer implements GLSurfaceView.Renderer {
+public class ShotRenderer implements GLSurfaceView.Renderer {
 
-    private TextureCube cube;
+    private Line line;
     private FlicqActivity activity;
     private int screenHeight;
     private int screenWidth;
@@ -49,16 +48,16 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
     private RotationVector rv = new RotationVector();
 
     // Constructor
-    public TextureCubeRenderer(FlicqActivity activity, int screenRotation,int[] surfaces, float[] dimensions, String desc) {
+    public ShotRenderer(FlicqActivity activity, int screenRotation, int[] surfaces, float[] dimensions, String desc) {
         this.activity = activity;
         this.screenRotation = screenRotation;
-        this.cube = new TextureCube(surfaces, dimensions, desc);
+        this.line = new Line(surfaces, dimensions, desc);
     }
 
     // Call back when the surface is first created or re-created.
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        TextureCube c = null;
+        Line c = null;
         gl.glClearColor(1.0f, 1.0f, 1.0f, 0.5f); // specify clear values for the color buffer
         gl.glClearDepthf(1.0f);            // Set depth's clear-value to farthest
         gl.glEnable(GL10.GL_DEPTH_TEST);   // Enables depth-buffer for hidden surface removal
@@ -66,7 +65,7 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
         gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);  // nice perspective view
         gl.glDisable(GL10.GL_DITHER);
 
-        cube.loadTextures(gl, activity);
+        line.loadTextures(gl, activity);
     }
 
     // Call back after onSurfaceCreated() or whenever the window's size changes.
@@ -111,7 +110,7 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
 
         activity.dataSelector.getData(rv, this.screenRotation);  // screenRotation only affects fixed rotations
 
-        gl.glTranslatef(0.0f,0.0f, 8*cube.offset);
+        gl.glTranslatef(0.0f,0.0f, 8* line.offset);
 
         gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
         gl.glRotatef(rv.a ,rv.x,rv.y,rv.z);
@@ -123,8 +122,8 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
                 if (this.screenRotation != 0) {
                     gl.glRotatef(+90.0f, 0.0f, 0.0f, 1.0f);  // correct for portrait
                 }
-                gl.glTranslatef(0.0f,0.0f, 8 * cube.offset );
+                gl.glTranslatef(0.0f,0.0f, 8 * line.offset );
         }
-        cube.draw(gl);
+        line.draw(gl);
     }
 }

@@ -52,7 +52,7 @@ import javax.microedition.khronos.opengles.GL10;
  * Based on code found at http://www3.ntu.edu.sg/home/ehchua/programming/android/Android_3D.html
  * @author Michael Stanley
 */
-public class TextureCube {
+public class Line {
     private int front, left, back, right, top, bottom;
     public String description = null; // used for debug purposes
     private FloatBuffer vertexArrayBuffer; // Buffer for vertex-array
@@ -91,8 +91,8 @@ public class TextureCube {
     int[] textureIds = new int[6];   // Array for 1 texture-ID
 
     // Constructor - Set up the buffers
-    //public TextureCube(float w, float l, float h) {
-    public TextureCube(int[] surfaces, float[] dimensions, String desc) {
+    //public Line(float w, float l, float h) {
+    public Line(int[] surfaces, float[] dimensions, String desc) {
         assert (dimensions.length == 3);
         this.description = new String(desc);
         this.w = dimensions[0];

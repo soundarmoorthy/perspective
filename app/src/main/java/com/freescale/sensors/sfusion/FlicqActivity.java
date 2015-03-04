@@ -106,7 +106,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     public String imuName;
 
     // Definition for graphics files used to render various 3D displays
-    public TextureCubeRenderer pcbRenderer = null;
+    public ShotRenderer pcbRenderer = null;
     final int pcbSurfaces[] = {R.drawable.pcb_sides, R.drawable.pcb_sides,
             R.drawable.pcb_sides, R.drawable.pcb_sides, R.drawable.rev5_pcb_top,
             R.drawable.rev5_pcb_bottom};
@@ -322,7 +322,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         int screenRotation = display.getRotation();
 
         GLSurfaceView pcbGlview = (GLSurfaceView) findViewById(R.id.pcb_glview);
-        pcbRenderer = new TextureCubeRenderer(this, screenRotation, pcbSurfaces, pcbDimensions, "Rev5 board");
+        pcbRenderer = new ShotRenderer(this, screenRotation, pcbSurfaces, pcbDimensions, "Rev5 board");
 
         pcbGlview.setRenderer(pcbRenderer);
 
