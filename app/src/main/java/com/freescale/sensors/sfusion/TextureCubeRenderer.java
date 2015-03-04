@@ -59,7 +59,7 @@ public class TextureCubeRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         TextureCube c = null;
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 0.5f); // specify clear values for the color buffer
+        gl.glClearColor(1.0f, 1.0f, 1.0f, 0.5f); // specify clear values for the color buffer
         gl.glClearDepthf(1.0f);            // Set depth's clear-value to farthest
         gl.glEnable(GL10.GL_DEPTH_TEST);   // Enables depth-buffer for hidden surface removal
         gl.glDepthFunc(GL10.GL_LEQUAL);    // The type of depth testing to do
