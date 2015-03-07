@@ -39,7 +39,9 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class ShotRenderer implements GLSurfaceView.Renderer {
 
+    private Line[] lines;
     private Line line;
+    private Line line2;
     private FlicqActivity activity;
     private int screenHeight;
     private int screenWidth;
@@ -51,8 +53,11 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     public ShotRenderer(FlicqActivity activity, int screenRotation, int[] surfaces, float[] dimensions, String desc) {
         this.activity = activity;
         this.screenRotation = screenRotation;
-        this.line = new Line();
+        this.lines = new Line[256];
+        line = new Line();
+        line2 = new Line();
     }
+
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -82,11 +87,12 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         //get data
         activity.dataSelector.getData(rv, this.screenRotation);  // screenRotation only affects fixed rotations
 
-        //setup coordinates
-        gl.glTranslatef(0.0f, 0.0f, -8.0f);
+        gl.glTranslatef(0.0f,0.0f,-8.0f);
 
+        //setup coordinates
         gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
         gl.glRotatef(rv.a, rv.x, rv.y, rv.z);
+
         line.draw(gl);
     }
 }

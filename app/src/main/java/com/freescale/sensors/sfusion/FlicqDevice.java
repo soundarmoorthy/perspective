@@ -511,13 +511,11 @@ class FlicqDevice extends SensorsWrapper {
             try {
                 bytes = str.getBytes("UTF-8");
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Caught exception trying to convert (to bytes): " + str);
                 Log.e(LOG_TAG, e.getMessage());
             }
             try {
                 myBluetoothSocketOutputStream.write(bytes);
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Caught exception trying to write: " + str);
                 Log.e(LOG_TAG, e.getMessage());
             }
         } else {

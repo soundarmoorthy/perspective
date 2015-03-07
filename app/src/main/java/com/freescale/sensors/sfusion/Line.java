@@ -33,7 +33,7 @@ public class Line {
 
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 
-        gl.glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
+        gl.glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
 
         // Point to our vertex buffer
         gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexFloatBuffer);
