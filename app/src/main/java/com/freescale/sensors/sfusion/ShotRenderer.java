@@ -56,6 +56,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         this.lines = new Line[256];
         line = new Line();
         line2 = new Line();
+        q = new FlicqQuaternion();
     }
 
 
@@ -77,22 +78,20 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         gl.glLoadIdentity();
     }
 
+    int i = 0;
+    FlicqQuaternion q;
+
     @Override
     public void onDrawFrame(GL10 gl) {
         //setup
         gl.glClear(GL10.GL_DEPTH_BUFFER_BIT | GL10.GL_COLOR_BUFFER_BIT);
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
-
         //get data
-        activity.dataSelector.getData(rv, this.screenRotation);  // screenRotation only affects fixed rotations
-
-        gl.glTranslatef(0.0f,0.0f,-8.0f);
-
-        //setup coordinates
+        activity.dataSelector.getData(rv, q, this.screenRotation);
+        gl.glTranslatef(1.0f, 1.0f, -15.0f);
         gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
         gl.glRotatef(rv.a, rv.x, rv.y, rv.z);
-
         line.draw(gl);
     }
 }

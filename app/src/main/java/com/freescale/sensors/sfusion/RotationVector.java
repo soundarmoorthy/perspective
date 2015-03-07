@@ -74,7 +74,7 @@ public class RotationVector {
         z = rv[3];
     }
 
-    synchronized void computeFromQuaternion(FlicqQuaternion q, AngleUnits units) {
+    public synchronized void computeFromQuaternion(FlicqQuaternion q, AngleUnits units) {
         float theta = (float) Math.acos(q.q0);
         a = 2 * theta;
         if (q.q0 == 1) {

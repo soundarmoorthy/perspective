@@ -91,7 +91,7 @@ public class DataSelector {
         }
     }
 
-    synchronized void getData(RotationVector rv, int screenRotation) {
+    synchronized void getData(RotationVector rv, FlicqQuaternion xyz, int screenRotation) {
         updateSelection();
         switch (activity.dataSource) {
             case LOCAL:
@@ -100,6 +100,7 @@ public class DataSelector {
                 break;
             case REMOTE:
                 activity.flicqDevice.computeQuaternion(workingQuaternion2, activity.algorithm);
+                xyz.set(workingQuaternion2);
                 if (activity.dualModeRequired()) {
                     workingQuaternion3.set(activity.localSensors.quaternion());
                     workingQuaternion3.reverse();

@@ -164,7 +164,7 @@ class FlicqDevice extends SensorsWrapper {
     void computeQuaternion(FlicqQuaternion result, Algorithm algorithm) {
         switch (algorithm) {
             case NINE_AXIS:
-                result.set(super.quaternion());
+                SampleData.setNextQuaternion(result);
                 break;
             case NONE:
             default:

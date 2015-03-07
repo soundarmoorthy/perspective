@@ -64,6 +64,12 @@ public class FlicqQuaternion {
         this.set(q);
     }
 
+    public float X,Y,Z;
+    public void setXYZ(float x, float y, float z)
+    {
+        X =x; Y=y;Z=z;
+    }
+
     FlicqQuaternion(FlicqQuaternion q) {
         initialize();
         this.set(q);
@@ -118,6 +124,9 @@ public class FlicqQuaternion {
         this.q1 = q.q1;
         this.q2 = q.q2;
         this.q3 = q.q3;
+        this.X = q.X;
+        this.Y  = q.Y;
+        this.Z = q.Z;
     }
 
     synchronized void setIdentity() {
