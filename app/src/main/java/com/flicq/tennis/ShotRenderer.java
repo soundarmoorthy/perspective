@@ -8,24 +8,18 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class ShotRenderer implements GLSurfaceView.Renderer {
 
-    private Line[] lines;
-    private Line line;
-    private Line line2;
     FlicqDevice device;
-    private int screenHeight;
-    private int screenWidth;
     private int screenRotation = 0;
     private float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
     private RotationVector rv = new RotationVector();
     private FlicqQuaternion q;
+    Line line;
 
     // Constructor
     public ShotRenderer(FlicqDevice device, int screenRotation) {
         this.device = device;
         this.screenRotation = screenRotation;
-        this.lines = new Line[256];
         line = new Line();
-        line2 = new Line();
         q = new FlicqQuaternion();
     }
 
@@ -60,11 +54,14 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         if(!render)
             return;
 
-        device.getData(rv, q);
-        gl.glTranslatef(1.0f, 1.0f, -15.0f);
+        gl.glTranslatef(0.0f,0.0f, -10.0f);
         gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
-        gl.glRotatef(rv.a, rv.x, rv.y, rv.z);
-        line.draw(gl);
+
+        for (int i=0;i< SampleData.length();i++ ) {
+                device.getData(rv, q);
+                gl.glRotatef(rv.a, rv.x, rv.y, rv.z);
+                line.draw(gl, i <= 400 && i >= 350);
+        }
     }
 
     boolean render = false;

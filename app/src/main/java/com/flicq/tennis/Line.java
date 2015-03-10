@@ -1,12 +1,5 @@
 package com.flicq.tennis;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.opengl.GLUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -15,10 +8,13 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class Line {
     private FloatBuffer vertexFloatBuffer; // Buffer for vertex-array
+
     private float[] vertices = { // Vertices for top and bottom
             -1.0f, 0.0f, 0.0f,
              1.0f, 0.0f, 0.0f
     };
+
+    FlicqQuaternion[] lines;
 
     public Line() {
 
@@ -29,11 +25,14 @@ public class Line {
         vertexFloatBuffer.position(0);
     }
 
-    public void draw(GL10 gl) {
+    public void draw(GL10 gl, boolean hit) {
 
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 
-        gl.glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+        if(hit)
+            gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+        else
+        gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
 
         // Point to our vertex buffer
         gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexFloatBuffer);

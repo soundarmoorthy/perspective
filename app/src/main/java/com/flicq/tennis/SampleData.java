@@ -1,12 +1,27 @@
 package com.flicq.tennis;
 
-/**
- * Created by soundararajan on 3/7/2015.
- */
 public final class SampleData {
 
     public static int index = 0;
 
+    static FlicqQuaternion[] computedData;
+
+    public static int length()
+    {
+        return set.length/7;
+    }
+
+
+    public static void Initialize()
+    {
+        computedData = new FlicqQuaternion[length()];
+        int ai =0;
+        for(int i=0;i<length();i++)
+        {
+            ai = i*7;
+            computedData[i] = new FlicqQuaternion(set[ai+3], set[ai+4], set[ai+5], set[ai+6], set[ai], set[ai+1], set[ai+2]);
+        }
+    }
 
     public static void getNextQuaternion(FlicqQuaternion q)
     {

@@ -80,11 +80,20 @@ public class FlicqQuaternion {
     }
 
     synchronized void set(float[] q) {
-        assert (q.length == 4);
         q0 = q[0];
         q1 = q[1];
         q2 = q[2];
         q3 = q[3];
+    }
+
+    FlicqQuaternion(float q0, float q1, float q2, float q3, float x, float y, float z) {
+        this.q0 = q0;
+        this.q1 = q1;
+        this.q2 = q2;
+        this.q3 = q3;
+        this.X = x;
+        this.Y  =y;
+        this.Z = z;
     }
 
     synchronized void set(FlicqQuaternion q) {
