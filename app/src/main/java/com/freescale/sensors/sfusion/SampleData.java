@@ -8,7 +8,7 @@ public final class SampleData {
     public static int index = 0;
 
 
-    public static void setNextQuaternion(FlicqQuaternion q)
+    public static void getNextQuaternion(FlicqQuaternion q)
     {
         if(index > 417)
             index =0;

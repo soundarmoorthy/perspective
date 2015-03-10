@@ -60,7 +60,7 @@ class BluetoothInputThread extends Thread {
         try {    // Get the input streams, using temp object because  member streams are final
             tmpIn = socket.getInputStream();
         } catch (IOException e) {
-            Log.e(FlicqActivity.LOG_TAG, "Problem in BluetoothInputThread constructor");
+            Log.e("Flicq", "Problem in BluetoothInputThread constructor");
         }
         myBluetoothSocketInputStream = tmpIn;
     }

@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
+<?xml version="1.0" encoding="utf-8"?> <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
     android:layout_height="match_parent"
     android:gravity="top"
     android:orientation="vertical" >
@@ -26,63 +23,16 @@
                 android:text="@string/exit" />
 
             <Button
-                android:id="@+id/data_source_popup"
+                android:id="@+id/app_mode"
                 android:layout_height="wrap_content"
                 style="@style/button"
                 android:background="@color/white"
                 android:onClick="showDataSelector"
-                android:text="Source/Algorithm" />
+                android:text="Mode" />
 
-
-            <CheckBox
-                android:id="@+id/absolute"
-                android:layout_width="wrap_content"
-                android:visibility="visible"
-                android:layout_height="wrap_content"
-                android:text="@string/absoluteLabel" />
-            
-            <CheckBox
-                android:id="@+id/zeroed"
-                android:layout_width="wrap_content"
-                android:visibility="visible"
-                android:layout_height="wrap_content"
-                android:text="@string/zeroedLabel" />
-            
-
-            <CheckBox
-                android:id="@+id/lpf_enable"
-                android:layout_width="wrap_content"
-                android:visibility="visible"
-                android:layout_height="wrap_content"
-                android:text="@string/lpf_enable" />
 
         </LinearLayout>
     </HorizontalScrollView>
-
-    <LinearLayout
-        android:id="@+id/filter_coef_wrapper"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        android:background="@color/fsl_charcoal"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:text=" Filter: Less" />
-
-        <SeekBar
-            android:id="@+id/filter_coef"
-            android:thumb="@drawable/seek_thumb"
-            android:layout_weight="1"
-            android:progressDrawable="@drawable/progress_horizontal"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/graphicFrame"
@@ -95,9 +45,9 @@
         android:visibility="visible" >
 
         <android.opengl.GLSurfaceView
-            android:id="@+id/pcb_glview"
+            android:id="@+id/shotView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:visibility="gone" />
+            android:visibility="visible" />
     </LinearLayout>
 </LinearLayout>

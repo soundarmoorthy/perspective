@@ -1,37 +1,3 @@
-/*
-Copyright (c) 2013, 2014, Freescale Semiconductor, Inc.
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
- * Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
- * Neither the name of Freescale Semiconductor, Inc. nor the
-   names of its contributors may be used to endorse or promote products
-   derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL FREESCALE SEMICONDUCTOR, INC. BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
-/**
- * This class implements the command interpreter for external Inertial Measurement Unit (FlicqDevice)
- * communicating via Bluetooth.  It interacts with Bluetooth via BluetoothInputThread class.
- * Interactions to those boards is completely encapsulated via this function.
- * @author Michael Stanley
- */
-
 package com.freescale.sensors.sfusion;
 
 import android.bluetooth.BluetoothAdapter;
@@ -46,7 +12,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.freescale.sensors.sfusion.FlicqActivity.Algorithm;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -55,12 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 
-class FlicqDevice extends SensorsWrapper {
-    // This class implements the state machine to decode bluetooth data records for ImuInterface data
-    // The parser should work for quaternion data, but will need updates for error checking and
-    // extended packet formats.  Consider this a rough draft.
-
-    // Parser assumes all numbers are in 16 bit format
+public class FlicqDevice {
     static FlicqDevice self = null;
 
     private enum ImuRecordType {NONE, DEBUG, ONE, THREE, FOUR}
@@ -68,10 +28,9 @@ class FlicqDevice extends SensorsWrapper {
     public enum BtStatus {UNKNOWN, NOT_SUPPORTED, STARTING, ENABLED, PAIRED, CHOKED, CONNECTED, READY}
 
     static public short softwareVersionNumber = 0;
-    static public int requestCode = 33; // used in startActivityForResult
+    static public final int requestCode = 33; // used in startActivityForResult
     static public BtStatus btStatus = BtStatus.UNKNOWN;
 
-    static String hexString = new String("");
     static private float timeScale = 0.000001f; // 1.00 microseconds per tick
     static private float gyro_lsb = 0.00087266f; // units are radians/sec.  Equivalent to +/- 1600 dps
     static private float acc_lsb = 0.00012207f;
@@ -84,39 +43,55 @@ class FlicqDevice extends SensorsWrapper {
     static private BluetoothSocket myServerSocket = null;
     static private BluetoothInputThread myBluetoothInputThread = null;
     static private OutputStream myBluetoothSocketOutputStream;
-    static private String LOG_TAG;
     static private String name;
     static private UUID uuid;
     static private BluetoothDevice dev;
     static private String pattern = null;
     static private boolean btReceiverRegistered = false;
     static private boolean enableDebugPacket;
-    static private boolean virtualGyroEnabled;
-    static private boolean rpcEnabled;
-    static private int numWrongPackets = 0;
     static float[] quatInputs = null;
     static int keepAliveCounter = 0;
     static boolean alreadySniffed = false;
 
+    protected TimedTriad acc = null;
+    protected TimedTriad mag = null;
+    protected TimedTriad gyro = null;
+    protected TimedQuaternion quaternion = null;
+    String LOG_TAG = null;
+    FlicqActivity activity;  // a back pointer to the master application
+
+    public FlicqQuaternion quaternion() {
+        return quaternion;
+    }
+
+    synchronized public void clear() {
+        acc.zero();
+        mag.zero();
+        gyro.zero();
+    }
+
     final int keepAliveInterval = 100;
 
-    private FlicqDevice(FlicqActivity demo, String pattern) {
-        super(demo);
-        FlicqDevice.pattern = pattern;
+    private FlicqDevice(FlicqActivity activity) {
+        this.activity = activity;
+        acc = new TimedTriad();
+        mag = new TimedTriad();
+        gyro = new TimedTriad();
+        quaternion = new TimedQuaternion();
+        clear();
+
+        FlicqDevice.pattern = "blue";
         quatInputs = new float[4];
-        enableDebugPacket = demo.myPrefs.getBoolean("enable_device_debug", false);
+        enableDebugPacket = false; //Set to true, to get debug packet.
         acc.setTimeScale(timeScale);
         mag.setTimeScale(timeScale);
         gyro.setTimeScale(timeScale);
         quaternion.setTimeScale(timeScale);
-        acc.setName("Accelerometer");
-        mag.setName("Magnetometer");
-        gyro.setName("Gyroscope");
     }
 
-    static public FlicqDevice getInstance(FlicqActivity demo, String pattern) {
+    static public FlicqDevice getInstance(FlicqActivity demo) {
         if (self == null) {
-            self = new FlicqDevice(demo, pattern);
+            self = new FlicqDevice(demo);
         }
         return (self);
     }
@@ -158,17 +133,18 @@ class FlicqDevice extends SensorsWrapper {
 
 
     static public void setBtSts(BtStatus sts, String s) {
+
         btStatus = sts;
     }
 
-    void computeQuaternion(FlicqQuaternion result, Algorithm algorithm) {
-        switch (algorithm) {
-            case NINE_AXIS:
-                SampleData.setNextQuaternion(result);
-                break;
-            case NONE:
-            default:
-        }
+
+    synchronized void adjustForZero(RotationVector rv, FlicqQuaternion q) {
+        rv.computeFromQuaternion(q, FlicqUtils.AngleUnits.DEGREES);
+    }
+
+    synchronized void getData(RotationVector rv, FlicqQuaternion q) {
+        SampleData.getNextQuaternion(q);
+        adjustForZero(rv, q);
     }
 
     private synchronized ImuRecordType processBuffer(Payload payload) {
@@ -196,7 +172,7 @@ class FlicqDevice extends SensorsWrapper {
                 short gx = bb.getShort(18);
                 short gy = bb.getShort(20);
                 short gz = bb.getShort(22);
-                if ((activity.algorithm == Algorithm.NINE_AXIS) || (recordSize < 41)) {
+                if (recordSize < 41) {
                     quatInputs[0] = (float) bb.getShort(24) / 30000f;
                     quatInputs[1] = (float) bb.getShort(26) / 30000f;
                     quatInputs[2] = (float) bb.getShort(28) / 30000f;
@@ -230,36 +206,9 @@ class FlicqDevice extends SensorsWrapper {
                     } // Don't have to do anything if the incoming quaternino is already ENU
                 }
                 quaternion.set(timestamp, quatInputs);
-                switch (boardId) {
-                    case 0:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.REV5;
-                        break;
-                    case 1:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL25Z;
-                        break;
-                    case 2:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.K20D50M;
-                        break;
-                    case 4:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL26Z;
-                        break;
-                    case 5:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.K64F;
-                        break;
-                    case 6:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL16Z;
-                        break;
-                    case 7:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z;
-                        break;
-                    case 8:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z_Standalone;
-                        break;
-                }
                 // checkFlags() is just a unit test to ensure that we are getting expected packet types
                 // There will often be a lag of one or two packets before newly selected packet types take affect.
                 // This is considered OK.
-                checkFlags(flags);
                 acc.set(timestamp, acc_lsb * ax, acc_lsb * ay, acc_lsb * az);
                 mag.set(timestamp, mag_lsb * mx, mag_lsb * my, mag_lsb * mz);
                 gyro.set(timestamp, gyro_lsb * gx, gyro_lsb * gy, gyro_lsb * gz);
@@ -278,52 +227,11 @@ class FlicqDevice extends SensorsWrapper {
                         else systicks = shortInt;
                         systicks = systicks * 20;
                         str += String.format("\nSysticks/Orientation: %08d", systicks);
-                        switch (activity.developmentBoard) {
-                            case REV5:
-                                break;
-                            case KL25Z:
-                                str += String.format("\nBoard = KL25Z");
-                                break;
-                            case K20D50M:
-                                str += String.format("\nBoard = K20D50M");
-                                break;
-                            case KL26Z:
-                                str += String.format("\nBoard = KL26Z");
-                                break;
-                            case K64F:
-                                str += String.format("\nBoard = K64F");
-                                break;
-                            case KL46Z:
-                                str += String.format("\nBoard = KL46Z");
-                                break;
-                            case KL46Z_Standalone:
-                                str += String.format("\nBoard = KL46Z Standalone");
-                                break;
-                            case KL16Z:
-                        }
                         for (i = 6; i < recordSize; i += 2) {
                             shortInt = bb.getShort(i);
                             str += String.format("\n%06d", shortInt);
                         }
                     }
-                }
-                break;
-            case 3:
-                retVal = ImuRecordType.THREE;
-                if (virtualGyroEnabled) {
-                    short vgx = bb.getShort(6); //  2 bytes each
-                    short vgy = bb.getShort(8);
-                    short vgz = bb.getShort(10);
-                    str = String.format("X:%7.1f Y:%7.1f Z:%7.1f degrees/sec", ((float) vgx) / 20.0f, ((float) vgy) / 20.0f, ((float) vgz) / 20.0f);
-                }
-                break;
-            case 4:
-                retVal = ImuRecordType.FOUR;
-                if (rpcEnabled) {
-                    short roll = bb.getShort(6); //  2 bytes each
-                    short pitch = bb.getShort(8);
-                    short heading = bb.getShort(10);
-                    str = String.format("R:%7.1f P:%7.1f C:%7.1f degrees", ((float) roll) / 10.0, ((float) pitch) / 10.0, ((float) heading) / 10.0);
                 }
                 break;
             default:
@@ -345,70 +253,13 @@ class FlicqDevice extends SensorsWrapper {
                 } else {
                     boardId = (int) bb.get(41);
                 }
-                switch (boardId) {
-                    case 0:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.REV5;
-                        break;
-                    case 1:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL25Z;
-                        break;
-                    case 2:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.K20D50M;
-                        break;
-                    case 4:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL26Z;
-                        break;
-                    case 5:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.K64F;
-                        break;
-                    case 6:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL16Z;
-                        break;
-                    case 7:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z;
-                        break;
-                    case 8:
-                        activity.developmentBoard = FlicqActivity.DevelopmentBoard.KL46Z_Standalone;
-                        break;
-                }
                 alreadySniffed = true;
         }
     }
 
     // utility function used by checkFlags()
     String expectedPacketDescriptor() {
-        String str = "unknown";
-        switch (activity.algorithm) {
-            case NINE_AXIS:
-                str = "9-axis";
-                break;
-            case NONE: // included only to eliminate compiler warning
-        }
-        return (str);
-    }
-
-    // checkFlags() is just a unit test to ensure that we are getting expected packet types
-    // There will often be a lag of one or two packets before newly selected packet types take affect.
-    // This is considered OK.
-    boolean checkFlags(int flags) {
-        boolean sts = false;
-        flags = flags & 0xF;
-        String str = "";
-        switch (flags) {
-            case 8:
-                if (activity.algorithm == FlicqActivity.Algorithm.NINE_AXIS) sts = true;
-                else str = "Got 9-axis packet, expected " + expectedPacketDescriptor();
-                break;
-            default:
-        }
-        if (sts) {
-            numWrongPackets = 0;
-        } else {
-            numWrongPackets += 1;
-            if (numWrongPackets > 3) {
-            }
-        }
-        return (sts);
+        return "9-axis";
     }
 
     boolean isReady() {
@@ -481,17 +332,6 @@ class FlicqDevice extends SensorsWrapper {
         sendTo("VG+ ");
     }
 
-    void configureStartupBehavior() {
-        enableDebugPacket = activity.myPrefs.getBoolean("enable_device_debug", false);
-        virtualGyroEnabled = activity.myPrefs.getBoolean("enable_virtual_gyro", false);
-        rpcEnabled = activity.myPrefs.getBoolean("enable_rpc", false);
-        turnDebugOn(); // always on (see note above)
-        if (virtualGyroEnabled) enableVirtualGyro();
-        else disableVirtualGyro();
-        if (rpcEnabled) turnRpcOn();
-        else turnRpcOff();
-    }
-
     void keepAlive() {
         // see http://stackoverflow.com/questions/18420525/application-using-bluetooth-spp-profile-not-working-after-update-from-android-4/18646072#18646072
         // for why this function was needed
@@ -506,7 +346,6 @@ class FlicqDevice extends SensorsWrapper {
 
     public void sendTo(String str) {
         if (isReady()) {
-            // FlicqActivity.write(true, "Sending \"" + str + "\" to BT device.\n");
             byte[] bytes = null;
             try {
                 bytes = str.getBytes("UTF-8");
@@ -632,7 +471,6 @@ class FlicqDevice extends SensorsWrapper {
                                 myBluetoothInputThread.start();
                                 myBluetoothSocketOutputStream = myServerSocket.getOutputStream();
                                 setBtSts(BtStatus.READY, "The Bluetooth output stream appears ready.");
-                                configureStartupBehavior();
                             } catch (ThreadDeath aTD) {
                                 setBtSts(BtStatus.CHOKED, "ThreadDeath exception generated while creating the Bluetooth thread or output stream.");
                             } catch (Throwable t) {

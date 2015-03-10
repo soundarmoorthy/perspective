@@ -34,7 +34,6 @@ import android.app.AlertDialog;
  * @author Michael Stanley
  */
 public class FlicqUtils {
-    static private FlicqActivity activity;
     static public final float degreesPerRadian = (float) (180.0f / 3.14159f);
     static public final float radiansPerDegree = (float) (3.14159f / 180.0f);
 
@@ -42,8 +41,7 @@ public class FlicqUtils {
 
     static public float unitScaler = 32768.0f;
 
-    FlicqUtils(FlicqActivity demo) {
-        FlicqUtils.activity = demo;
+    FlicqUtils() {
     }
 
     static public float dotProduct(float[] a, float[] b) {

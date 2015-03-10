@@ -66,7 +66,6 @@ public class RotationVector {
     }
 
     synchronized void set(AngleUnits units, float[] rv) {
-        assert (rv.length == 4);
         this.units = units;
         a = rv[0];
         x = rv[1];
@@ -93,9 +92,6 @@ public class RotationVector {
         if ((this.units == AngleUnits.RADIANS) && (units == AngleUnits.DEGREES)) {
             this.units = units;
             this.a = this.a * FlicqUtils.degreesPerRadian;
-        } else if ((this.units == AngleUnits.RADIANS) && (units == AngleUnits.DEGREES)) {
-            this.units = units;
-            this.a = this.a * FlicqUtils.radiansPerDegree;
         }
     }
 

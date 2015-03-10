@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
     <item
-        android:id="@+id/stopped"
+        android:id="@+id/btn_stop"
         android:orderInCategory="1"
-        android:title="Stopped"/>
+        android:title="Stop"/>
     <item
-        android:id="@+id/local_9_axis"
+        android:id="@+id/btn_capture"
         android:orderInCategory="4"
-        android:title="Local 9-axis"/>
+        android:title="Capture"/>
     <item
-        android:id="@+id/remote_9_axis"
+        android:id="@+id/btn_render"
         android:orderInCategory="10"
-        android:title="Remote 9-axis"/>
-    <item
-        android:id="@+id/fixed"
-        android:orderInCategory="13"
-        android:title="Fixed Rotation"/>
-
+        android:title="Show"/>
 </menu>

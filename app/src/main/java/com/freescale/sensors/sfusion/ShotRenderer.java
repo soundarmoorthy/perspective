@@ -42,16 +42,17 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     private Line[] lines;
     private Line line;
     private Line line2;
-    private FlicqActivity activity;
+    FlicqDevice device;
     private int screenHeight;
     private int screenWidth;
     private int screenRotation = 0;
     private float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
     private RotationVector rv = new RotationVector();
+    private FlicqQuaternion q;
 
     // Constructor
-    public ShotRenderer(FlicqActivity activity, int screenRotation, int[] surfaces, float[] dimensions, String desc) {
-        this.activity = activity;
+    public ShotRenderer(FlicqDevice device, int screenRotation) {
+        this.device = device;
         this.screenRotation = screenRotation;
         this.lines = new Line[256];
         line = new Line();
@@ -79,19 +80,33 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     }
 
     int i = 0;
-    FlicqQuaternion q;
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        //setup
+
         gl.glClear(GL10.GL_DEPTH_BUFFER_BIT | GL10.GL_COLOR_BUFFER_BIT);
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
-        //get data
-        activity.dataSelector.getData(rv, q, this.screenRotation);
+
+        if(!render)
+            return;
+
+        device.getData(rv, q);
         gl.glTranslatef(1.0f, 1.0f, -15.0f);
         gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
         gl.glRotatef(rv.a, rv.x, rv.y, rv.z);
         line.draw(gl);
+    }
+
+    boolean render = false;
+
+    public void enable()
+    {
+        render = true;
+    }
+
+    public void disable()
+    {
+        render = false;
     }
 }
