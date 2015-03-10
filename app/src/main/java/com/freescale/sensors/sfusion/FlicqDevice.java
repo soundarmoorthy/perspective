@@ -1,4 +1,4 @@
-package com.freescale.sensors.sfusion;
+package com.flicq.tennis;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;

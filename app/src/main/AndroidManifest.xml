@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.freescale.sensors.sfusion"
+    package="com.flicq.tennis"
     android:versionCode="21"
     android:versionName="2014.09.29" >
 

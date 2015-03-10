@@ -1,4 +1,4 @@
-package com.freescale.sensors.sfusion;
+package com.flicq.tennis;
 
 /**
  * Created by soundararajan on 3/7/2015.

@@ -1,4 +1,4 @@
-package com.freescale.sensors.sfusion;
+package com.flicq.tennis;
 
 import android.content.Context;
 import android.graphics.Bitmap;
