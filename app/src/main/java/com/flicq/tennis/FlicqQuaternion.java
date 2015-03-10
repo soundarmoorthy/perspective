@@ -1,5 +1,7 @@
 package com.flicq.tennis;
 
+import com.flicq.tennis.FlicqUtils.AngleUnits;
+
 import android.opengl.Matrix;
 
 public class FlicqQuaternion {
@@ -124,7 +126,7 @@ public class FlicqQuaternion {
         q0 = -q0;
     }
 
-    void toRotationVector(RotationVector rv, FlicqUtils.AngleUnits unit) {
+    void toRotationVector(RotationVector rv, AngleUnits unit) {
         float theta = (float) Math.acos(q0);
         float x, y, z, sinTheta;
         float scale_factor = 1;
@@ -136,7 +138,7 @@ public class FlicqQuaternion {
             y = q2 / sinTheta;
             z = q3 / sinTheta;
         }
-        if (unit == FlicqUtils.AngleUnits.DEGREES) {
+        if (unit == AngleUnits.DEGREES) {
             scale_factor = FlicqUtils.degreesPerRadian;
         }
         rv.set(unit, 2 * theta * scale_factor, x, y, z);

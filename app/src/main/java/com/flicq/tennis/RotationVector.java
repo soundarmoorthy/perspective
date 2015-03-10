@@ -1,14 +1,7 @@
 package com.flicq.tennis;
 
-import com.freescale.sensors.sfusion.FlicqUtils.AngleUnits;
+import com.flicq.tennis.FlicqUtils.AngleUnits;
 
-/**
- * Defines a basic "rotation vector" which is comprised of an axis of rotation defined as the vector
- * from 0,0,0 to x,y,z, and angle of rotation.  This is not a generalized library.  It only implements the
- * functions required for this application.
- *
- * @author Michael Stanley
- */
 public class RotationVector {
     // a = angle in radians OR degrees (this is up to the programmer, NOT enforced here
     // x, y, z = coordinates of vector about which we will do the rotation.
