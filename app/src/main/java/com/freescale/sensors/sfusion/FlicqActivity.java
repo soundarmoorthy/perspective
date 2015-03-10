@@ -75,13 +75,11 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
 
     public boolean onMenuItemClick(MenuItem item) {
         boolean sts = true;
-        Button menuButton = (Button) findViewById(R.id.app_mode);
-
         int itemId = item.getItemId();
         if (itemId == R.id.btn_stop) {
             if (flicqDevice != null)
                 flicqDevice.stop(false);
-
+                shotRenderer.disable();
         } else if (itemId == R.id.btn_render) {
             shotRenderer.enable();
             flicqDevice.stop(true); //This will disable uploading data to cloud

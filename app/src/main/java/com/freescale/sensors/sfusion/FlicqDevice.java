@@ -133,7 +133,6 @@ public class FlicqDevice {
 
 
     static public void setBtSts(BtStatus sts, String s) {
-
         btStatus = sts;
     }
 
