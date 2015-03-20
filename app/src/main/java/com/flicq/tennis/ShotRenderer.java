@@ -26,18 +26,25 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        gl.glClearColor(1.0f, 1.0f, 1.0f, 0.1f);
+        gl.glClearDepthf(1.0f);
+        gl.glEnable(GL10.GL_DEPTH_TEST);
+        gl.glDepthFunc(GL10.GL_LEQUAL);
+        gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
+
     }
 
+    final float idealZ = -6.0f;
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         if(height == 0) {
             height = 1;
         }
-        gl.glClearColor(1.0f,1.0f,1.0f,0.5f);
-        gl.glViewport(0, 0, width, height);
         gl.glMatrixMode(GL10.GL_PROJECTION);
         gl.glLoadIdentity();
-        GLU.gluPerspective(gl, 60.0f, (float)width / (float)height, 0.1f, 30.0f);
+        float ratio = (float)width / height;
+        GLU.gluPerspective(gl, 60.0f, ratio, 0.1f, 30.0f);
+        gl.glViewport(0, 0, width, height);
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
     }
@@ -50,17 +57,20 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         gl.glClear(GL10.GL_DEPTH_BUFFER_BIT | GL10.GL_COLOR_BUFFER_BIT);
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
-
         if(!render)
             return;
 
-        gl.glTranslatef(0.0f,0.0f, -10.0f);
+        gl.glTranslatef(0.0f,0.0f, idealZ);
         gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
 
         for (int i=0;i< SampleData.length();i++ ) {
-                device.getData(rv, q);
-                gl.glRotatef(rv.a, rv.x, rv.y, rv.z);
-                line.draw(gl, i <= 400 && i >= 350);
+            device.getData(rv, q);
+            gl.glPushMatrix();
+
+            gl.glTranslatef(rv.x,rv.y,idealZ+rv.z);
+            gl.glRotatef(rv.a, rv.x, rv.y, rv.z);
+            line.draw(gl, i <= 400 && i >= 350);
+            gl.glPopMatrix();
         }
     }
 

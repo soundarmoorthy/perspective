@@ -29,6 +29,7 @@ public class Line {
 
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 
+        gl.glPushMatrix();
         if(hit)
             gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
         else
@@ -40,6 +41,7 @@ public class Line {
         // Draw the vertices as triangle strip
         gl.glDrawArrays(GL10.GL_LINES, 0, vertices.length / 2);
 
+        gl.glPopMatrix();
         //Disable the client state before leaving
         gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 
