@@ -14,8 +14,6 @@ public class Line {
              1.0f, 0.0f, 0.0f
     };
 
-    FlicqQuaternion[] lines;
-
     public Line() {
 
         ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect(vertices.length * 4);
@@ -31,9 +29,9 @@ public class Line {
 
         gl.glPushMatrix();
         if(hit)
-            gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+            gl.glColor4f(0.8f, 0.2f, 0.0f, 0.5f);
         else
-        gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+            gl.glColor4f(0.0f, 0.8f, 0.3f, 0.5f);
 
         // Point to our vertex buffer
         gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexFloatBuffer);

@@ -26,11 +26,13 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        gl.glClearColor(1.0f, 1.0f, 1.0f, 0.1f);
+        gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         gl.glClearDepthf(1.0f);
         gl.glEnable(GL10.GL_DEPTH_TEST);
         gl.glDepthFunc(GL10.GL_LEQUAL);
         gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
+        gl.glEnable(gl.GL_BLEND);
+        gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 
     }
 
@@ -66,8 +68,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         for (int i=0;i< SampleData.length();i++ ) {
             device.getData(rv, q);
             gl.glPushMatrix();
-
-            gl.glTranslatef(rv.x,rv.y,idealZ+rv.z);
+            gl.glTranslatef(rv.x * 2.0f,rv.y * 2.0f,idealZ+(rv.z* 2.0f));
             gl.glRotatef(rv.a, rv.x, rv.y, rv.z);
             line.draw(gl, i <= 400 && i >= 350);
             gl.glPopMatrix();
