@@ -141,6 +141,7 @@ public class FlicqDevice {
         rv.computeFromQuaternion(q, FlicqUtils.AngleUnits.DEGREES);
     }
 
+    public static final boolean sample = true;
     synchronized void getData(RotationVector rv, FlicqQuaternion q) {
         SampleData.getNextQuaternion(q);
         adjustForZero(rv, q);
