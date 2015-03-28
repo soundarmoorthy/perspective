@@ -169,7 +169,7 @@ public class Flicq extends com.google.api.client.googleapis.services.json.Abstra
          * @since 1.13
          */
         protected ShowAll() {
-          super(Flicq.this, "GET", REST_PATH, null, com.appspot.flicq_thurst_4711.flicq.model.Subscribers.class);
+          super(Flicq.this, "GET", REST_PATH, null, com.flicq.tennis.appengine.model.Subscribers.class);
         }
 
         @Override
@@ -269,7 +269,7 @@ public class Flicq extends com.google.api.client.googleapis.services.json.Abstra
        * This request holds the parameters needed by the flicq server.  After setting any optional
        * parameters, call the {@link Add#execute()} method to invoke the remote operation.
        *
-       * @param content the {@link com.appspot.flicq_thurst_4711.flicq.model.Shot}
+       * @param content the {@link com..flicq.tennis.appengine.model.Shot}
        * @return the request
        */
       public Add add(com.flicq.tennis.appengine.model.Shot content) throws java.io.IOException {
@@ -448,7 +448,7 @@ public class Flicq extends com.google.api.client.googleapis.services.json.Abstra
          * @since 1.13
          */
         protected List() {
-          super(Flicq.this, "GET", REST_PATH, null, com.appspot.flicq_thurst_4711.flicq.model.Shots.class);
+          super(Flicq.this, "GET", REST_PATH, null, com.flicq.tennis.appengine.model.Shots.class);
         }
 
         @Override

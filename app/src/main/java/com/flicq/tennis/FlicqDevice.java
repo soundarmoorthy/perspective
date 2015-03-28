@@ -13,6 +13,8 @@ import android.os.Message;
 import android.util.Log;
 
 
+import com.flicq.tennis.appengine.Flicq;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -141,18 +143,15 @@ public class FlicqDevice {
         rv.computeFromQuaternion(q, FlicqUtils.AngleUnits.DEGREES);
     }
 
-    public static final boolean sample = true;
     synchronized void getData(RotationVector rv, FlicqQuaternion q) {
         SampleData.getNextQuaternion(q);
         adjustForZero(rv, q);
     }
 
     private synchronized ImuRecordType processBuffer(Payload payload) {
-        String str;
-        int i, flags, boardId, systicks;
+        int i, flags, systicks;
         short shortInt;
-        byte b;
-        double n; // used for normalization functions
+        double n;
         ImuRecordType retVal = ImuRecordType.NONE;
         ByteBuffer bb = payload.bb;
         short packetId = bb.get(0);
@@ -180,10 +179,10 @@ public class FlicqDevice {
                 }
                 if (recordSize < 41) {
                     flags = (int) bb.get(32);
-                    boardId = (int) bb.get(33);
+                    //boardId = (int) bb.get(33);
                 } else {
                     flags = (int) bb.get(40);
-                    boardId = (int) bb.get(41);
+                    //boardId = (int) bb.get(41);
                 }
                 // normalize the quaternion to fix roundoff errors
                 n = quatInputs[0] * quatInputs[0] + quatInputs[1] * quatInputs[1] + quatInputs[2] * quatInputs[2] + quatInputs[3] * quatInputs[3];
@@ -220,16 +219,16 @@ public class FlicqDevice {
                     recordSize = bb.position();
                     if ((recordSize >= 4) && ((recordSize % 2) == 0)) {
                         softwareVersionNumber = bb.getShort(2); // location 0 is packetType, location 1 is the packet number.  This is the software version.
-                        str = String.format("Embedded Software Version: %06d", softwareVersionNumber);
+                        //str = String.format("Embedded Software Version: %06d", softwareVersionNumber);
                         shortInt = bb.getShort(4); // this location will be the number of systicks/20
                         if (shortInt < 0)
                             systicks = shortInt + 65536;  // the transmitted value is unsigned, but ByteBuffer does not handle them without some adjustment
                         else systicks = shortInt;
                         systicks = systicks * 20;
-                        str += String.format("\nSysticks/Orientation: %08d", systicks);
+                        //str += String.format("\nSysticks/Orientation: %08d", systicks);
                         for (i = 6; i < recordSize; i += 2) {
                             shortInt = bb.getShort(i);
-                            str += String.format("\n%06d", shortInt);
+                            //str += String.format("\n%06d", shortInt);
                         }
                     }
                 }
