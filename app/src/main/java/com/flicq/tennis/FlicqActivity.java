@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 public class FlicqActivity extends Activity implements OnMenuItemClickListener {
@@ -67,7 +68,16 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         flicqDevice = FlicqDevice.getInstance(this);
+
+
+        FlicqCloud cloud = new FlicqCloud();
+        try {
+            cloud.Send();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         setContentView(R.layout.activity_main);
 
