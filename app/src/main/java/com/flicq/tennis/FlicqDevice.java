@@ -13,8 +13,6 @@ import android.os.Message;
 import android.util.Log;
 
 
-import com.flicq.tennis.appengine.Flicq;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -48,7 +46,6 @@ public class FlicqDevice {
     static private String name;
     static private UUID uuid;
     static private BluetoothDevice dev;
-    static private String pattern = null;
     static private boolean btReceiverRegistered = false;
     static private boolean enableDebugPacket;
     static float[] quatInputs = null;
@@ -82,7 +79,6 @@ public class FlicqDevice {
         quaternion = new TimedQuaternion();
         clear();
 
-        FlicqDevice.pattern = "blue";
         quatInputs = new float[4];
         enableDebugPacket = false; //Set to true, to get debug packet.
         acc.setTimeScale(timeScale);
@@ -265,79 +261,12 @@ public class FlicqDevice {
         return (btStatus == BtStatus.READY);
     }
 
-    // Possible 4 byte commands:
-    // "AVP " = Use physical gyro
-    // "AVV " = Use virtual gyro
-    // "DB+ " = debug packet on (default)
-    // "DB- " = debug packet off
-    // "Q3  " = transmit 3-axis quaternion in standard packet
-    // "Q6MA" = transmit 6-axis mag/accel quaternion in standard packet
-    // "Q6AG" = transmit 6-axis accel/gyro quaternion in standard packet
-    // "Q9  " = transmit 9-axis quaternion in standard packet (default)
-    // "RPC+" = Roll/Pitch/Compass on (default)
-    // "RPC-" = Roll/Pitch/Compass off
-    // "RST " = Soft reset
-    public void turnDebugOn() {
-        sendTo("DB+ ");
-    }
-
-    public void turnDebugOff() {
-        sendTo("DB- ");
-    }  // we will not be using this command, as debug will be left on at the protocol level so that
-
-    // we can get the embedded app software version number (needed for compatibility checks).
-    // The Preferences option for debug on/off will only affect what gets displayed.
-    public void useQ3() {
-        sendTo("Q3  ");
-    }
-
-    public void useQ3M() {
-        sendTo("Q3M ");
-    }
-
-    public void useQ3G() {
-        sendTo("Q3G ");
-    }
-
-    public void useQ6MA() {
-        sendTo("Q6MA");
-    }
-
-    public void useQ6AG() {
-        sendTo("Q6AG");
-    }
-
-    public void useQ9() {
-        sendTo("Q9  ");
-    }
-
-    public void turnRpcOn() {
-        sendTo("RPC+");
-    }
-
-    public void turnRpcOff() {
-        sendTo("RPC-");
-    }
-
-    public void reset() {
-        sendTo("RST ");
-    }
-
-    public void disableVirtualGyro() {
-        sendTo("VG- ");
-    }
-
-    public void enableVirtualGyro() {
-        sendTo("VG+ ");
-    }
-
     void keepAlive() {
         // see http://stackoverflow.com/questions/18420525/application-using-bluetooth-spp-profile-not-working-after-update-from-android-4/18646072#18646072
         // for why this function was needed
 //		if (Build.VERSION.SDK_INT > 17) { 
         keepAliveCounter += 1;
         if (keepAliveCounter >= keepAliveInterval) {
-            turnDebugOn();
             keepAliveCounter = 1;
         }
 //		}
@@ -418,7 +347,7 @@ public class FlicqDevice {
                     String address = device.getAddress();
                     dev = device;
                     uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-                    sts = name.startsWith(pattern);
+                    sts = name.startsWith("Blue"); //The firmware sets the name as BlueRadio.
                     if (sts) {
                         setBtSts(BtStatus.PAIRED, "Found FlicqDevice.");
                         return;

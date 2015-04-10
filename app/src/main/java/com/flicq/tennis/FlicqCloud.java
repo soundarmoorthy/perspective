@@ -28,7 +28,8 @@ public final class FlicqCloud {
                     try {
 
                         Shot shot;
-                        shot = new Shot().setX("3.222").setY("3.333").setZ("3.5").setK("1.2");
+                        shot = new Shot().setAX("1.0").setAY("2.0").setAZ("3.0").setQ0("4.0").setQ1("5.0")
+                                .setQ2("6.0").setQ3("7.0");
                         Flicq.FlicqEndpointService.Shots.Add query = flicq.flicqEndpointService().shots().add(shot);
                         query.execute();
                         return Void.TYPE.newInstance();

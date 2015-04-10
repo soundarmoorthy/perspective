@@ -58,6 +58,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
             flicqDevice.stop(true); //This will disable uploading data to cloud
         } else if (itemId == R.id.btn_capture) {
             flicqDevice.start();
+
             shotRenderer.disable();
         } else {
             sts = false;
@@ -69,11 +70,10 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        flicqDevice = FlicqDevice.getInstance(this);
-
         FlicqCloud cloud = new FlicqCloud();
-            cloud.Send();
+        cloud.Send();
 
+        flicqDevice = FlicqDevice.getInstance(this);
         setContentView(R.layout.activity_main);
 
         Display display = ((WindowManager) this
