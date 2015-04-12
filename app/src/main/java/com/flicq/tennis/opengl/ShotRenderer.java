@@ -18,8 +18,6 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.os.Environment;
 
-import com.flicq.tennis.FlicqActivity;
-
 
 public class ShotRenderer implements GLSurfaceView.Renderer {
 
@@ -27,14 +25,12 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     Grid grid;
     Axis axis;
     Helper helper;
-    FlicqActivity parent;
-    int screenRotation;
+    int initialScreenRotation;
     int width, height;
     private float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
 
-    public ShotRenderer(FlicqActivity activity, int screenRotation) {
-        this.parent = activity;
-        this.screenRotation = screenRotation;
+    public ShotRenderer(int initialScreenRotation) {
+        this.initialScreenRotation = initialScreenRotation;
         line = new Line();
         grid = new Grid();
         axis = new Axis();
@@ -222,7 +218,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         gl.glRotatef(cameraAngleY, 1, 0, 0);
         gl.glRotatef(cameraAngleX, 0, 1, 0);
         
-        gl.glRotatef(rotationDegrees[this.screenRotation], 0, 0, 1);  // portrait/landscape rotation
+        gl.glRotatef(rotationDegrees[this.initialScreenRotation], 0, 0, 1);  // portrait/landscape rotation
         
         
         

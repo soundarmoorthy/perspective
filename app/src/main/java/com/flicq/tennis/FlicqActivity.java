@@ -17,6 +17,10 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 
+import com.flicq.tennis.appengine.FlicqCloud;
+import com.flicq.tennis.ble.FlicqDevice;
+import com.flicq.tennis.opengl.ShotRenderer;
+
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
@@ -47,23 +51,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     }
 
     public boolean onMenuItemClick(MenuItem item) {
-        boolean sts = true;
-        int itemId = item.getItemId();
-        if (itemId == R.id.btn_stop) {
-            if (flicqDevice != null)
-                flicqDevice.stop(false);
-                shotRenderer.disable();
-        } else if (itemId == R.id.btn_render) {
-            shotRenderer.enable();
-            flicqDevice.stop(true); //This will disable uploading data to cloud
-        } else if (itemId == R.id.btn_capture) {
-            flicqDevice.start();
-
-            shotRenderer.disable();
-        } else {
-            sts = false;
-        }
-        return (sts);
+        return false;
     }
 
     @Override
@@ -73,15 +61,15 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         FlicqCloud cloud = new FlicqCloud();
         cloud.Send();
 
-        flicqDevice = FlicqDevice.getInstance(this);
+        flicqDevice = FlicqDevice.getInstance();
         setContentView(R.layout.activity_main);
 
         Display display = ((WindowManager) this
                 .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        int screenRotation = display.getRotation();
+        int initialScreenRotation = display.getRotation();
 
         GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
-        shotRenderer = new ShotRenderer(this.flicqDevice, screenRotation);
+        shotRenderer = new ShotRenderer(initialScreenRotation);
         shotView.setRenderer(shotRenderer);
 
         Button exitButton = (Button) findViewById(R.id.exit_button);
@@ -102,24 +90,15 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
-        }
+    }
 
     @Override
     public void onStart() {
         super.onStart();
-        if ((flicqDevice != null) && (!flicqDevice.isListening())) {
-            flicqDevice.startBluetooth();
-        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FlicqDevice.requestCode) {
-            if (resultCode == RESULT_OK) {
-                flicqDevice.getPairedDevice();
-                flicqDevice.initializeConnection();
-            }
-        }
     }
 
     @Override
@@ -134,27 +113,26 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
 
     @Override
     public void onStop() {
-        if (flicqDevice != null)
-            flicqDevice.stop(false);
+        //do here
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (flicqDevice != null) {
-            flicqDevice.stop(true); // release BT threads
-        }
+        // do here
     }
 
     @Override
     public void onPause() {
+        //do here
         super.onPause();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        //do here
     }
 
     @Override
@@ -162,3 +140,4 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         super.onRestoreInstanceState(savedInstanceState);
     }
 }
+
