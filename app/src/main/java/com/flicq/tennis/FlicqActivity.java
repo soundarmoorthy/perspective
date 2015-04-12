@@ -19,9 +19,6 @@ import com.flicq.tennis.ble.FlicqDevice;
 import com.flicq.tennis.opengl.ShotRenderer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-
 
 public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     public FlicqDevice flicqDevice = null;
@@ -36,9 +33,6 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         popup.setOnMenuItemClickListener(this);
         popup.show();
     }
-
-
-
 
     public boolean onMenuItemClick(MenuItem item) {
         int itemId = item.getItemId();
@@ -89,8 +83,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
 
         int mode = 1;
-        float[] set = new float[1];
-        shotRenderer = new ShotRenderer(initialScreenRotation, set,  mode );
+        shotRenderer = new ShotRenderer(initialScreenRotation, SampleData.set,  mode );
         shotView.setRenderer(shotRenderer);
 
 
