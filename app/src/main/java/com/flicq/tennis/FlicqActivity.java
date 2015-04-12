@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,30 +15,19 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 
-import com.flicq.tennis.appengine.FlicqCloud;
 import com.flicq.tennis.ble.FlicqDevice;
 import com.flicq.tennis.opengl.ShotRenderer;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+
 
 public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     public FlicqDevice flicqDevice = null;
 
     public ShotRenderer shotRenderer = null;
 
-
-    static private class MyHandler extends Handler {
-        @SuppressWarnings("unused")
-        private final WeakReference<FlicqActivity> myActivity;
-
-        public MyHandler(FlicqActivity activity) {
-            myActivity = new WeakReference<FlicqActivity>(activity);
-        }
-
-        public void handleMessage(Message msg) {
-        }
-    }
 
     public void showDataSelector(View v) {
         PopupMenu popup = new PopupMenu(this, v);
@@ -50,16 +37,47 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         popup.show();
     }
 
+
+
+
     public boolean onMenuItemClick(MenuItem item) {
-        return false;
+        int itemId = item.getItemId();
+        SystemState prevState = currentState;
+
+        switch (itemId) {
+            case R.id.btn_stop:
+                currentState = SystemState.STOPPED;
+                break;
+            case R.id.btn_capture:
+                currentState = SystemState.CAPTURE;
+                break;
+            case R.id.btn_render:
+                currentState = SystemState.RENDER;
+                break;
+            default:
+                currentState = SystemState.UNKNOWN;
+        }
+
+        if(currentState == prevState)
+            return false; //Return false to let others consume this click.
+
+        for(int i=0;i<systemComponents.size(); i++)
+        {
+            ISystemComponent component = systemComponents.get(i);
+            component.SystemStateChanged(prevState, currentState);
+        }
+
+        return true; //Return true to prevent others from handling this click
     }
+
+    SystemState currentState;
+    ArrayList<ISystemComponent> systemComponents;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FlicqCloud cloud = new FlicqCloud();
-        cloud.Send();
+        currentState = SystemState.STOPPED;
 
         flicqDevice = FlicqDevice.getInstance();
         setContentView(R.layout.activity_main);
@@ -69,8 +87,16 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         int initialScreenRotation = display.getRotation();
 
         GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
-        shotRenderer = new ShotRenderer(initialScreenRotation);
+
+        int mode = 1;
+        float[] set = new float[1];
+        shotRenderer = new ShotRenderer(initialScreenRotation, set,  mode );
         shotView.setRenderer(shotRenderer);
+
+
+        systemComponents = new ArrayList<ISystemComponent>();
+        systemComponents.add(0, flicqDevice);
+        systemComponents.add(1, shotRenderer);
 
         Button exitButton = (Button) findViewById(R.id.exit_button);
         exitButton.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +115,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
         return super.onOptionsItemSelected(item);
     }
 
@@ -99,6 +126,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
     }
 
     @Override
@@ -139,5 +167,8 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
     }
+
 }
+
+;
 

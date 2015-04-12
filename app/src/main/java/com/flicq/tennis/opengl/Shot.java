@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 
         import javax.microedition.khronos.opengles.GL10;
 
-public class Line {
+public class Shot {
     private FloatBuffer vertexFloatBuffer; // Buffer for vertex-array
 
     private float[] vertices = { // Vertices for top and bottom
@@ -18,7 +18,7 @@ public class Line {
             0.0f, 0.0f, -0.2f
     };
 
-    public Line() {
+    public Shot() {
 
         ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect(vertices.length * 4);
         vertexByteBuffer.order(ByteOrder.nativeOrder());
