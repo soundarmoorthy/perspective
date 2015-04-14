@@ -16,10 +16,12 @@ import javax.microedition.khronos.opengles.GL10;
 import android.graphics.Bitmap;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+import android.os.AsyncTask;
 import android.os.Environment;
 
-import com.flicq.tennis.ISystemComponent;
-import com.flicq.tennis.SystemState;
+import com.flicq.tennis.framework.IActivityHelper;
+import com.flicq.tennis.framework.ISystemComponent;
+import com.flicq.tennis.framework.SystemState;
 
 
 public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
@@ -31,10 +33,11 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
     int initialScreenRotation;
     int width, height;
     private float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
+    IActivityHelper activityHelper;
 
     // The set[] is a single dimensional array, with every "successive 7 elements" defining
     // a plot information. ax, ay, az, q0, q1, q2, q3
-    public ShotRenderer(int initialScreenRotation, float[] set, int mode) {
+    public ShotRenderer(int initialScreenRotation, float[] set, int mode, IActivityHelper activityHelper) {
         this.initialScreenRotation = initialScreenRotation;
         this.set  = set;
         setMode(mode);
@@ -42,6 +45,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
         grid = new Grid();
         axis = new Axis();
         helper = new Helper();
+        this.activityHelper = activityHelper;
         cameraAngleX = -45;
         cameraAngleY = 45;
     }
@@ -227,8 +231,8 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
         
         gl.glRotatef(rotationDegrees[this.initialScreenRotation], 0, 0, 1);  // portrait/landscape rotation
         
-        grid.draw(gl);
-        axis.draw(gl);
+        //grid.draw(gl);
+        //axis.draw(gl);
 
         if(animation_use){
         	int i=(animation)%(set.length/7);
@@ -239,46 +243,12 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
         	renderFusionData(gl, set, -1, mode);
         
         if (this.screenshot_request) {
-        	take_screenshot(gl);
             this.screenshot_request = false;
         }
         
 
     }
-    private void take_screenshot(GL10 gl){
-    	int screenshotSize = this.width * this.height;
-        ByteBuffer bb = ByteBuffer.allocateDirect(screenshotSize * 4);
-        bb.order(ByteOrder.nativeOrder());
-        gl.glReadPixels(0, 0, width, height, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, bb);
-        int pixelsBuffer[] = new int[screenshotSize];
-        bb.asIntBuffer().get(pixelsBuffer);
-        bb = null;
 
-        for (int i = 0; i < screenshotSize; ++i) {
-            // The alpha and green channels' positions are preserved while the red and blue are swapped
-            pixelsBuffer[i] = ((pixelsBuffer[i] & 0xff00ff00)) | ((pixelsBuffer[i] & 0x000000ff) << 16) | ((pixelsBuffer[i] & 0x00ff0000) >> 16);
-        }
-
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        bitmap.setPixels(pixelsBuffer, screenshotSize-width, -width, 0, 0, width, height);
-        // TODO Auto-generated method stub
-        String root = Environment.getExternalStorageDirectory().toString();
-        File myDir = new File(root + "/fusion_screenshots");    
-        myDir.mkdirs();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-        Date now = new Date();
-        String fileName = formatter.format(now) + ".jpg";
-        File file = new File (myDir, fileName);
-        if (file.exists ()) file.delete (); 
-        try {
-               FileOutputStream out = new FileOutputStream(file);
-               bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out); // ERROR 341 LINE
-               out.flush();
-               out.close();
-        } catch (Exception e) {
-               e.printStackTrace();
-        }
-    }
     int ai;
     public synchronized void computeRotationVectorFromQuaternion() {
         float theta = (float) Math.acos(q0);

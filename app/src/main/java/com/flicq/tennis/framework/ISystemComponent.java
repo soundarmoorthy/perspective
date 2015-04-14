@@ -1,4 +1,4 @@
-package com.flicq.tennis;
+package com.flicq.tennis.framework;
 
 public interface ISystemComponent
 {

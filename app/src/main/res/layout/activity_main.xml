@@ -17,22 +17,38 @@
 
             <Button
                 android:id="@+id/exit_button"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/button"
                 android:background="@color/white"
                 android:text="@string/exit" />
 
             <Button
-                android:id="@+id/app_mode"
-                android:layout_height="wrap_content"
-                style="@style/button"
+                android:id="@+id/btn_stop"
                 android:background="@color/white"
-                android:onClick="showDataSelector"
-                android:text="Mode" />
-
-
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10px"
+                android:onClick="onClick"
+                android:text="Reset"/>
+            <Button
+                android:id="@+id/btn_capture"
+                android:background="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"
+                android:layout_marginRight="10px"
+                android:text="Capture"/>
+            <Button
+                android:id="@+id/btn_render"
+                android:background="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10px"
+                android:onClick="OnClick"
+                android:text="Show"/>
         </LinearLayout>
     </HorizontalScrollView>
+
 
     <LinearLayout
         android:id="@+id/graphicFrame"

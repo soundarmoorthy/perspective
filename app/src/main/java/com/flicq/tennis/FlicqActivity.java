@@ -1,68 +1,37 @@
 package com.flicq.tennis;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.PopupMenu;
-import android.widget.PopupMenu.OnMenuItemClickListener;
+import android.widget.Toast;
 
 import com.flicq.tennis.ble.FlicqDevice;
+import com.flicq.tennis.framework.IActivityHelper;
+import com.flicq.tennis.framework.ISystemComponent;
+import com.flicq.tennis.framework.SampleData;
+import com.flicq.tennis.framework.SystemState;
 import com.flicq.tennis.opengl.ShotRenderer;
 
 import java.util.ArrayList;
 
-public class FlicqActivity extends Activity implements OnMenuItemClickListener {
+public class FlicqActivity extends Activity implements IActivityHelper, View.OnClickListener {
     public FlicqDevice flicqDevice = null;
 
     public ShotRenderer shotRenderer = null;
 
-
-    public void showDataSelector(View v) {
-        PopupMenu popup = new PopupMenu(this, v);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.data_source_options, popup.getMenu());
-        popup.setOnMenuItemClickListener(this);
-        popup.show();
-    }
-
-    public boolean onMenuItemClick(MenuItem item) {
-        int itemId = item.getItemId();
-        SystemState prevState = currentState;
-
-        switch (itemId) {
-            case R.id.btn_stop:
-                currentState = SystemState.STOPPED;
-                break;
-            case R.id.btn_capture:
-                currentState = SystemState.CAPTURE;
-                break;
-            case R.id.btn_render:
-                currentState = SystemState.RENDER;
-                break;
-            default:
-                currentState = SystemState.UNKNOWN;
-        }
-
-        if(currentState == prevState)
-            return false; //Return false to let others consume this click.
-
-        for(int i=0;i<systemComponents.size(); i++)
-        {
-            ISystemComponent component = systemComponents.get(i);
-            component.SystemStateChanged(prevState, currentState);
-        }
-
-        return true; //Return true to prevent others from handling this click
-    }
+    private static final int BLUETOOTH_ENABLE_REQUEST_CODE = 4711;
 
     SystemState currentState;
     ArrayList<ISystemComponent> systemComponents;
@@ -73,7 +42,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
 
         currentState = SystemState.STOPPED;
 
-        flicqDevice = FlicqDevice.getInstance();
+        flicqDevice = FlicqDevice.getInstance(this);
         setContentView(R.layout.activity_main);
 
         Display display = ((WindowManager) this
@@ -83,7 +52,7 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
 
         int mode = 1;
-        shotRenderer = new ShotRenderer(initialScreenRotation, SampleData.set,  mode );
+        shotRenderer = new ShotRenderer(initialScreenRotation, SampleData.set, mode, this);
         shotView.setRenderer(shotRenderer);
 
 
@@ -119,8 +88,24 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == BLUETOOTH_ENABLE_REQUEST_CODE)
+        {
+            runOnUiThread(InitializeAdapterTask);
+        }
 
     }
+
+    private Runnable InitializeAdapterTask = new Runnable() {
+        @Override
+        public void run() {
+            //Now the BLE adapter is initialized.
+            final BluetoothManager bluetoothManager =
+                    (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+            BluetoothAdapter adapter =  bluetoothManager.getAdapter();
+            flicqDevice.OnBluetoothAdapterInitialized(adapter);
+            Log.e("OnActivityResult", "Initialized adapter");
+        }
+    };
 
     @Override
     public void onRestart() {
@@ -161,7 +146,56 @@ public class FlicqActivity extends Activity implements OnMenuItemClickListener {
         super.onRestoreInstanceState(savedInstanceState);
     }
 
+    @Override
+    public void EnableBluetoothAdapter() {
+        boolean supported = false;
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            //This will start the enable activity. To see the result look into
+            //activityResult
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, BLUETOOTH_ENABLE_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void SetStatus(String s) {
+        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public Context GetApplicationContext()
+    {
+        return getApplicationContext();
+    }
+
+    @Override
+    public void RunOnUIThread(Runnable action) {
+        runOnUiThread(action);
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        int itemId = view.getId();
+        SystemState prevState = currentState;
+
+        switch (itemId) {
+            case R.id.btn_stop:
+                currentState = SystemState.STOPPED;
+                break;
+            case R.id.btn_capture:
+                currentState = SystemState.CAPTURE;
+                break;
+            case R.id.btn_render:
+                currentState = SystemState.RENDER;
+                break;
+            default:
+                currentState = SystemState.UNKNOWN;
+        }
+
+        for (int i = 0; i < systemComponents.size(); i++) {
+            ISystemComponent component = systemComponents.get(i);
+            component.SystemStateChanged(prevState, currentState);
+        }
+    }
 }
-
-;
-

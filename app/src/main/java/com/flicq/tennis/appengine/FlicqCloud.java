@@ -1,7 +1,5 @@
 package com.flicq.tennis.appengine;
 
-import android.os.AsyncTask;
-
 import com.flicq.tennis.appengine.model.Shot;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -16,29 +14,36 @@ public final class FlicqCloud {
     public FlicqCloud() {
         builder = new Flicq.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null);
         flicq = builder.build();
-    }
 
-    public void Send() {
         try {
-            AsyncTask<Void,Void,Void> task = new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... voids){
-                    try {
-
-                        Shot shot;
-                        shot = new Shot().setAX("1.0").setAY("2.0").setAZ("3.0").setQ0("4.0").setQ1("5.0")
-                                .setQ2("6.0").setQ3("7.0");
-                        Flicq.FlicqEndpointService.Shots.Add query = flicq.flicqEndpointService().shots().add(shot);
-                        query.execute();
-                        return Void.TYPE.newInstance();
-
-                    } catch (Exception ioe) {
-                        ioe.printStackTrace();
-                        return null;
-                    }
-                }
-            };
-                    task.execute();
-        }catch  (Exception ex){}
+            shot = new Shot();
+            query = flicq.flicqEndpointService().shots().add(shot);
+        }catch(Exception ioe)
+        {
+            ioe.printStackTrace();
+        }
     }
+    Flicq.FlicqEndpointService.Shots.Add query;
+
+    Shot shot;
+    public void SendCurrentShot(String data, String id) {
+        try {
+            //Actual data from sensor
+            dataPoint = data.split(";");
+            shot.setAX(dataPoint[0]);
+            shot.setAY(dataPoint[1]);
+            shot.setAZ(dataPoint[2]);
+
+            shot.setQ0(dataPoint[3]);
+            shot.setQ1(dataPoint[4]);
+            shot.setQ2(dataPoint[5]);
+            shot.setQ3(dataPoint[6]);
+            shot.setCounter(id);
+
+            query.execute();
+        } catch (Exception ioe) {
+            ioe.printStackTrace();
+        }
+    }
+    public String[] dataPoint = new String[7];
 }
