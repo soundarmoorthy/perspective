@@ -19,7 +19,6 @@ public final class FlicqDevice implements ISystemComponent
         return device;
     }
 
-
     private FlicqDevice(IActivityHelper helper)
     {
         this.helper = helper;
@@ -39,17 +38,11 @@ public final class FlicqDevice implements ISystemComponent
         {
             if(!bluetoothAdapterInitialized)
                 InitializeBluetoothAdapterAsync();
-            //Whenever the user clicks CAPTURE from the UI, we create a new session
-            //which will hold the corresponding shot ID and a handle to the cloud upload.
-            //Make sure you initialize it every time.
             session = new FlicqSession();
         }
         else if (newState == SystemState.STOPPED) {
             if(oldState == SystemState.CAPTURE)
-            {
-                //Release the session object if the user clicked stop.
                 session = null;
-            }
         }
     }
 

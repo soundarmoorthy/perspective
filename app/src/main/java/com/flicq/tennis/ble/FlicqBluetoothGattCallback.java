@@ -1,9 +1,11 @@
 package com.flicq.tennis.ble;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothProfile;
 import android.util.Log;
 
 import java.io.StringReader;
@@ -18,18 +20,23 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
 {
     FlicqSession session;
     String id;
+    BluetoothAdapter adapter;
     public FlicqBluetoothGattCallback(FlicqSession session)
     {
         this.session = session;
         this.id = session.getTimestamp();
+        this.adapter = adapter;
     }
 
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-        if(newState == 0)
+        if(newState == BluetoothProfile.STATE_CONNECTED) {
             Log.i("BLE", "Connected Device : " + gatt.getDevice().getName());
-        else if(newState == 8)
+            gatt.discoverServices();
+        }
+        else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
             Log.i("BLE", "Disconnected Device : " + gatt.getDevice().getName());
-
+            gatt.close();
+        }
     }
 
     @Override
@@ -56,44 +63,14 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         }
     }
 
-    @Override
-    public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-        Log.i("BLE", "OnCharacteristicRead");
-    }
-
-    @Override
-    public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-        Log.i("BLE", "OnCharacteristicWrite");
-    }
-
     public static int i=0;
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
         Log.i("BLE", "OnCharacteristicChanged " + String.valueOf(i++));
 
-        Log.i("BLE", characteristic.getStringValue(0));
+        //Log.i("BLE", characteristic.getFloatValue(52, 0).toString());
         //String value = characteristic.getStringValue(0);
         //Queue it in a TaskExecutor to run it in the future
         //session.getCloudManager().SendCurrentShot(value, id);
-    }
-
-    @Override
-    public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
-        Log.i("BLE", "OnDescriptionRead");
-    }
-
-    @Override
-    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
-        Log.i("BLE", "OnDescriptionWrite");
-    }
-
-    @Override
-    public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
-        Log.i("BLE", "OnReliableWriteCompleted");
-    }
-
-    @Override
-    public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
-        Log.i("BLE", "OnReadRemoteRssi");
     }
 }

@@ -27,8 +27,7 @@ public final class FlicqLeScanCallback implements BluetoothAdapter.LeScanCallbac
         if (address.equals("00:07:80:06:5B:4E")) { //Flicq demo device
             try {
                 Log.i("BLE", "Found Device :  " + address + " , Name : " + device.getName());
-                BluetoothGatt gatt = device.connectGatt(helper.GetApplicationContext(), true, new FlicqBluetoothGattCallback(session));
-                gatt.discoverServices();
+                BluetoothGatt gatt = device.connectGatt(helper.GetApplicationContext(), false, new FlicqBluetoothGattCallback(session));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
