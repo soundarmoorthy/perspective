@@ -29,7 +29,7 @@ package com.flicq.tennis.appengine.model;
  * @author Google, Inc.
  */
 @SuppressWarnings("javadoc")
-public final class Shot extends com.google.api.client.json.GenericJson {
+public final class Shot extends com.google.api.client.json.GenericJson implements Comparable<Shot> {
 
   /**
    * The value may be {@code null}.
@@ -230,4 +230,13 @@ public final class Shot extends com.google.api.client.json.GenericJson {
     return (Shot) super.clone();
   }
 
+    @Override
+    public int compareTo(Shot shot) {
+        if(this.getCounter().equals(shot.getCounter()))
+            return 0;
+        if(Long.parseLong(this.getCounter()) > Long.parseLong(shot.getCounter()))
+            return 1;
+        else
+            return -1;
+    }
 }

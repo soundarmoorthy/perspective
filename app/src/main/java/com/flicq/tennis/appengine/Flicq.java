@@ -35,7 +35,7 @@ public class Flicq extends com.google.api.client.googleapis.services.json.Abstra
    *
    * @since 1.7
    */
-  public static final String DEFAULT_ROOT_URL = "https://united-creek-911.appspot.com/_ah/api/";
+  public static final String DEFAULT_ROOT_URL = "https://united-creek-4711.appspot.com/_ah/api/";
 
   /**
    * The default encoded service path of the service. This is determined when the library is
@@ -43,7 +43,7 @@ public class Flicq extends com.google.api.client.googleapis.services.json.Abstra
    *
    * @since 1.7
    */
-  public static final String DEFAULT_SERVICE_PATH = "flicq/v3/";
+  public static final String DEFAULT_SERVICE_PATH = "flicq/v1/";
 
   /**
    * The default encoded base URL of the service. This is determined when the library is generated

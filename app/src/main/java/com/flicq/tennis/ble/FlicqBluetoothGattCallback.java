@@ -6,10 +6,15 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
+import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.StringReader;
-import java.util.List;
+import com.flicq.tennis.appengine.FlicqCloudRequestHandler;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -29,13 +34,24 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     }
 
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-        if(newState == BluetoothProfile.STATE_CONNECTED) {
+        if (newState == BluetoothProfile.STATE_CONNECTED) {
             Log.i("BLE", "Connected Device : " + gatt.getDevice().getName());
             gatt.discoverServices();
-        }
-        else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
+            try {
+                File f= File.createTempFile("flicq-thurst", ".log");
+                Log.e("Log File : ", f.getAbsolutePath());
+                fs = new FileOutputStream(f);
+            } catch (Exception ex) {
+
+            }
+        } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             Log.i("BLE", "Disconnected Device : " + gatt.getDevice().getName());
             gatt.close();
+            try {
+                fs.close();
+            } catch (Exception ex) {
+
+            }
         }
     }
 
@@ -63,14 +79,24 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         }
     }
 
+
+    FileOutputStream fs;
     public static int i=0;
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-        Log.i("BLE", "OnCharacteristicChanged " + String.valueOf(i++));
+        byte[] value = characteristic.getValue();
+            //fs.write(value[0]);
+            Log.e("BLE", String.valueOf(value));
+        //Use the data from BLE and send it to cloud
+//            new AsyncTask<Void, Void, Void>() {
+//                @Override
+//                protected Void doInBackground(Void... params) {
+//                    FlicqCloudRequestHandler f = new FlicqCloudRequestHandler();
+//                    f.SendCurrentShot(String.format("%d;%d;%d;%d;%d;%d;%d",i, i++,i++,i++, i++, i++,i++));
+//                    Log.e("Upload", f.getTimestamp() );
+//                    return null;
+//                }
+//            }.execute();
 
-        //Log.i("BLE", characteristic.getFloatValue(52, 0).toString());
-        //String value = characteristic.getStringValue(0);
-        //Queue it in a TaskExecutor to run it in the future
-        //session.getCloudManager().SendCurrentShot(value, id);
     }
 }

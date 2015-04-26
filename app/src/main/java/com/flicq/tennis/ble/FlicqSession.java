@@ -1,6 +1,6 @@
 package com.flicq.tennis.ble;
 
-import com.flicq.tennis.appengine.FlicqCloud;
+import com.flicq.tennis.appengine.FlicqCloudRequestHandler;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -9,14 +9,15 @@ import java.util.Locale;
  */
 public class FlicqSession {
     String timeStamp;
-    final FlicqCloud cloud;
     public FlicqSession() {
-        timeStamp = String.valueOf(Calendar.getInstance(Locale.getDefault()).getTimeInMillis());
-        cloud = new FlicqCloud();
     }
 
-    public FlicqCloud getCloudManager()
+    public FlicqCloudRequestHandler getCloudManager()
     {
+
+        FlicqCloudRequestHandler cloud;
+        timeStamp = String.valueOf(Calendar.getInstance(Locale.getDefault()).getTimeInMillis());
+        cloud = new FlicqCloudRequestHandler();
         return cloud;
     }
 

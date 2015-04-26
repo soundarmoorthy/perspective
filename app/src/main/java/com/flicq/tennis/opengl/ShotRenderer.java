@@ -2,23 +2,18 @@
 
 package com.flicq.tennis.opengl;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import android.graphics.Bitmap;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.os.AsyncTask;
-import android.os.Environment;
 
+import com.flicq.tennis.appengine.FlicqCloudRequestHandler;
 import com.flicq.tennis.framework.IActivityHelper;
 import com.flicq.tennis.framework.ISystemComponent;
 import com.flicq.tennis.framework.SystemState;
@@ -39,7 +34,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
     // a plot information. ax, ay, az, q0, q1, q2, q3
     public ShotRenderer(int initialScreenRotation, float[] set, int mode, IActivityHelper activityHelper) {
         this.initialScreenRotation = initialScreenRotation;
-        this.set  = set;
+        SetData(set);
         setMode(mode);
         shot = new Shot();
         grid = new Grid();
@@ -230,18 +225,23 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
         gl.glRotatef(cameraAngleX, 0, 1, 0);
         
         gl.glRotatef(rotationDegrees[this.initialScreenRotation], 0, 0, 1);  // portrait/landscape rotation
-        
-        //grid.draw(gl);
-        //axis.draw(gl);
+
+        if(preparingData)
+            return;
 
         if(animation_use){
-        	int i=(animation)%(set.length/7);
-        	if(animation_play)
-        		animation++;
-            renderFusionData(gl, set, i, mode);
-        }else
-        	renderFusionData(gl, set, -1, mode);
-        
+                int i = (animation) % (set.length / 7);
+                if (animation_play)
+                    animation++;
+                renderFusionData(gl, set, i, mode);
+        }
+        else
+        {
+            grid.draw(gl);
+            axis.draw(gl);
+        }
+
+        	//renderFusionData(gl, set, -1, mode);
         if (this.screenshot_request) {
             this.screenshot_request = false;
         }
@@ -289,14 +289,21 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
     
 	public boolean screenshot_request = false;
 	public boolean animation_use = false;
-	public boolean animation_play = true;
+	public boolean animation_play = false;
 	private int mode = 1;
 	
 	//Rotation Quaternions
     /*
     * The data is in the following format. x, y, z, q0, q1, q2, q3
     * */
-     private float set[];
+    private boolean preparingData = false;
+
+    private static float[] set;
+
+    public static void SetData(float[] set)
+    {
+            ShotRenderer.set = set;
+    }
 
     @Override
     public void SystemStateChanged(SystemState oldState, SystemState newState) {
@@ -304,7 +311,18 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
         if (newState == SystemState.CAPTURE) {
             animation_use = false;
         } else if (newState == SystemState.RENDER) {
-            animation_use = true;
+
+            preparingData = true;
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    FlicqCloudRequestHandler request = new FlicqCloudRequestHandler();
+                    ShotRenderer.SetData(request.GetShots());
+                    animation_use = true;
+                    preparingData = false;
+                    return null;
+                }
+            }.execute();
         } else if (newState == SystemState.STOPPED) {
             animation_use = false;
         }
