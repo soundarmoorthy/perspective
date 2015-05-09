@@ -1,20 +1,21 @@
 package com.flicq.tennis.ble;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.flicq.tennis.appengine.FlicqCloudRequestHandler;
+import com.flicq.tennis.contentmanager.ContentStore;
 import com.flicq.tennis.framework.IActivityHelper;
 import com.flicq.tennis.framework.ISystemComponent;
 import com.flicq.tennis.framework.SampleData;
 import com.flicq.tennis.framework.SystemState;
 
-public final class FlicqDevice implements ISystemComponent
+public final class FlicqDevice implements ISystemComponent, BluetoothAdapter.LeScanCallback
 {
-    private FlicqSession session;
     IActivityHelper helper;
-    boolean bluetoothAdapterInitialized;
 
     private static FlicqDevice device;
     public static FlicqDevice getInstance(IActivityHelper helper) {
@@ -26,33 +27,27 @@ public final class FlicqDevice implements ISystemComponent
     private FlicqDevice(IActivityHelper helper)
     {
         this.helper = helper;
-        bluetoothAdapterInitialized = false;
     }
 
     private void initialize() {
         if (helper != null) {
+            //This will invoke a method in the activity class
+            //to do the job. The idea is to show up the
+            //enable bluetooth dialog, in case if adapter
+            //is turned off.
             helper.EnableBluetoothAdapter();
-            bluetoothAdapterInitialized = true;
         }
     }
 
     @Override
     public void SystemStateChanged(SystemState oldState, SystemState newState) {
-        if (newState == SystemState.CAPTURE)
-        {
-            if(!bluetoothAdapterInitialized)
-                InitializeBluetoothAdapterAsync();
-            session = new FlicqSession();
-
-            //TemporarySend();
-        }
-        else if (newState == SystemState.STOPPED) {
-            if(oldState == SystemState.CAPTURE)
-                session = null;
-        }
-        else if(newState == SystemState.RENDER)
-        {
-            //session = null;
+        if (newState == SystemState.CAPTURE) {
+            InitializeBluetoothAdapterAsync();
+            ContentStore.Instance().NewShot();
+        } else if (newState == SystemState.STOPPED) {
+            if (gattDevice != null)
+                gattDevice.close();
+            gattDevice = null;
         }
     }
 
@@ -93,7 +88,24 @@ public final class FlicqDevice implements ISystemComponent
         if (adapter == null) {
             helper.SetStatus("The device doesn't support BLE. Cannot continue");
         } else {
-            adapter.startLeScan(new FlicqLeScanCallback(helper, session));
+            adapter.startLeScan(this);
+        }
+    }
+
+    BluetoothGatt gattDevice;
+    @Override
+    public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
+        //TODO : Use service based scan here.
+        String address = device.getAddress();
+        if(address.equals("00:07:80:06:5A:1A") ||
+                address.equals("00:07:80:06:5B:4E")) { //Flicq demo device
+            try {
+                Log.i("BLE", "Found Device :  " + address + " , Name : " + device.getName());
+                BluetoothGatt gatt = device.connectGatt(helper.GetApplicationContext(), false, new FlicqBluetoothGattCallback());
+                gattDevice = gatt;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.flicq.tennis;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
@@ -18,13 +19,19 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.flicq.tennis.ble.FlicqDevice;
+import com.flicq.tennis.contentmanager.ContentStore;
+import com.flicq.tennis.contentmanager.UnprocessedShot;
 import com.flicq.tennis.framework.IActivityHelper;
 import com.flicq.tennis.framework.ISystemComponent;
 import com.flicq.tennis.framework.SampleData;
 import com.flicq.tennis.framework.SystemState;
 import com.flicq.tennis.opengl.ShotRenderer;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class FlicqActivity extends Activity implements IActivityHelper, View.OnClickListener {
     public FlicqDevice flicqDevice = null;
@@ -62,7 +69,25 @@ public class FlicqActivity extends Activity implements IActivityHelper, View.OnC
 
         Button exitButton = (Button) findViewById(R.id.exit_button);
         exitButton.setOnClickListener(new View.OnClickListener() {
+
             public void onClick(View view) {
+                try {
+                    FileOutputStream fos = new FileOutputStream(File.createTempFile("ble", ".log"));
+                    ContentStore store = ContentStore.Instance();
+                    if (store != null) {
+                        LinkedList<float[]> shot = store.getShot().getPoints();
+                        for (int j = 0; j < shot.size(); j++) {
+                            float[] point = shot.get(j);
+                            String value = "";
+                            for (int k = 0; k < point.length; k++) {
+                                value += String.valueOf(point[k]) + "\t";
+                            }
+                            fos.write(value.getBytes());
+                        }
+                    }
+                } catch (IOException e) {
+
+                }
                 finish();
                 onStop();
                 System.exit(0);
@@ -171,6 +196,12 @@ public class FlicqActivity extends Activity implements IActivityHelper, View.OnC
     @Override
     public void RunOnUIThread(Runnable action) {
         runOnUiThread(action);
+    }
+
+    private BluetoothGatt currentDevice;
+    @Override
+    public void SetGatt(BluetoothGatt currentGattDevice) {
+        this.currentDevice = currentGattDevice;
     }
 
     @Override

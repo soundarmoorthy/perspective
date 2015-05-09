@@ -16,7 +16,6 @@ public class FlicqSession {
     {
 
         FlicqCloudRequestHandler cloud;
-        timeStamp = String.valueOf(Calendar.getInstance(Locale.getDefault()).getTimeInMillis());
         cloud = new FlicqCloudRequestHandler();
         return cloud;
     }

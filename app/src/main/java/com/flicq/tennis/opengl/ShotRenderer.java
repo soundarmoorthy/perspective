@@ -14,8 +14,10 @@ import android.opengl.GLU;
 import android.os.AsyncTask;
 
 import com.flicq.tennis.appengine.FlicqCloudRequestHandler;
+import com.flicq.tennis.contentmanager.ContentStore;
 import com.flicq.tennis.framework.IActivityHelper;
 import com.flicq.tennis.framework.ISystemComponent;
+import com.flicq.tennis.framework.SampleData;
 import com.flicq.tennis.framework.SystemState;
 
 
@@ -206,7 +208,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
 	        gl.glEnable(GL10.GL_DEPTH_TEST);
 	        gl.glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
 	        gl.glDisable(GL10.GL_BLEND);
-	        gl.glDrawArrays(GL10.GL_LINES, 0, count);
+	        //gl.glDrawArrays(GL10.GL_LINES, 0, count);
 	        
 	        gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
     	}
@@ -235,13 +237,13 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
                     animation++;
                 renderFusionData(gl, set, i, mode);
         }
-        else
-        {
-            grid.draw(gl);
-            axis.draw(gl);
-        }
+//        else //We don't need the axis now.
+//        {
+//            grid.draw(gl);
+//            axis.draw(gl);
+//        }
 
-        	//renderFusionData(gl, set, -1, mode);
+        renderFusionData(gl, set, -1, mode);
         if (this.screenshot_request) {
             this.screenshot_request = false;
         }
@@ -311,18 +313,21 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
         if (newState == SystemState.CAPTURE) {
             animation_use = false;
         } else if (newState == SystemState.RENDER) {
-
             preparingData = true;
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
+            ContentStore.Instance().Stop();
+            SetData(ContentStore.Instance().getShot().getDataForRendering());
+            //SetData(SampleData.set2);
+
+/*            new AsyncTask<Void, Void, Void>() { @Override protected Void doInBackground(Void... params) {
                     FlicqCloudRequestHandler request = new FlicqCloudRequestHandler();
                     ShotRenderer.SetData(request.GetShots());
                     animation_use = true;
                     preparingData = false;
                     return null;
                 }
-            }.execute();
+            }.execute();*/
+            preparingData = false;
+            animation_use = true;
         } else if (newState == SystemState.STOPPED) {
             animation_use = false;
         }
