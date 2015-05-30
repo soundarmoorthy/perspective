@@ -17,6 +17,8 @@
 
             <Button
                 android:id="@+id/exit_button"
+                android:background="@color/white"
+                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/exit" />
@@ -25,23 +27,30 @@
                 android:id="@+id/btn_stop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/buttonselector"
+                android:textColor="@color/black"
                 android:layout_marginRight="10px"
                 android:onClick="onClick"
                 android:text="Reset"/>
             <Button
                 android:id="@+id/btn_capture"
+                android:background="@color/white"
+                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="onClick"
                 android:layout_marginRight="10px"
-                android:text="Capture"/>
+                android:text="Game">
+            </Button>
             <Button
                 android:id="@+id/btn_render"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:textColor="@color/black"
                 android:layout_marginRight="10px"
                 android:onClick="onClick"
-                android:text="Show"/>
+                android:text="Replay"/>
 
         </LinearLayout>
     </HorizontalScrollView>
