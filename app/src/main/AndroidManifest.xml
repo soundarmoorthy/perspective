@@ -30,7 +30,7 @@
         android:icon="@drawable/logo"
         android:label="@string/app_title"
         android:logo="@drawable/logo"
-        android:theme="@style/AppTheme" >
+        >
         <activity
             android:name=".FlicqActivity"
             android:launchMode="singleInstance"

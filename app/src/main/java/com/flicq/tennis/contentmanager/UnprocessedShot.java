@@ -40,8 +40,16 @@ public class UnprocessedShot {
         return f;
     }
 
-    public void add(float []sensorValues)
-    {
-            this.values.add(sensorValues);
+    float[] cache = new float[7];
+    public void add(float []values) {
+        cache[0] = values[4];
+        cache[1] = values[5];
+        cache[2] = values[6];
+
+        cache[3] = values[0];
+        cache[4] = values[1];
+        cache[5] = values[2];
+        cache[6] = values[3];
+        this.values.add(cache);
     }
 }

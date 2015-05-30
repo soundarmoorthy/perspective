@@ -23,10 +23,6 @@ import com.flicq.tennis.framework.SystemState;
 
 public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
 
-    Shot shot;
-    Grid grid;
-    Axis axis;
-    Helper helper;
     int initialScreenRotation;
     int width, height;
     private float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
@@ -34,15 +30,13 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
 
     // The set[] is a single dimensional array, with every "successive 7 elements" defining
     // a plot information. ax, ay, az, q0, q1, q2, q3
-    public ShotRenderer(int initialScreenRotation, float[] set, int mode, IActivityHelper activityHelper) {
+    public ShotRenderer(int initialScreenRotation, int mode, IActivityHelper activityHelper) {
         this.initialScreenRotation = initialScreenRotation;
-        SetData(set);
         setMode(mode);
-        shot = new Shot();
-        grid = new Grid();
-        axis = new Axis();
-        helper = new Helper();
         this.activityHelper = activityHelper;
+		//The camera angle by default is tilted to 45 degree to get a 3d view.
+		//To run the OpenGL rendering tests make sure you set this to 0degree and
+		//90 degree properly.
         cameraAngleX = -45;
         cameraAngleY = 45;
     }
@@ -178,15 +172,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
 	        matrix[15] = 1.0f;
 	        
 	        gl.glMultMatrixf(matrix, 0);
-	        if(i==frame){
-	        	shot.draw(gl, true);
-	        }
 	        gl.glPopMatrix();
-
-	        
-	        if(i==frame){
-	        	helper.draw(gl, x, y, z);
-	        }
     	}
     	if(frame==-1)
     	{
@@ -208,8 +194,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
 	        gl.glEnable(GL10.GL_DEPTH_TEST);
 	        gl.glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
 	        gl.glDisable(GL10.GL_BLEND);
-	        //gl.glDrawArrays(GL10.GL_LINES, 0, count);
-	        
+
 	        gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
     	}
     }
@@ -231,49 +216,19 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
         if(preparingData)
             return;
 
-        if(animation_use){
-                int i = (animation) % (set.length / 7);
-                if (animation_play)
-                    animation++;
-                renderFusionData(gl, set, i, mode);
-        }
-//        else //We don't need the axis now.
-//        {
-//            grid.draw(gl);
-//            axis.draw(gl);
-//        }
-
         renderFusionData(gl, set, -1, mode);
-        if (this.screenshot_request) {
-            this.screenshot_request = false;
-        }
-        
-
     }
 
     int ai;
-    public synchronized void computeRotationVectorFromQuaternion() {
-        float theta = (float) Math.acos(q0);
-        a = 2 * theta; //For some reason q0 is q0/2
-        if (q0 == 1.0f) {
-            x = y = z = (float) 0.0;
-        } else {
-            float sinTheta = (float) Math.sin(theta);
-            x = q1 / sinTheta;
-            y = q2 / sinTheta;
-            z = q3 / sinTheta;
-        }
-        a = a * degreesPerRadian;
-    }
 
     static public final float degreesPerRadian = (float) (180.0f / 3.14159f);
     
     private void setMode(int i) {
 		mode = i;
-		if(mode<0)
-			mode=0;
-		if(mode>3)
-			mode=3;
+//		if(mode<0)
+//			mode=0;
+//		if(mode>3)
+//			mode=3;
 		
 	}
 
@@ -290,7 +245,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
 	private int cameraAngleY;
     
 	public boolean screenshot_request = false;
-	public boolean animation_use = false;
+	public boolean animation_use = true;
 	public boolean animation_play = false;
 	private int mode = 1;
 	
@@ -298,20 +253,23 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
     /*
     * The data is in the following format. x, y, z, q0, q1, q2, q3
     * */
-    private boolean preparingData = false;
+    private static boolean preparingData = false;
 
     private static float[] set;
 
-    public static void SetData(float[] set)
-    {
-            ShotRenderer.set = set;
+
+    public static void SetData(float[] set) {
+        //Guard the set data from being run into race conditions.
+        preparingData = true;
+        ShotRenderer.set = set;
+        preparingData = false;
     }
 
     @Override
     public void SystemStateChanged(SystemState oldState, SystemState newState) {
 
         if (newState == SystemState.CAPTURE) {
-            animation_use = false;
+            animation_use = true;
         } else if (newState == SystemState.RENDER) {
             preparingData = true;
             ContentStore.Instance().Stop();

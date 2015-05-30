@@ -8,7 +8,7 @@ import android.content.Intent;
 public interface IActivityHelper {
 
     //
-    public void EnableBluetoothAdapter();
+    void EnableBluetoothAdapter();
 
     void SetStatus(String s);
 

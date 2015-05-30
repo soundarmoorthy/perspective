@@ -26,6 +26,7 @@ import com.flicq.tennis.framework.ISystemComponent;
 import com.flicq.tennis.framework.SampleData;
 import com.flicq.tennis.framework.SystemState;
 import com.flicq.tennis.opengl.ShotRenderer;
+import com.flicq.tennis.test.TestOpenGL;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -59,7 +60,7 @@ public class FlicqActivity extends Activity implements IActivityHelper, View.OnC
         GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
 
         int mode = 1;
-        shotRenderer = new ShotRenderer(initialScreenRotation, SampleData.set, mode, this);
+        shotRenderer = new ShotRenderer(initialScreenRotation, mode, this);
         shotView.setRenderer(shotRenderer);
 
 
@@ -93,6 +94,8 @@ public class FlicqActivity extends Activity implements IActivityHelper, View.OnC
                 System.exit(0);
             }
         });
+        //This is to test the OpenGL rendering with a known set of data.
+        //TestOpenGL.Run();
     }
 
     @Override
