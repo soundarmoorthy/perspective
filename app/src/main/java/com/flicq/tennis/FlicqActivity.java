@@ -72,23 +72,6 @@ public class FlicqActivity extends Activity implements IActivityHelper, View.OnC
         exitButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
-                try {
-                    FileOutputStream fos = new FileOutputStream(File.createTempFile("ble", ".log"));
-                    ContentStore store = ContentStore.Instance();
-                    if (store != null) {
-                        LinkedList<float[]> shot = store.getShot().getPoints();
-                        for (int j = 0; j < shot.size(); j++) {
-                            float[] point = shot.get(j);
-                            String value = "";
-                            for (int k = 0; k < point.length; k++) {
-                                value += String.valueOf(point[k]) + "\t";
-                            }
-                            fos.write(value.getBytes());
-                        }
-                    }
-                } catch (IOException e) {
-
-                }
                 finish();
                 onStop();
                 System.exit(0);

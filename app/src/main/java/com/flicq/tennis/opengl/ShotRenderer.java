@@ -31,6 +31,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
     // The set[] is a single dimensional array, with every "successive 7 elements" defining
     // a plot information. ax, ay, az, q0, q1, q2, q3
     public ShotRenderer(int initialScreenRotation, int mode, IActivityHelper activityHelper) {
+		SetData(SampleData.set);
         this.initialScreenRotation = initialScreenRotation;
         setMode(mode);
         this.activityHelper = activityHelper;
@@ -70,8 +71,10 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
     final float matrix[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     private int animation=0;
     
-    private void  renderFusionData(GL10 gl, float[] data, int frame, int mode){
+    private void renderFusionData(GL10 gl, float[] data, int frame, int mode){
 
+		if(data == null || data.length == 0)
+			return;
     	int count=data.length/7;
     	float x=0,y=0,z=0;
     	float vx=0,vy=0,vz=0;
@@ -245,7 +248,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
 	private int cameraAngleY;
     
 	public boolean screenshot_request = false;
-	public boolean animation_use = true;
+	public boolean animation_use = false;
 	public boolean animation_play = false;
 	private int mode = 1;
 	
@@ -274,7 +277,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
             preparingData = true;
             ContentStore.Instance().Stop();
             SetData(ContentStore.Instance().getShot().getDataForRendering());
-            //SetData(SampleData.set2);
+            SetData(SampleData.set2);
 
 /*            new AsyncTask<Void, Void, Void>() { @Override protected Void doInBackground(Void... params) {
                     FlicqCloudRequestHandler request = new FlicqCloudRequestHandler();
