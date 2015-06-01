@@ -1,36 +1,38 @@
 package com.flicq.tennis.contentmanager;
 
 
-import com.flicq.tennis.opengl.ShotRenderer;
+import android.os.AsyncTask;
+import android.text.format.Time;
+import com.flicq.tennis.appengine.FlicqCloudRequestHandler;
 
 /**
  * Created by soundararajan on 4/26/2015.
  */
 public class ContentStore {
-    //private LinkedList<UnprocessedShot> shots;
     boolean stopped;
-
-    public UnprocessedShot getShot() {
-        return currentShot;
-    }
-
-    private ContentStore() {
-        //shots = new LinkedList<UnprocessedShot>();
-        stopped = false;
-    }
-
-    private UnprocessedShot currentShot;
-    private final Object currentShotLock = new Object();
-
-    public void NewShot() {
-
+    public FlicqShot getShot() {
         synchronized (currentShotLock) {
-            long id = System.currentTimeMillis();
-            currentShot = new UnprocessedShot(id);
+            return currentShot;
         }
     }
 
-    public void Dump(float[] values) {
+    private ContentStore() {
+        stopped = false;
+    }
+
+    private FlicqShot currentShot;
+    private final Object currentShotLock = new Object();
+
+    public void NewShot() {
+        synchronized (currentShotLock) {
+            long id = System.currentTimeMillis();
+            Time time = new Time();
+            time.setToNow();
+            currentShot = new FlicqShot(time);
+        }
+    }
+
+    public void Dump(final float[] values) {
         if (stopped)
             return;
         synchronized (currentShotLock) {
@@ -68,11 +70,13 @@ public class ContentStore {
         }
     }
 
-    public void Stop() {
+    public void ShotDone()
+    {
         stopped = true;
+        FlicqShot cachedShot = currentShot;
+        UploadAsync(cachedShot);
     }
 
-    //Should we expose this as android service
     private static ContentStore store;
 
     public static ContentStore Instance() {
@@ -81,7 +85,15 @@ public class ContentStore {
         return store;
     }
 
-    public void Upload() {
+    private void UploadAsync(final FlicqShot shot) {
+        new AsyncTask<Void,Void,Void>(){
 
+            @Override
+            protected Void doInBackground(Void... voids) {
+                FlicqCloudRequestHandler handler = new FlicqCloudRequestHandler();
+                handler.SendCurrentShot(shot);
+                return null;
+            }
+        }.execute();
     }
 }

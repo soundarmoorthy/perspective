@@ -38,35 +38,12 @@ public class AsyncSerialContentProcessor {
     public void Process(final float[] values)
     {
         executorQueue.submit(new Runnable() {
+
             @Override
             public void run() {
-                Log.e("BLE", String.valueOf(values[0]) + " " + String.valueOf(values[1]) + " " +
-                        String.valueOf(values[2]) + " " + String.valueOf(values[3]) + " " +
-                        String.valueOf(values[4]) + " " + String.valueOf(values[5]) + " " +
-                        String.valueOf(values[6]) + " " + String.valueOf(values[7]));
-                ContentStore.Instance().Dump(values);
+                Log.e("BLE :", values[0] + "," + values[1] + "," + values[2] + "," + values[3] + "," + values[4] + "," + values[5] + "," + values[6]);
+                //ContentStore.Instance().Dump(values);
             }
         });
-    }
-
-    //This will no longer be available when things work.
-    private void TemporarySend()
-    {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                FlicqCloudRequestHandler handler = new FlicqCloudRequestHandler();
-                float[] shotData = SampleData.set;
-//                for(int i=0;i< shotData.length /7; i++)
-//                {
-//                    float[] f = new float[7];
-//                    for(int j=0;j<7;j++)
-//                        f[j] = shotData[(i*7)+j];
-//                    handler.SendCurrentShot(f);
-//                    Log.i("Remaining : ", String.valueOf((shotData.length - i)/7));
-//                }
-                return null;
-            }
-        }.execute();
     }
 }

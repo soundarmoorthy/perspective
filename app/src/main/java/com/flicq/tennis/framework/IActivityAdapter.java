@@ -5,15 +5,12 @@ import android.bluetooth.BluetoothGatt;
 import android.content.Context;
 import android.content.Intent;
 
-public interface IActivityHelper {
+public interface IActivityAdapter {
 
     //
     void EnableBluetoothAdapter();
 
-    void SetStatus(String s);
+    void SetStatus(StatusType type, String s);
 
     Context GetApplicationContext();
-    void RunOnUIThread(Runnable action);
-
-    void SetGatt(BluetoothGatt currentGattDevice);
 }

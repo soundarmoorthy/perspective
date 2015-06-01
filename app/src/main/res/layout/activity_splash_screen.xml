@@ -1,0 +1,19 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+    android:layout_height="fill_parent" android:background="@color/white"
+    tools:context="com.flicq.tennis.SplashScreen">
+        <LinearLayout android:id="@+id/fullscreen_content_controls" style="?metaButtonBarButtonStyle"
+            android:layout_width="fill_parent" android:layout_height="fill_parent"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@color/white" android:orientation="horizontal"
+            >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/img_flicq_logo_splash"
+                android:src="@mipmap/flicq_logo_splash"
+                android:maxHeight="400dp"
+                android:maxWidth="300dp"
+                />
+        </LinearLayout>
+</FrameLayout>

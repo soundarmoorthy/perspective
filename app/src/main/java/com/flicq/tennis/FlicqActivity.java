@@ -1,12 +1,14 @@
 package com.flicq.tennis;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,25 +18,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.flicq.tennis.ble.FlicqDevice;
-import com.flicq.tennis.contentmanager.ContentStore;
-import com.flicq.tennis.contentmanager.UnprocessedShot;
-import com.flicq.tennis.framework.IActivityHelper;
+import com.flicq.tennis.external.ButtonAwesome;
+import com.flicq.tennis.external.TextAwesome;
+import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.ISystemComponent;
-import com.flicq.tennis.framework.SampleData;
+import com.flicq.tennis.framework.StatusType;
 import com.flicq.tennis.framework.SystemState;
 import com.flicq.tennis.opengl.ShotRenderer;
-import com.flicq.tennis.test.TestOpenGL;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
-public class FlicqActivity extends Activity implements IActivityHelper, View.OnClickListener {
+public class FlicqActivity extends Activity implements IActivityAdapter, View.OnClickListener {
     public FlicqDevice flicqDevice = null;
 
     public ShotRenderer shotRenderer = null;
@@ -72,13 +69,38 @@ public class FlicqActivity extends Activity implements IActivityHelper, View.OnC
         exitButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
+                confirmWithUserAndExit();
+            }
+        });
+
+        this.SetStatus( StatusType.INFO, "Ready");
+    }
+
+    private void confirmWithUserAndExit() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Confirm");
+        builder.setMessage("Are you sure, you want to exit ?");
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
                 finish();
                 onStop();
                 System.exit(0);
             }
         });
-        //This is to test the OpenGL rendering with a known set of data.
-        //TestOpenGL.Run();
+
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     @Override
@@ -101,9 +123,14 @@ public class FlicqActivity extends Activity implements IActivityHelper, View.OnC
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == BLUETOOTH_ENABLE_REQUEST_CODE)
         {
-            runOnUiThread(InitializeAdapterTask);
+            final BluetoothManager bluetoothManager =
+                    (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+            BluetoothAdapter adapter =  bluetoothManager.getAdapter();
+            if(adapter.getState() == BluetoothAdapter.STATE_ON) {
+                SetStatus(StatusType.INFO, "Bluetooth On");
+                runOnUiThread(InitializeAdapterTask);
+            }
         }
-
     }
 
     private Runnable InitializeAdapterTask = new Runnable() {
@@ -137,7 +164,6 @@ public class FlicqActivity extends Activity implements IActivityHelper, View.OnC
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // do here
     }
 
     @Override
@@ -169,8 +195,22 @@ public class FlicqActivity extends Activity implements IActivityHelper, View.OnC
     }
 
     @Override
-    public void SetStatus(String s) {
-        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+    public void SetStatus(final StatusType type, final String s) {
+        runOnUiThread(new Runnable() {
+                          @Override
+                          public void run() {
+                              TextAwesome iconText = (TextAwesome) findViewById(R.id.txt_status_icon);
+                              if(type == StatusType.ERROR)
+                                  iconText.setText(R.string.fa_sign_out);
+                              else if(type == StatusType.WARNING)
+                                  iconText.setText(R.string.fa_warning);
+                              else if(type == StatusType.INFO)
+                                  iconText.setText(R.string.fa_info);
+
+                              TextView view = (TextView) findViewById(R.id.txt_status);
+                              view.setText(s);
+                          }
+                      });
     }
 
     @Override
@@ -179,29 +219,15 @@ public class FlicqActivity extends Activity implements IActivityHelper, View.OnC
         return getApplicationContext();
     }
 
-    @Override
-    public void RunOnUIThread(Runnable action) {
-        runOnUiThread(action);
-    }
-
-    private BluetoothGatt currentDevice;
-    @Override
-    public void SetGatt(BluetoothGatt currentGattDevice) {
-        this.currentDevice = currentGattDevice;
-    }
-
+    static boolean ble_on = false;
     @Override
     public void onClick(View view) {
-
         int itemId = view.getId();
         SystemState prevState = currentState;
-
         switch (itemId) {
-            case R.id.btn_stop:
-                currentState = SystemState.STOPPED;
-                break;
             case R.id.btn_capture:
-                currentState = SystemState.CAPTURE;
+                ble_on = !ble_on;
+                currentState = ble_on ? SystemState.CAPTURE : SystemState.STOPPED;
                 break;
             case R.id.btn_render:
                 currentState = SystemState.RENDER;
@@ -210,9 +236,30 @@ public class FlicqActivity extends Activity implements IActivityHelper, View.OnC
                 currentState = SystemState.UNKNOWN;
         }
 
+        updateUI(itemId);
         for (int i = 0; i < systemComponents.size(); i++) {
             ISystemComponent component = systemComponents.get(i);
             component.SystemStateChanged(prevState, currentState);
         }
+    }
+
+    private void updateUI(int itemId) {
+        int []ids = {R.id.btn_capture, R.id.btn_render};
+        for(int i=0;i<ids.length;i++)
+        {
+            if(itemId == ids[i]) {
+                Button  button = (Button) findViewById(ids[i]);
+                button.setBackgroundColor(Color.argb(255,240,240,240));//A more lighter gray
+            }
+            else {
+                Button button = (Button) findViewById(ids[i]);
+                button.setBackgroundColor(Color.WHITE);
+            }
+        }
+        ButtonAwesome awesome = (ButtonAwesome) findViewById(R.id.btn_capture);
+        if(ble_on)
+            awesome.setText(R.string.fa_toggle_on);
+        else
+            awesome.setText(R.string.fa_toggle_off);
     }
 }

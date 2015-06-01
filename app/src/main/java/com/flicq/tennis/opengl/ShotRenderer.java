@@ -11,11 +11,9 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
-import android.os.AsyncTask;
 
-import com.flicq.tennis.appengine.FlicqCloudRequestHandler;
 import com.flicq.tennis.contentmanager.ContentStore;
-import com.flicq.tennis.framework.IActivityHelper;
+import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.ISystemComponent;
 import com.flicq.tennis.framework.SampleData;
 import com.flicq.tennis.framework.SystemState;
@@ -26,12 +24,12 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
     int initialScreenRotation;
     int width, height;
     private float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
-    IActivityHelper activityHelper;
+    IActivityAdapter activityHelper;
 
     // The set[] is a single dimensional array, with every "successive 7 elements" defining
     // a plot information. ax, ay, az, q0, q1, q2, q3
-    public ShotRenderer(int initialScreenRotation, int mode, IActivityHelper activityHelper) {
-		SetData(SampleData.set);
+    public ShotRenderer(int initialScreenRotation, int mode, IActivityAdapter activityHelper) {
+		//SetData(SampleData.set);
         this.initialScreenRotation = initialScreenRotation;
         setMode(mode);
         this.activityHelper = activityHelper;
@@ -275,18 +273,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
             animation_use = true;
         } else if (newState == SystemState.RENDER) {
             preparingData = true;
-            ContentStore.Instance().Stop();
             SetData(ContentStore.Instance().getShot().getDataForRendering());
-            SetData(SampleData.set2);
-
-/*            new AsyncTask<Void, Void, Void>() { @Override protected Void doInBackground(Void... params) {
-                    FlicqCloudRequestHandler request = new FlicqCloudRequestHandler();
-                    ShotRenderer.SetData(request.GetShots());
-                    animation_use = true;
-                    preparingData = false;
-                    return null;
-                }
-            }.execute();*/
             preparingData = false;
             animation_use = true;
         } else if (newState == SystemState.STOPPED) {

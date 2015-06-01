@@ -3,15 +3,11 @@ package com.flicq.tennis.appengine;
 import android.util.Log;
 
 import com.flicq.tennis.appengine.model.Shot;
-import com.flicq.tennis.appengine.model.Shots;
+import com.flicq.tennis.contentmanager.FlicqShot;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.util.DateTime;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -39,11 +35,11 @@ public final class FlicqCloudRequestHandler {
         return new com.google.api.client.util.DateTime(new java.util.Date().getTime());
     }
     Shot shot;
-    public void SendCurrentShot(List<Float> shotData) {
+    public void SendCurrentShot(FlicqShot source) {
         try {
             shot.setTime(getTimestamp());
             shot.setID(System.getProperty("user.name"));
-            shot.setItems(shotData);
+            shot.setItems(source.getDataForUpload());
             query.execute();
             Log.i("Cloud Upload done : ", "soundar");
         } catch (Exception ioe) {

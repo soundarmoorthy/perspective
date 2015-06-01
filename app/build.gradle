@@ -17,6 +17,11 @@ android {
     }
     productFlavors {
     }
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', 'src/main/java/external', 'src/main/java/com/flicq/tennis/thirdparty']
+        }
+    }
 }
 
 dependencies {
@@ -38,4 +43,5 @@ dependencies {
     compile files('libs/jetty-6.1.26.jar')
     compile files('libs/jetty-util-6.1.26.jar')
     compile files('libs/jsr305-1.3.9.jar')
+    compile 'com.android.support:support-v4:22.0.0'
 }

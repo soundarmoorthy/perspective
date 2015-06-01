@@ -28,16 +28,21 @@
     <application
         android:allowBackup="false"
         android:icon="@drawable/logo"
-        android:label="@string/app_title"
-        android:logo="@drawable/logo"
-        >
+        android:label="Flicq"
+        android:logo="@drawable/logo" >
         <activity
             android:name=".FlicqActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name=".SplashScreen"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_splash_screen"
+            android:theme="@style/FullscreenTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
