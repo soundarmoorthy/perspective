@@ -1,13 +1,10 @@
 package com.flicq.tennis.ble;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.flicq.tennis.contentmanager.ContentStore;
-import com.flicq.tennis.framework.Helper;
+import com.flicq.tennis.framework.Utils;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.ISystemComponent;
 import com.flicq.tennis.framework.StatusType;
@@ -56,10 +53,12 @@ public final class FlicqDevice implements ISystemComponent
         }.execute();
     }
 
+    BluetoothAdapter bleAdapter = null;
     boolean android_mode = false;
     //Called from Activity result of FlicqActivity class. The scanning can only be
     //started when the adapter initializes properly which is determined by result of the activity
     public void OnBluetoothAdapterInitialized(final BluetoothAdapter adapter) {
+        this.bleAdapter = adapter;
         if (adapter == null) {
             helper.SetStatus(StatusType.ERROR, "NO BLE SUPPORT");
             return;
@@ -68,9 +67,26 @@ public final class FlicqDevice implements ISystemComponent
             new SimulateBLEData(helper).Start();
             return;
         }
-        helper.SetStatus(StatusType.INFO, "Finding a Flicq Device");
+        helper.SetStatus(StatusType.INFO, "Wait !, Finding a Flicq Device");
+        final FlicqLeScanCallback callback = new FlicqLeScanCallback(helper);
 
-        BluetoothAdapter.LeScanCallback callback = new FlicqLeScanCallback(helper, adapter);
+        //UUID []flicqServiceUUID = {UUID.fromString(FlicqBluetoothGattCallback.FLICQ_SERVICE_GATT_UUID)};
+        //adapter.startLeScan(flicqServiceUUID, callback);
         adapter.startLeScan(callback);
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                while (true) {
+                    if (callback.connectionSuccessful()) {
+                        Utils.SleepSomeTime(10); //Let StartLeScan complete. hOpefully this is enough
+                        adapter.stopLeScan(callback);
+                        break;
+                    }
+                    Utils.SleepSomeTime(200);
+                }
+                return null;
+            }
+        }.execute();
     }
 }

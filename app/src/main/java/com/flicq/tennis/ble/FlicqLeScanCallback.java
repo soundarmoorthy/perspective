@@ -6,7 +6,6 @@ import com.flicq.tennis.framework.StatusType;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
-import android.util.Log;
 
 
 
@@ -16,14 +15,11 @@ import android.util.Log;
 public final class FlicqLeScanCallback implements BluetoothAdapter.LeScanCallback
 {
     IActivityAdapter helper;
-    BluetoothAdapter adapter;
-    public FlicqLeScanCallback(IActivityAdapter helper, BluetoothAdapter adapter)
+    public FlicqLeScanCallback(IActivityAdapter helper)
     {
         this.helper = helper;
-        this.adapter = adapter;
     }
 
-    BluetoothGatt gattDevice;
     @Override
     public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
         //TODO : Use service based scan here.
@@ -31,15 +27,19 @@ public final class FlicqLeScanCallback implements BluetoothAdapter.LeScanCallbac
         if(address.equals("00:07:80:06:5A:1A") ||
                 address.equals("00:07:80:06:5B:4E")) { //Flicq demo device
             try {
-                Log.i("BLE", "Found Device :  " + address + " , Name : " + device.getName());
                 helper.SetStatus(StatusType.INFO, "Yo, Connected to " + device.getName() + " !");
-                gattDevice = device.connectGatt(helper.GetApplicationContext(), false, new FlicqBluetoothGattCallback(helper));
-
-                //adapter.stopLeScan(this);
+                device.connectGatt(helper.GetApplicationContext(), false, new FlicqBluetoothGattCallback(helper));
             } catch (Exception ex) {
                 ex.printStackTrace();
                 helper.SetStatus(StatusType.ERROR, ex.getMessage());
             }
+            connected = true;
         }
+    }
+
+    private boolean connected;
+    public boolean connectionSuccessful()
+    {
+        return this.connected;
     }
 }

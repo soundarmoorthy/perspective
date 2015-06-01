@@ -3,7 +3,7 @@ package com.flicq.tennis.framework;
 /**
  * Created by soundararajan on 5/18/2015.
  */
-public class Helper {
+public class Utils {
     public static void SleepSomeTime(int milliseconds)
     {
         try{
