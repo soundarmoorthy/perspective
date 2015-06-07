@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.flicq.tennis.ble.FlicqDevice;
@@ -44,11 +45,15 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.activity_main);
+        //Do anything after this
         currentState = SystemState.STOPPED;
 
+
         flicqDevice = FlicqDevice.getInstance(this);
-        setContentView(R.layout.activity_main);
+
+        txtShotDataCached = (TextView) findViewById(R.id.txtShotData);
+        scrollViewTxtShotDataCached = (ScrollView) findViewById(R.id.txtShotDataScrollView);
 
         Display display = ((WindowManager) this
                 .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
@@ -73,7 +78,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
             }
         });
 
-        this.SetStatus( StatusType.INFO, "Ready");
+        this.SetStatus(StatusType.INFO, "Ready");
     }
 
     private void confirmWithUserAndExit() {
@@ -194,23 +199,50 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         }
     }
 
+
+    TextView txtShotDataCached;
+    ScrollView scrollViewTxtShotDataCached;
+    @Override
+    public void writeToUi(final String str) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                txtShotDataCached.append("\n");
+                txtShotDataCached.append(str);
+            }
+        });
+
+        //Automatically scroll to end;
+        scrollViewTxtShotDataCached.post(new Runnable() {
+            public void run() {
+                scrollViewTxtShotDataCached.smoothScrollTo(0, txtShotDataCached.getBottom());
+            }
+        });
+    }
+
+    private Runnable UpdateUI = new Runnable() {
+        @Override
+        public void run() {
+        }
+    };
+
     @Override
     public void SetStatus(final StatusType type, final String s) {
         runOnUiThread(new Runnable() {
-                          @Override
-                          public void run() {
-                              TextAwesome iconText = (TextAwesome) findViewById(R.id.txt_status_icon);
-                              if(type == StatusType.ERROR)
-                                  iconText.setText(R.string.fa_sign_out);
-                              else if(type == StatusType.WARNING)
-                                  iconText.setText(R.string.fa_warning);
-                              else if(type == StatusType.INFO)
-                                  iconText.setText(R.string.fa_info);
+            @Override
+            public void run() {
+                TextAwesome iconText = (TextAwesome) findViewById(R.id.txt_status_icon);
+                if (type == StatusType.ERROR)
+                    iconText.setText(R.string.fa_sign_out);
+                else if (type == StatusType.WARNING)
+                    iconText.setText(R.string.fa_warning);
+                else if (type == StatusType.INFO)
+                    iconText.setText(R.string.fa_info);
 
-                              TextView view = (TextView) findViewById(R.id.txt_status);
-                              view.setText(s);
-                          }
-                      });
+                TextView view = (TextView) findViewById(R.id.txt_status);
+                view.setText(s);
+            }
+        });
     }
 
     @Override

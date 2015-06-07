@@ -12,6 +12,7 @@ import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.StatusType;
 import com.flicq.tennis.framework.Utils;
 
+import java.util.Calendar;
 import java.util.UUID;
 
 /**
@@ -28,7 +29,7 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
         if (newState == BluetoothProfile.STATE_CONNECTED) {
             Log.i("BLE", "Connected Device : " + gatt.getDevice().getName());
-            Utils.SleepSomeTime(300);
+            Utils.SleepSomeTime(20);
             gatt.discoverServices();
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             Log.i("BLE", "Disconnected Device : " + gatt.getDevice().getName());
@@ -68,13 +69,18 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
 
     float[] values = new float[7];
 
+
+
+    long timeInMillisPrevious = 0;
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
         int offset = 0;
         if (characteristic == null) {
             return;
         }
-        UpdateStatus();
+        //UpdateStatus();
+
+        long timeInMillis = Calendar.getInstance().getTimeInMillis();
         values[0] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset++);
         values[1] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset++);
         values[2] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset++);
@@ -82,7 +88,9 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         values[4] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset++);
         values[5] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset++);
         values[6] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset);
-        AsyncSerialContentProcessor.Instance().Process(values);
+        String str = "+" + String.valueOf(timeInMillis - timeInMillisPrevious) + " -> " + values[0] + "," + values[1] + "," + values[2] + "," + values[3] + "," + values[4] + "," + values[5] + "," + values[6];
+        timeInMillisPrevious = timeInMillis;
+        AsyncSerialContentProcessor.Instance().Process(str, helper);
     }
 
     static int count = 0;
@@ -91,7 +99,7 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         for(int i=0;i<count;i++)
             s += "..";
         count ++;
-        helper.SetStatus(StatusType.INFO,"Receiving data" + s );
+        helper.SetStatus(StatusType.INFO, "Receiving data" + s);
         if(count > 20)
             count = 0;
     }

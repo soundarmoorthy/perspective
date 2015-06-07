@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.flicq.tennis.appengine.FlicqCloudRequestHandler;
+import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.SampleData;
 
 import java.util.concurrent.ExecutorService;
@@ -35,12 +36,25 @@ public class AsyncSerialContentProcessor {
 
     ExecutorService executorQueue;
 
+    static int counter = 0;
+    public void Process(final String values,final IActivityAdapter adapter)
+    {
+        executorQueue.submit(new Runnable() {
+            @Override
+            public void run() {
+                String modifiedValues = String.valueOf(counter++) + "[" + values + "]";
+                adapter.writeToUi(modifiedValues);
+            }
+        });
+    }
+
     public void Process(final float[] values)
     {
         executorQueue.submit(new Runnable() {
 
             @Override
             public void run() {
+
                 Log.e("BLE :", values[0] + "," + values[1] + "," + values[2] + "," + values[3] + "," + values[4] + "," + values[5] + "," + values[6]);
                 //ContentStore.Instance().Dump(values);
             }
