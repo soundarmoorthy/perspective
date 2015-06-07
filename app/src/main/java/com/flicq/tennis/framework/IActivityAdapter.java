@@ -14,5 +14,5 @@ public interface IActivityAdapter {
 
     Context GetApplicationContext();
 
-    void writeToUi(String str);
+    void writeToUi(String str,boolean differs);
 }

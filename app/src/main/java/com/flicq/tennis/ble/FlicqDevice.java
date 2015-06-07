@@ -2,7 +2,6 @@ package com.flicq.tennis.ble;
 
 import android.bluetooth.BluetoothAdapter;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.flicq.tennis.contentmanager.ContentStore;
 import com.flicq.tennis.framework.Utils;
@@ -74,7 +73,7 @@ public final class FlicqDevice implements ISystemComponent
         //UUID []flicqServiceUUID = {UUID.fromString(FlicqBluetoothGattCallback.FLICQ_SERVICE_GATT_UUID)};
         //adapter.startLeScan(flicqServiceUUID, callback);
         adapter.startLeScan(callback);
-        Log.i("BLE", "LE Scan started");
+        helper.writeToUi("BLE : LE Scan started", false);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -82,11 +81,11 @@ public final class FlicqDevice implements ISystemComponent
                 while (true) {
                     if (callback.connectionSuccessful()) {
                         adapter.stopLeScan(callback);
-                        Log.i("BLE", "LE Scan stopped");
+                        helper.writeToUi("BLE : LE Scan stopped. No more channel usage for scanning. WoW", false);
                         break;
                     }
                     Utils.SleepSomeTime(200);
-                    Log.i("BLE", "StopScan() : Waiting for connection to complete");
+                    helper.writeToUi("BLE : StopScan() : Polling for connection complete with 200ms interval",false);
                 }
                 return null;
             }

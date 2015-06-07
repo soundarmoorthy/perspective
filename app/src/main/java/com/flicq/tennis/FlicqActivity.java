@@ -54,6 +54,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
 
         txtShotDataCached = (TextView) findViewById(R.id.txtShotData);
         scrollViewTxtShotDataCached = (ScrollView) findViewById(R.id.txtShotDataScrollView);
+        txtShotDataCached.setLineSpacing(0.0f, 1.2f);
 
         Display display = ((WindowManager) this
                 .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
@@ -199,16 +200,19 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         }
     }
 
-
     TextView txtShotDataCached;
     ScrollView scrollViewTxtShotDataCached;
     @Override
-    public void writeToUi(final String str) {
+    public void writeToUi(final String str, final boolean differs) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 txtShotDataCached.append("\n");
+                if(differs)
+                    txtShotDataCached.setTextColor(Color.RED);
                 txtShotDataCached.append(str);
+
+                txtShotDataCached.setTextColor(Color.BLACK);
             }
         });
 

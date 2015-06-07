@@ -5,8 +5,6 @@ import com.flicq.tennis.framework.StatusType;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-
 
 
 /**
@@ -28,6 +26,7 @@ public final class FlicqLeScanCallback implements BluetoothAdapter.LeScanCallbac
                // address.equals("00:07:80:06:5B:4E")) { //Flicq demo device
             try {
                 helper.SetStatus(StatusType.INFO, "Yo, Connected to " + device.getName() + " !");
+                helper.writeToUi("Yo, Found Device " + device.getName() + " !. Let's Pair :-)", false);
                 device.connectGatt(helper.GetApplicationContext(), false, new FlicqBluetoothGattCallback(helper));
             } catch (Exception ex) {
                 ex.printStackTrace();

@@ -28,35 +28,35 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
 
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
         if (newState == BluetoothProfile.STATE_CONNECTED) {
-            Log.i("BLE", "Connected Device : " + gatt.getDevice().getName());
+            helper.writeToUi("BLE : Connected Device : " + gatt.getDevice().getName(),false);
             Utils.SleepSomeTime(20);
             gatt.discoverServices();
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-            Log.i("BLE", "Disconnected Device : " + gatt.getDevice().getName());
+            helper.writeToUi("BLE : Disconnected Device : " + gatt.getDevice().getName(), false);
             helper.SetStatus(StatusType.WARNING, "Disconnected  : " + gatt.getDevice().getName());
+
             gatt.close();
         }
     }
 
   public static final String FLICQ_SERVICE_GATT_UUID = "ffffffff-1111-1111-ccc0-000000000000";
+    public static final String FLICQ_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805f9b34fb";
     @Override
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-        Log.i("BLE", "OnServicesDiscovered");
-
         try {
             //Try to first initialize device and gatt database.
             BluetoothGattService service = gatt.getService(UUID.fromString(FLICQ_SERVICE_GATT_UUID));
-            Log.i("BLE", "Found Service : " + service.getUuid().toString());
+            helper.writeToUi("BLE : Found Service : " + service.getUuid().toString(), false);
             BluetoothGattCharacteristic characteristic = service.getCharacteristic(
                     UUID.fromString("ffffffff-1111-1111-ccc0-000000000001"));
             gatt.setCharacteristicNotification(characteristic, true);
-            Log.i("BLE", "Found Characteristic : " + characteristic.getUuid());
+            helper.writeToUi("BLE : Found Characteristic : " + characteristic.getUuid(), false);
 
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                    UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));
+                    UUID.fromString(FLICQ_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID));
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             boolean success = gatt.writeDescriptor(descriptor);
-            Log.i("BLE", "Enable Notification for characteristic descriptor + " + descriptor.getUuid().toString() + ", Status = " + String.valueOf(success));
+            helper.writeToUi("BLE : Enable Notification for characteristic descriptor + " + descriptor.getUuid().toString() + ", Status = " + String.valueOf(success), false);
             helper.SetStatus(StatusType.INFO, "Ready to receive data");
         } catch (Exception ex) {
             Log.e("BLE", "Error in OnServices Discovered implementation. ");
@@ -71,36 +71,14 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
 
 
 
-    long timeInMillisPrevious = 0;
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-        int offset = 0;
-        if (characteristic == null) {
+        if (characteristic == null)
             return;
-        }
-        //UpdateStatus();
 
-        long timeInMillis = Calendar.getInstance().getTimeInMillis();
-        values[0] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset++);
-        values[1] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset++);
-        values[2] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset++);
-        values[3] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset++);
-        values[4] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset++);
-        values[5] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset++);
-        values[6] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, offset);
-        String str = "+" + String.valueOf(timeInMillis - timeInMillisPrevious) + " -> " + values[0] + "," + values[1] + "," + values[2] + "," + values[3] + "," + values[4] + "," + values[5] + "," + values[6];
-        timeInMillisPrevious = timeInMillis;
-        AsyncSerialContentProcessor.Instance().Process(str, helper);
-    }
-
-    static int count = 0;
-    private void UpdateStatus() {
-        String s = "";
-        for(int i=0;i<count;i++)
-            s += "..";
-        count ++;
-        helper.SetStatus(StatusType.INFO, "Receiving data" + s);
-        if(count > 20)
-            count = 0;
+        final BluetoothGattDescriptor cccd = characteristic.getDescriptor(UUID.fromString(FLICQ_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID));
+        final boolean notification = cccd == null || cccd.getValue() == null || cccd.getValue().length != 2 || cccd.getValue()[0] == 0x01;
+        if(notification)
+            AsyncSerialContentProcessor.Instance().Process(characteristic, helper);
     }
 }

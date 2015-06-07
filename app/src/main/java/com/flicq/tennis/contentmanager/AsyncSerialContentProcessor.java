@@ -1,12 +1,12 @@
 package com.flicq.tennis.contentmanager;
 
-import android.os.AsyncTask;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.util.Log;
 
-import com.flicq.tennis.appengine.FlicqCloudRequestHandler;
 import com.flicq.tennis.framework.IActivityAdapter;
-import com.flicq.tennis.framework.SampleData;
+import com.flicq.tennis.framework.StatusType;
 
+import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,16 +36,50 @@ public class AsyncSerialContentProcessor {
 
     ExecutorService executorQueue;
 
-    static int counter = 0;
-    public void Process(final String values,final IActivityAdapter adapter)
+    byte previous = 0,current = 0;
+    public void Process(final BluetoothGattCharacteristic characteristic, final IActivityAdapter adapter)
     {
-        executorQueue.submit(new Runnable() {
-            @Override
-            public void run() {
-                String modifiedValues = String.valueOf(counter++) + "[" + values + "]";
-                adapter.writeToUi(modifiedValues);
-            }
-        });
+        byte[] content = characteristic.getValue();
+        String str = parse(content);
+        adapter.writeToUi(str, false);
+        UpdateStatus(adapter);
+//        executorQueue.submit(new Runnable() {
+//            @Override
+//            public void run() {
+//                byte[] content = characteristic.getValue();
+//                String str = parse(content);
+//                adapter.writeToUi(str, false);
+//                UpdateStatus(adapter);
+//            }
+//        });
+    }
+    public static String parse(final byte[] data) {
+        if (data == null || data.length == 0)
+            return "";
+        final char[] out = new char[data.length * 3 - 1];
+        for (int j = 0; j < data.length; j++) {
+            int v = data[j] & 0xFF;
+            out[j * 3] = HEX_ARRAY[v >>> 4];
+            out[j * 3 + 1] = HEX_ARRAY[v & 0x0F];
+            if (j != data.length - 1)
+                out[j * 3 + 2] = '-';
+        }
+        return new String(out);
+    }
+    final private static char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+
+    private long previousTime = 0;
+    private boolean show = true;
+    private void UpdateStatus(IActivityAdapter helper) {
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+        if (currentTime - previousTime < 500) //Update only for once in 500 milliseconds.
+            return;
+        if (show)
+            helper.SetStatus(StatusType.INFO, "Receiving data");
+        else
+            helper.SetStatus(StatusType.INFO, "");
+        show = !show;
+        previousTime = currentTime;
     }
 
     public void Process(final float[] values)
