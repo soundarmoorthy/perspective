@@ -13,7 +13,7 @@ import com.flicq.tennis.test.SimulateBLEData;
 
 public final class FlicqDevice implements ISystemComponent
 {
-    IActivityAdapter helper;
+    IActivityAdapter activityAdapter;
 
     private static FlicqDevice device;
     public static FlicqDevice getInstance(IActivityAdapter helper) {
@@ -22,21 +22,19 @@ public final class FlicqDevice implements ISystemComponent
         return device;
     }
 
-    private FlicqDevice(IActivityAdapter helper)
+    private FlicqDevice(IActivityAdapter activityAdapter)
     {
-        this.helper = helper;
+        this.activityAdapter = activityAdapter;
     }
 
     @Override
     public void SystemStateChanged(SystemState oldState, SystemState newState) {
         if (newState == SystemState.CAPTURE) {
             InitializeBluetoothAdapterAsync();
-            ContentStore.Instance().NewShot();
         } else if (newState == SystemState.STOPPED) {
 //            if (gattDevice != null)
 //                gattDevice.close();
 //            gattDevice = null;
-            ContentStore.Instance().ShotDone();
         }
     }
 
@@ -45,8 +43,8 @@ public final class FlicqDevice implements ISystemComponent
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                if (helper != null) {
-                    helper.EnableBluetoothAdapter();
+                if (activityAdapter != null) {
+                    activityAdapter.EnableBluetoothAdapter();
                 }
                 return null;
             }
@@ -60,20 +58,20 @@ public final class FlicqDevice implements ISystemComponent
     public void OnBluetoothAdapterInitialized(final BluetoothAdapter adapter) {
         this.bleAdapter = adapter;
         if (adapter == null) {
-            helper.SetStatus(StatusType.ERROR, "NO BLE SUPPORT");
+            activityAdapter.SetStatus(StatusType.ERROR, "NO BLE SUPPORT");
             return;
         }
         if (android_mode) {
-            new SimulateBLEData(helper).Start();
+            new SimulateBLEData(activityAdapter).Start();
             return;
         }
-        helper.SetStatus(StatusType.INFO, "Wait !, Finding a Flicq Device");
-        final FlicqLeScanCallback callback = new FlicqLeScanCallback(helper);
+        activityAdapter.SetStatus(StatusType.INFO, "Wait !, Finding a Flicq Device");
+        final FlicqLeScanCallback callback = new FlicqLeScanCallback(activityAdapter);
 
         //UUID []flicqServiceUUID = {UUID.fromString(FlicqBluetoothGattCallback.FLICQ_SERVICE_GATT_UUID)};
         //adapter.startLeScan(flicqServiceUUID, callback);
         adapter.startLeScan(callback);
-        helper.writeToUi("BLE : LE Scan started", false);
+        activityAdapter.writeToUi("BLE : LE Scan started", false);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -81,11 +79,11 @@ public final class FlicqDevice implements ISystemComponent
                 while (true) {
                     if (callback.connectionSuccessful()) {
                         adapter.stopLeScan(callback);
-                        helper.writeToUi("BLE : LE Scan stopped. No more channel usage for scanning. WoW", false);
+                        activityAdapter.writeToUi("BLE : LE Scan stopped.", false);
                         break;
                     }
-                    Utils.SleepSomeTime(200);
-                    helper.writeToUi("BLE : StopScan() : Polling for connection complete with 200ms interval",false);
+                    Utils.SleepSomeTime(500);
+                    activityAdapter.writeToUi("BLE : StopScan() : Polling for connection complete with 500ms interval", false);
                 }
                 return null;
             }
