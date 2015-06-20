@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.opengl.GLSurfaceView;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -27,9 +28,11 @@ import com.flicq.tennis.contentmanager.FlicqShot;
 import com.flicq.tennis.external.ButtonAwesome;
 import com.flicq.tennis.external.TextAwesome;
 import com.flicq.tennis.framework.IActivityAdapter;
+import com.flicq.tennis.framework.SampleData;
 import com.flicq.tennis.framework.StatusType;
 import com.flicq.tennis.framework.SystemState;
 import com.flicq.tennis.opengl.ShotRenderer;
+import com.flicq.tennis.test.LocalSensorDataSimulator;
 
 public class FlicqActivity extends Activity implements IActivityAdapter, View.OnClickListener {
 
@@ -42,16 +45,24 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     FlicqDevice flicqDevice = null;
     ShotRenderer shotRenderer = null;
     SystemState currentSystemState;
+    LocalSensorDataSimulator simulator;
+    boolean simulator_mode = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         onCreateInitialSetup(savedInstanceState);
         //Do anything after this.
         setupDeviceCapture();
+        setupDeviceSimulator();
         setupRendering();
         setupLog();
         setupExitButton();
         this.SetStatus(StatusType.INFO, "Welcome !");
+    }
+
+    private void setupDeviceSimulator() {
+        IActivityAdapter adapter = this;
+        simulator = new LocalSensorDataSimulator(adapter);
     }
 
     private void onCreateInitialSetup(Bundle savedInstanceState) {
@@ -285,10 +296,23 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     }
 
     private void getLastShotAndDraw() {
+        if(simulator_mode)
+            renderLocalSensorData();
+        else
+            renderDeviceData();
+    }
+
+    private void renderLocalSensorData() {
+        float[] data = simulator.getSensorData();
+        shotRenderer.Render(SampleData.set);
+    }
+
+    private void renderDeviceData() {
         FlicqShot shot = ContentStore.Instance().getShot();
         float[] data = shot.getDataForRendering();
-        shotRenderer.Render(shot.getDataForRendering());
+        shotRenderer.Render(data);
     }
+
 
     private void setupUIForLogging() {
         setVisibility(View.VISIBLE, View.GONE);
@@ -306,6 +330,26 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     }
 
     private void handleCapture()
+    {
+        if(!simulator_mode)
+            handleRealDevice();
+        else
+            handleSimulator();
+    }
+
+    private void handleSimulator()
+    {
+        final LocalSensorDataSimulator simu = simulator;
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+               simu.Start();
+                return null;
+            }
+        }.execute();
+    }
+
+    private void handleRealDevice()
     {
         ble_on = !ble_on;
         currentSystemState = ble_on ? SystemState.CAPTURE : SystemState.STOPPED;

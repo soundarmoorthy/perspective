@@ -2,12 +2,8 @@ package com.flicq.tennis.ble;
 
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.StatusType;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-
-import java.util.ArrayList;
-
 
 /**
  * Created by soundararajan on 4/13/2015.
