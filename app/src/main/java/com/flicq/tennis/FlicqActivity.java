@@ -25,52 +25,73 @@ import com.flicq.tennis.ble.FlicqDevice;
 import com.flicq.tennis.external.ButtonAwesome;
 import com.flicq.tennis.external.TextAwesome;
 import com.flicq.tennis.framework.IActivityAdapter;
-import com.flicq.tennis.framework.ISystemComponent;
 import com.flicq.tennis.framework.StatusType;
 import com.flicq.tennis.framework.SystemState;
 import com.flicq.tennis.opengl.ShotRenderer;
 
-import java.util.ArrayList;
-
 public class FlicqActivity extends Activity implements IActivityAdapter, View.OnClickListener {
-    public FlicqDevice flicqDevice = null;
-
-    public ShotRenderer shotRenderer = null;
 
     private static final int BLUETOOTH_ENABLE_REQUEST_CODE = 4711;
 
-    SystemState currentState;
-    ArrayList<ISystemComponent> systemComponents;
+    public FlicqActivity() {
+        super();
+    }
+
+    FlicqDevice flicqDevice = null;
+    ShotRenderer shotRenderer = null;
+    SystemState currentSystemState;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        onCreateInitialSetup(savedInstanceState);
+        //Do anything after this.
+
+        setupDeviceCapture();
+        setupRendering();
+        setupLog();
+        setupExitButton();
+        this.SetStatus(StatusType.INFO, "Welcome !");
+    }
+
+    private void onCreateInitialSetup(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Do anything after this
-        currentState = SystemState.STOPPED;
+        currentSystemState = SystemState.STOPPED;
+    }
 
+    private void setupDeviceCapture()
+    {
+        IActivityAdapter adapter = this;
+        flicqDevice = new FlicqDevice(adapter);
+    }
 
-        flicqDevice = FlicqDevice.getInstance(this);
-
+    private void setupLog()
+    {
         txtShotDataCached = (TextView) findViewById(R.id.txtShotData);
         scrollViewTxtShotDataCached = (ScrollView) findViewById(R.id.txtShotDataScrollView);
         txtShotDataCached.setLineSpacing(0.0f, 1.2f);
+    }
 
+    private void setupRendering()
+    {
+        int initialScreenRotation = getScreenRotation();
+        GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
+        shotRenderer = new ShotRenderer(initialScreenRotation, 1);
+        shotView.setRenderer(shotRenderer);
+        setupUIForRender();
+    }
+
+    int getScreenRotation()
+    {
         Display display = ((WindowManager) this
                 .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         int initialScreenRotation = display.getRotation();
-
-        GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
-
-        int mode = 1;
-        shotRenderer = new ShotRenderer(initialScreenRotation, mode, this);
-        shotView.setRenderer(shotRenderer);
+        return initialScreenRotation;
+    }
 
 
-        systemComponents = new ArrayList<ISystemComponent>();
-        systemComponents.add(0, flicqDevice);
-        systemComponents.add(1, shotRenderer);
-
+    private void setupExitButton()
+    {
         Button exitButton = (Button) findViewById(R.id.exit_button);
         exitButton.setOnClickListener(new View.OnClickListener() {
 
@@ -79,7 +100,6 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
             }
         });
 
-        this.SetStatus(StatusType.INFO, "Ready");
     }
 
     private void confirmWithUserAndExit() {
@@ -122,34 +142,38 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
 
     @Override
     public void onStart() {
+
         super.onStart();
+    }
+
+    private void ConnectDevice() {
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, BLUETOOTH_ENABLE_REQUEST_CODE);
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == BLUETOOTH_ENABLE_REQUEST_CODE)
-        {
+        if (requestCode == BLUETOOTH_ENABLE_REQUEST_CODE) {
             final BluetoothManager bluetoothManager =
                     (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-            BluetoothAdapter adapter =  bluetoothManager.getAdapter();
-            if(adapter.getState() == BluetoothAdapter.STATE_ON) {
+            BluetoothAdapter adapter = bluetoothManager.getAdapter();
+            if (adapter.getState() == BluetoothAdapter.STATE_ON) {
                 SetStatus(StatusType.INFO, "Bluetooth On");
-                runOnUiThread(InitializeAdapterTask);
+                fireOnBluetoothSetupReady();
             }
         }
     }
 
-    private Runnable InitializeAdapterTask = new Runnable() {
-        @Override
-        public void run() {
-            //Now the BLE adapter is initialized.
-            final BluetoothManager bluetoothManager =
-                    (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-            BluetoothAdapter adapter =  bluetoothManager.getAdapter();
-            flicqDevice.OnBluetoothAdapterInitialized(adapter);
-            Log.e("OnActivityResult", "Initialized adapter");
-        }
-    };
+    private void fireOnBluetoothSetupReady() {
+        //Now the BLE adapter is initialized.
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter btAdapter = bluetoothManager.getAdapter();
+        Log.e("OnActivityResult", "Initialized adapter");
+        flicqDevice.OnBluetoothAdapterInitialized(btAdapter);
+    }
 
     @Override
     public void onRestart() {
@@ -189,16 +213,6 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         super.onRestoreInstanceState(savedInstanceState);
     }
 
-    @Override
-    public void EnableBluetoothAdapter() {
-        boolean supported = false;
-        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            //This will start the enable activity. To see the result look into
-            //activityResult
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, BLUETOOTH_ENABLE_REQUEST_CODE);
-        }
-    }
 
     TextView txtShotDataCached;
     ScrollView scrollViewTxtShotDataCached;
@@ -223,12 +237,6 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
             }
         });
     }
-
-    private Runnable UpdateUI = new Runnable() {
-        @Override
-        public void run() {
-        }
-    };
 
     @Override
     public void SetStatus(final StatusType type, final String s) {
@@ -259,35 +267,51 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     @Override
     public void onClick(View view) {
         int itemId = view.getId();
-        SystemState prevState = currentState;
         switch (itemId) {
             case R.id.btn_capture:
-                ble_on = !ble_on;
-                currentState = ble_on ? SystemState.CAPTURE : SystemState.STOPPED;
+                handleCapture();
                 break;
             case R.id.btn_render:
-                currentState = SystemState.RENDER;
+                setupUIForRender();
                 break;
+            case R.id.btn_engineering:
+                setupUIForLogging();
             default:
-                currentState = SystemState.UNKNOWN;
+                currentSystemState = SystemState.UNKNOWN;
         }
-
         updateUI(itemId);
-        for (int i = 0; i < systemComponents.size(); i++) {
-            ISystemComponent component = systemComponents.get(i);
-            component.SystemStateChanged(prevState, currentState);
-        }
+    }
+
+    private void setupUIForLogging() {
+        setVisibility(View.VISIBLE, View.GONE);
+    }
+
+    private void setupUIForRender(){
+        setVisibility(View.GONE, View.VISIBLE);
+    }
+
+    private void setVisibility(int display, int render)
+    {
+        findViewById(R.id.txtShotDataScrollView).setVisibility(display);
+        findViewById(R.id.txtShotData).setVisibility(display);
+        findViewById(R.id.shotView).setVisibility(render);
+    }
+
+    private void handleCapture()
+    {
+        ble_on = !ble_on;
+        currentSystemState = ble_on ? SystemState.CAPTURE : SystemState.STOPPED;
+        if(currentSystemState == SystemState.CAPTURE)
+            ConnectDevice();
     }
 
     private void updateUI(int itemId) {
-        int []ids = {R.id.btn_capture, R.id.btn_render};
-        for(int i=0;i<ids.length;i++)
-        {
-            if(itemId == ids[i]) {
-                Button  button = (Button) findViewById(ids[i]);
-                button.setBackgroundColor(Color.argb(255,240,240,240));//A more lighter gray
-            }
-            else {
+        int []ids = {R.id.btn_capture, R.id.btn_render, R.id.btn_engineering};
+        for(int i=0;i<ids.length;i++) {
+            if (itemId == ids[i]) {
+                Button button = (Button) findViewById(ids[i]);
+                button.setBackgroundColor(Color.argb(255, 240, 240, 240));//A more lighter gray
+            } else {
                 Button button = (Button) findViewById(ids[i]);
                 button.setBackgroundColor(Color.WHITE);
             }

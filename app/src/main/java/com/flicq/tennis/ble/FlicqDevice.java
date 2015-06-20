@@ -3,52 +3,18 @@ package com.flicq.tennis.ble;
 import android.bluetooth.BluetoothAdapter;
 import android.os.AsyncTask;
 
-import com.flicq.tennis.contentmanager.ContentStore;
 import com.flicq.tennis.framework.Utils;
 import com.flicq.tennis.framework.IActivityAdapter;
-import com.flicq.tennis.framework.ISystemComponent;
 import com.flicq.tennis.framework.StatusType;
-import com.flicq.tennis.framework.SystemState;
 import com.flicq.tennis.test.SimulateBLEData;
 
-public final class FlicqDevice implements ISystemComponent
+public final class FlicqDevice
 {
     IActivityAdapter activityAdapter;
 
-    private static FlicqDevice device;
-    public static FlicqDevice getInstance(IActivityAdapter helper) {
-        if (device == null)
-            device = new FlicqDevice(helper);
-        return device;
-    }
-
-    private FlicqDevice(IActivityAdapter activityAdapter)
+    public FlicqDevice(IActivityAdapter activityAdapter)
     {
         this.activityAdapter = activityAdapter;
-    }
-
-    @Override
-    public void SystemStateChanged(SystemState oldState, SystemState newState) {
-        if (newState == SystemState.CAPTURE) {
-            InitializeBluetoothAdapterAsync();
-        } else if (newState == SystemState.STOPPED) {
-//            if (gattDevice != null)
-//                gattDevice.close();
-//            gattDevice = null;
-        }
-    }
-
-
-    private void InitializeBluetoothAdapterAsync() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                if (activityAdapter != null) {
-                    activityAdapter.EnableBluetoothAdapter();
-                }
-                return null;
-            }
-        }.execute();
     }
 
     BluetoothAdapter bleAdapter = null;
@@ -83,7 +49,7 @@ public final class FlicqDevice implements ISystemComponent
                         break;
                     }
                     Utils.SleepSomeTime(500);
-                    activityAdapter.writeToUi("BLE : StopScan() : Polling for connection complete with 500ms interval", false);
+                    activityAdapter.writeToUi("BLE : StopScan() : Poll conn. complete with 500ms interval", false);
                 }
                 return null;
             }

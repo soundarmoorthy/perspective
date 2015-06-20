@@ -40,6 +40,15 @@
                 android:onClick="onClick"
                 android:text="@string/fa_play_circle_o"/>
 
+            <com.flicq.tennis.external.ButtonAwesome
+                android:id="@+id/btn_engineering"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:textColor="@color/flicq_red"
+                android:onClick="onClick"
+                android:text="@string/fa_pencil_square_o"/>
+
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -58,13 +67,14 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:background="@color/white"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <ScrollView
             android:id="@+id/txtShotDataScrollView"
             android:layout_width="fill_parent"
             android:scrollbars="vertical"
             android:fillViewport="true"
+            android:visibility="gone"
             android:layout_height="fill_parent">
 
         <TextView
@@ -74,7 +84,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:visibility="visible" />
+            android:visibility="gone" />
         </ScrollView>
     </LinearLayout>
 

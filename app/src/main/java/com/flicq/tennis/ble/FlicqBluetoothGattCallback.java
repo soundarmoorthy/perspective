@@ -9,11 +9,9 @@ import android.util.Log;
 
 import com.flicq.tennis.contentmanager.AsyncContentProcessor;
 import com.flicq.tennis.framework.IActivityAdapter;
-import com.flicq.tennis.framework.StatusType;
 import com.flicq.tennis.framework.Utils;
 
 import java.util.Calendar;
-import java.util.LinkedList;
 import java.util.UUID;
 
 /**
@@ -68,6 +66,8 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     }
 
     long previous = 0, current;
+    private static final int BEGIN=1;
+    private static final int END=250;
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
         if (characteristic == null)
@@ -77,6 +77,12 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         byte[] copied = new byte[content.length];
         for (int i = 0; i < content.length; i++)
             copied[i] = content[i];
+
+       int seqNum  = -1;//TODO : Find which index has seq number
+        if(seqNum == BEGIN)
+            processor.beginShot();
+        else if(seqNum == END)
+            processor.endShot();
         processor.RunAsync(current - previous, copied);
         previous = current;
     }

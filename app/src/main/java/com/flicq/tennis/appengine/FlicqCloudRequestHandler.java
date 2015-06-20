@@ -35,13 +35,12 @@ public final class FlicqCloudRequestHandler {
         return new com.google.api.client.util.DateTime(new java.util.Date().getTime());
     }
     Shot shot;
-    public void SendCurrentShot(FlicqShot source) {
+    public void SendShot(FlicqShot source) {
         try {
             shot.setTime(getTimestamp());
             shot.setID(System.getProperty("user.name"));
             shot.setItems(source.getDataForUpload());
             query.execute();
-            Log.i("Cloud Upload done : ", "soundar");
         } catch (Exception ioe) {
             ioe.printStackTrace();
         }

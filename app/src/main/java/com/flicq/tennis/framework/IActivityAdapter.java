@@ -7,9 +7,6 @@ import android.content.Intent;
 
 public interface IActivityAdapter {
 
-    //
-    void EnableBluetoothAdapter();
-
     void SetStatus(StatusType type, String s);
 
     Context GetApplicationContext();

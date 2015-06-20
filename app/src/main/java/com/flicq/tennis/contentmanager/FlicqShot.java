@@ -1,15 +1,10 @@
 package com.flicq.tennis.contentmanager;
 
 import android.text.format.Time;
-import android.text.method.DateTimeKeyListener;
-
-import com.google.api.client.util.DateTime;
 
 import junit.framework.Assert;
 
-import java.security.Timestamp;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class FlicqShot {

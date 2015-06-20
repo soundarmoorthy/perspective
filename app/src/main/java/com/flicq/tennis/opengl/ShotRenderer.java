@@ -12,29 +12,22 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 
-import com.flicq.tennis.contentmanager.ContentStore;
 import com.flicq.tennis.framework.IActivityAdapter;
-import com.flicq.tennis.framework.ISystemComponent;
-import com.flicq.tennis.framework.SampleData;
-import com.flicq.tennis.framework.SystemState;
 
 
-public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
+public class ShotRenderer implements GLSurfaceView.Renderer {
 
     int initialScreenRotation;
     int width, height;
     private float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
-    IActivityAdapter activityHelper;
 
     // The set[] is a single dimensional array, with every "successive 7 elements" defining
     // a plot information. ax, ay, az, q0, q1, q2, q3
-    public ShotRenderer(int initialScreenRotation, int mode, IActivityAdapter activityHelper) {
-		//SetData(SampleData.set);
+    public ShotRenderer(int initialScreenRotation, int mode) {
         this.initialScreenRotation = initialScreenRotation;
         setMode(mode);
-        this.activityHelper = activityHelper;
 		//The camera angle by default is tilted to 45 degree to get a 3d view.
-		//To run the OpenGL rendering tests make sure you set this to 0degree and
+		//To run the OpenGL rendering tests make sure you set this to 0 degree and
 		//90 degree properly.
         cameraAngleX = -45;
         cameraAngleY = 45;
@@ -201,6 +194,9 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
     }
     @Override
     public void onDrawFrame(GL10 gl) {
+		if(!render)
+			return;
+
     	cameraAngleX +=deltaX;
     	cameraAngleY +=deltaY;
     	deltaX=0;
@@ -214,8 +210,6 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
         
         gl.glRotatef(rotationDegrees[this.initialScreenRotation], 0, 0, 1);  // portrait/landscape rotation
 
-        if(preparingData)
-            return;
 
         renderFusionData(gl, set, -1, mode);
     }
@@ -246,38 +240,29 @@ public class ShotRenderer implements GLSurfaceView.Renderer, ISystemComponent {
 	private int cameraAngleY;
     
 	public boolean screenshot_request = false;
-	public boolean animation_use = false;
+	public boolean render = false;
 	public boolean animation_play = false;
 	private int mode = 1;
 	
+
 	//Rotation Quaternions
     /*
-    * The data is in the following format. x, y, z, q0, q1, q2, q3
+    * The data is in the following format. x, y, z, q0, q1, q2, q3. And there can be n sets of data.
     * */
-    private static boolean preparingData = false;
-
-    private static float[] set;
+    float[] set;
 
 
-    public static void SetData(float[] set) {
-        //Guard the set data from being run into race conditions.
-        preparingData = true;
-        ShotRenderer.set = set;
-        preparingData = false;
+    private void SetData(float[] set) {
+        this.set = set;
     }
 
-    @Override
-    public void SystemStateChanged(SystemState oldState, SystemState newState) {
-
-        if (newState == SystemState.CAPTURE) {
-            animation_use = true;
-        } else if (newState == SystemState.RENDER) {
-            preparingData = true;
-            SetData(ContentStore.Instance().getShot().getDataForRendering());
-            preparingData = false;
-            animation_use = true;
-        } else if (newState == SystemState.STOPPED) {
-            animation_use = false;
-        }
+    public void Render(float[] data) {
+            SetData(data);
+            render = true;
     }
+
+	public void Stop()
+	{
+		render = false;
+	}
 }

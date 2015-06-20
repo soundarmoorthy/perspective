@@ -39,7 +39,7 @@ public class TestOpenGL {
             values[j++] = 0.0f; //q2
             values[j++] = 0.0f; //q3
         }
-        ShotRenderer.SetData(values);
+        //ShotRenderer.SetData(values);
     }
 
     private static void TestAccelerometerY() {
@@ -56,7 +56,7 @@ public class TestOpenGL {
             values[j++] = 0.0f; //q2
             values[j++] = 0.0f; //q3
         }
-        ShotRenderer.SetData(values);
+        //ShotRenderer.SetData(values);
     }
 
     private static void TestAccelerometerZ() {
@@ -73,6 +73,6 @@ public class TestOpenGL {
             values[j++] = 0.0f; //q2
             values[j++] = 0.0f; //q3
         }
-        ShotRenderer.SetData(values);
+        //ShotRenderer.SetData(values);
     }
 }

@@ -4,6 +4,7 @@ package com.flicq.tennis.contentmanager;
 import android.os.AsyncTask;
 import android.text.format.Time;
 import com.flicq.tennis.appengine.FlicqCloudRequestHandler;
+import com.flicq.tennis.framework.IActivityAdapter;
 
 /**
  * Created by soundararajan on 4/26/2015.
@@ -16,8 +17,9 @@ public class ContentStore {
         }
     }
 
-    private ContentStore() {
-        stopped = false;
+    IActivityAdapter adapter;
+    public ContentStore(IActivityAdapter adapter) {
+        this.adapter = adapter;
     }
 
     private FlicqShot currentShot;
@@ -33,8 +35,6 @@ public class ContentStore {
     }
 
     public void Dump(final float[] values) {
-        if (stopped)
-            return;
         synchronized (currentShotLock) {
             float quaternionTimeScale = 30000f;
             values[0] = values[0] / quaternionTimeScale;
@@ -77,21 +77,13 @@ public class ContentStore {
         UploadAsync(cachedShot);
     }
 
-    private static ContentStore store;
-
-    public static ContentStore Instance() {
-        if (store == null)
-            store = new ContentStore();
-        return store;
-    }
-
-    private void UploadAsync(final FlicqShot shot) {
+    private static void UploadAsync(final FlicqShot shot) {
         new AsyncTask<Void,Void,Void>(){
 
             @Override
             protected Void doInBackground(Void... voids) {
                 FlicqCloudRequestHandler handler = new FlicqCloudRequestHandler();
-                handler.SendCurrentShot(shot);
+                handler.SendShot(shot);
                 return null;
             }
         }.execute();
