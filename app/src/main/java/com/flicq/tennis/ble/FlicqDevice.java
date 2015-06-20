@@ -1,6 +1,7 @@
 package com.flicq.tennis.ble;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.os.AsyncTask;
 
 import com.flicq.tennis.framework.Utils;
@@ -46,6 +47,8 @@ public final class FlicqDevice
                     if (callback.connectionSuccessful()) {
                         adapter.stopLeScan(callback);
                         activityAdapter.writeToUi("BLE : LE Scan stopped.", false);
+                        BluetoothDevice device = callback.device();
+                        device.connectGatt(activityAdapter.GetApplicationContext(), false, new FlicqBluetoothGattCallback(activityAdapter));
                         break;
                     }
                     Utils.SleepSomeTime(500);

@@ -16,9 +16,7 @@ public class ContentStore {
         }
     }
 
-    IActivityAdapter adapter;
-    public ContentStore(IActivityAdapter adapter) {
-        this.adapter = adapter;
+    private ContentStore() {
     }
 
     private FlicqShot currentShot;
@@ -85,5 +83,12 @@ public class ContentStore {
                 return null;
             }
         }.execute();
+    }
+
+    private static ContentStore instance;
+    public static ContentStore Instance() {
+        if(instance == null)
+            instance = new ContentStore();
+        return instance;
     }
 }

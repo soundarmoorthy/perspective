@@ -1,5 +1,8 @@
 package com.flicq.tennis.contentmanager;
 
+import android.bluetooth.BluetoothGattCallback;
+
+import com.flicq.tennis.ble.FlicqBluetoothGattCallback;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.StatusType;
 
@@ -23,42 +26,36 @@ public class AsyncContentProcessor {
 
     ExecutorService executorQueue;
     private IActivityAdapter adapter;
-    byte previous, count;
+    int count;
     long startTime, endTime;
     ContentStore store;
 
    public AsyncContentProcessor(IActivityAdapter varAdapter)
    {
 
+       store = ContentStore.Instance();
        executorQueue = Executors.newSingleThreadExecutor();
        adapter = varAdapter;
-       missingPackets = new LinkedList<Byte>();
-       store = new ContentStore(varAdapter);
    }
 
     public void connected() {
         count = 0;
-        previous = 0;
         startTime = System.currentTimeMillis();
         adapter.writeToUi("BLE : Connected Device", false);
     }
 
     public void disconnected()
     {
+        displayStats();
+    }
+
+    private void displayStats()
+    {
         endTime = System.currentTimeMillis();
         adapter.writeToUi("BLE : Disconnected Device ", false);
         adapter.writeToUi("BLE Report", false);
         adapter.writeToUi("Time taken : " + String.valueOf((endTime - startTime) / 1000) + " seconds", false);
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("Missing packets : ");
-        for (int i = 0; i < missingPackets.size(); i++) {
-            builder.append(String.valueOf(missingPackets.get(i) + 1) + ",");
-        }
-
         adapter.writeToUi("Packets Received" + String.valueOf(count), false);
-        adapter.writeToUi(builder.toString(), false);
-        missingPackets.clear();
     }
 
     public void RunAsync(final long relativeTimeDiffInMilli,final byte[] content)
@@ -68,9 +65,6 @@ public class AsyncContentProcessor {
             public void run() {
                 count++;
                 String str = parse(content) + " -> " + relativeTimeDiffInMilli;
-                if (content[5] - previous != 1)
-                    missingPackets.add(previous);
-                previous = content[5];
                 adapter.writeToUi(str, false);
                 UpdateStatus();
 
@@ -99,8 +93,6 @@ public class AsyncContentProcessor {
         store.ShotDone();
     }
 
-    private LinkedList<Byte> missingPackets;
-
     private static String parse(final byte[] data) {
         if (data == null || data.length == 0)
             return "";
@@ -119,14 +111,7 @@ public class AsyncContentProcessor {
     private long previousTime = 0;
     private boolean show = true;
     private void UpdateStatus() {
-        long currentTime = Calendar.getInstance().getTimeInMillis();
-        if (currentTime - previousTime < 500) //Update only for once in 500 milliseconds.
-            return;
-        if (show)
-            adapter.SetStatus(StatusType.INFO, "Receiving data");
-        else
-            adapter.SetStatus(StatusType.INFO, "");
-        show = !show;
-        previousTime = currentTime;
+        int percent = (count * 100) / FlicqBluetoothGattCallback.END;
+        adapter.SetStatus(StatusType.INFO, String.valueOf(percent) + " % capture completed");
     }
 }

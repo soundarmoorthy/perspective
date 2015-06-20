@@ -22,6 +22,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.flicq.tennis.ble.FlicqDevice;
+import com.flicq.tennis.contentmanager.ContentStore;
+import com.flicq.tennis.contentmanager.FlicqShot;
 import com.flicq.tennis.external.ButtonAwesome;
 import com.flicq.tennis.external.TextAwesome;
 import com.flicq.tennis.framework.IActivityAdapter;
@@ -45,7 +47,6 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     public void onCreate(Bundle savedInstanceState) {
         onCreateInitialSetup(savedInstanceState);
         //Do anything after this.
-
         setupDeviceCapture();
         setupRendering();
         setupLog();
@@ -273,6 +274,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
                 break;
             case R.id.btn_render:
                 setupUIForRender();
+                getLastShotAndDraw();
                 break;
             case R.id.btn_engineering:
                 setupUIForLogging();
@@ -280,6 +282,12 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
                 currentSystemState = SystemState.UNKNOWN;
         }
         updateUI(itemId);
+    }
+
+    private void getLastShotAndDraw() {
+        FlicqShot shot = ContentStore.Instance().getShot();
+        float[] data = shot.getDataForRendering();
+        shotRenderer.Render(shot.getDataForRendering());
     }
 
     private void setupUIForLogging() {

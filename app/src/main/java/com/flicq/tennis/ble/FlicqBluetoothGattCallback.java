@@ -11,6 +11,7 @@ import com.flicq.tennis.contentmanager.AsyncContentProcessor;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.Utils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -36,7 +37,7 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
             enough = false;
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             processor.disconnected();
-            gatt.close();
+            endShotFormally(gatt);
         }
     }
 
@@ -60,6 +61,7 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             boolean success = gatt.writeDescriptor(descriptor);
             helper.writeToUi("BLE : Enable Notification + " + descriptor.toString() + ", Status = " + String.valueOf(success), false);
+            processor.beginShot();
         } catch (Exception ex) {
             Log.e("BLE", "Error in OnServices Discovered implementation. ");
             ex.printStackTrace();
@@ -67,8 +69,7 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     }
 
     long previous = 0, current;
-    private static final int BEGIN=1;
-    private static final int END=250;
+    public static final int END=250;
     private boolean enough = false;
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
@@ -81,15 +82,27 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         for (int i = 0; i < content.length; i++)
             copied[i] = content[i];
 
-       int seqNum  = -1;//TODO : Find which index has seq number
-        if(seqNum == BEGIN)
-            processor.beginShot();
-        else if(seqNum == END) {
-            processor.endShot();
-            enough = true;
-            //gatt.disconnect();
+        int seqNum = copied[14];
+        if(seqNum == 0x0F)
+            errorPackets++;
+        else {
+            if (seqNum >= END) {
+                endShotFormally(gatt);
+            }
         }
         processor.RunAsync(current - previous, copied);
         previous = current;
     }
+
+    private void endShotFormally(BluetoothGatt gatt)
+    {
+        enough = true;
+        processor.endShot();
+        gatt.disconnect();
+        gatt.close();
+        helper.writeToUi("No of 0x0F packets : " + String.valueOf(errorPackets), false);
+        errorPackets = 0;
+        helper.writeToUi("BLE ; Disconnected after receiving all packets", false);
+    }
+    int errorPackets = 0;
 }

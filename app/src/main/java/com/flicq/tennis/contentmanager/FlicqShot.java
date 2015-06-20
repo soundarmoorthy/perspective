@@ -12,19 +12,8 @@ public class FlicqShot {
 
     Time time;
 
-    public List<Float> getPoints()
-    {
-        return values;
-    }
-
-    public Time getTimeStamp()
-    {
-        return this.time;
-    }
-
-    public FlicqShot(Time time)
-    {
-       this.time = time;
+    public FlicqShot(Time time) {
+        this.time = time;
         values = new ArrayList<Float>();
     }
 

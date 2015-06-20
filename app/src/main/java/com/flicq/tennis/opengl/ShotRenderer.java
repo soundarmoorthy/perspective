@@ -216,7 +216,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
     int ai;
 
-    static public final float degreesPerRadian = (float) (180.0f / 3.14159f);
+    static private final float degreesPerRadian = (float) (180.0f / 3.14159f);
     
     private void setMode(int i) {
 		mode = i;
@@ -227,21 +227,21 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 		
 	}
 
-    public int length()
+    private int length()
     {
         return set.length/7;
     }
 
-    float q0,q1,q2,q3;
-    float a,x,y,z;
-	public float deltaX;
-	public float deltaY;
+    private float q0,q1,q2,q3;
+    private float a,x,y,z;
+	private float deltaX;
+	private float deltaY;
 	private int cameraAngleX;
 	private int cameraAngleY;
     
-	public boolean screenshot_request = false;
-	public boolean render = false;
-	public boolean animation_play = false;
+	private boolean screenshot_request = false;
+	private boolean render = false;
+	private boolean animation_play = false;
 	private int mode = 1;
 	
 

@@ -6,6 +6,8 @@ import com.flicq.tennis.framework.StatusType;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
+import java.util.ArrayList;
+
 
 /**
  * Created by soundararajan on 4/13/2015.
@@ -13,6 +15,7 @@ import android.bluetooth.BluetoothDevice;
 public final class FlicqLeScanCallback implements BluetoothAdapter.LeScanCallback
 {
     IActivityAdapter helper;
+    BluetoothDevice firstFoundDevice;
     public FlicqLeScanCallback(IActivityAdapter helper)
     {
         this.helper = helper;
@@ -27,13 +30,18 @@ public final class FlicqLeScanCallback implements BluetoothAdapter.LeScanCallbac
             try {
                 helper.SetStatus(StatusType.INFO, "Yo, Connected to " + device.getName() + " !");
                 helper.writeToUi("Yo, Found Device " + device.getName() + " !. Let's Pair :-)", false);
-                device.connectGatt(helper.GetApplicationContext(), false, new FlicqBluetoothGattCallback(helper));
+                firstFoundDevice  = device;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 helper.SetStatus(StatusType.ERROR, ex.getMessage());
             }
             connected = true;
         }
+    }
+
+    public BluetoothDevice device()
+    {
+        return firstFoundDevice;
     }
 
     private boolean connected;
