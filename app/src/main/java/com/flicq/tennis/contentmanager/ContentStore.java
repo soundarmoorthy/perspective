@@ -10,7 +10,6 @@ import com.flicq.tennis.framework.IActivityAdapter;
  * Created by soundararajan on 4/26/2015.
  */
 public class ContentStore {
-    boolean stopped;
     public FlicqShot getShot() {
         synchronized (currentShotLock) {
             return currentShot;
@@ -72,7 +71,6 @@ public class ContentStore {
 
     public void ShotDone()
     {
-        stopped = true;
         FlicqShot cachedShot = currentShot;
         UploadAsync(cachedShot);
     }

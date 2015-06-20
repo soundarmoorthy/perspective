@@ -73,11 +73,20 @@ public class AsyncContentProcessor {
                 previous = content[5];
                 adapter.writeToUi(str, false);
                 UpdateStatus();
-                //TODO: byte[] -> float[]
-                //store.Dump(content);
-                //ContentStore.Instance().Dump(content);
+
+                float[] parsedContent = getParsedContent(content);
+                store.Dump(parsedContent);
             }
         });
+    }
+
+    private static float[] getParsedContent(byte[] content) {
+       float[] parsedData = new float[content.length /2];
+        for(int i=0;i<parsedData.length;i++)
+        {
+            parsedData[i] = content[i] + (content[i+1] << 8);
+        }
+        return parsedData;
     }
 
     public void beginShot()
@@ -92,7 +101,7 @@ public class AsyncContentProcessor {
 
     private LinkedList<Byte> missingPackets;
 
-    public String parse(final byte[] data) {
+    private static String parse(final byte[] data) {
         if (data == null || data.length == 0)
             return "";
         final char[] out = new char[data.length * 3 - 1];

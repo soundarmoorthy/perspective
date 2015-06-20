@@ -33,6 +33,7 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
             processor.connected();
             Utils.SleepSomeTime(20);
             gatt.discoverServices();
+            enough = false;
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             processor.disconnected();
             gatt.close();
@@ -68,11 +69,13 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     long previous = 0, current;
     private static final int BEGIN=1;
     private static final int END=250;
+    private boolean enough = false;
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-        if (characteristic == null)
+        if (characteristic == null || enough)
             return;
         current = Calendar.getInstance().getTimeInMillis();
+
         byte[] content = characteristic.getValue();
         byte[] copied = new byte[content.length];
         for (int i = 0; i < content.length; i++)
@@ -81,8 +84,11 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
        int seqNum  = -1;//TODO : Find which index has seq number
         if(seqNum == BEGIN)
             processor.beginShot();
-        else if(seqNum == END)
+        else if(seqNum == END) {
             processor.endShot();
+            enough = true;
+            //gatt.disconnect();
+        }
         processor.RunAsync(current - previous, copied);
         previous = current;
     }
