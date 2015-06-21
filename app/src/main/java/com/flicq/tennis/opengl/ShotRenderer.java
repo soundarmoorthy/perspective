@@ -19,8 +19,6 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
     int initialScreenRotation;
     int width, height;
-	Shot shot;
-	Helper helper;
     private float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
 
     // The set[] is a single dimensional array, with every "successive 7 elements" defining
@@ -28,8 +26,6 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     public ShotRenderer(int initialScreenRotation, int mode) {
         this.initialScreenRotation = initialScreenRotation;
         setMode(mode);
-		shot = new Shot();
-		helper = new Helper();
 		//The camera angle by default is tilted to 45 degree to get a 3d view.
 		//To run the OpenGL rendering tests make sure you set this to 0 degree and
 		//90 degree properly.
@@ -170,11 +166,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 	        matrix[15] = 1.0f;
 	        
 	        gl.glMultMatrixf(matrix, 0);
-			if(i == frame)
-				shot.draw(gl,true);
 	        gl.glPopMatrix();
-			if(i == frame)
-				helper.draw(gl,x,y,z);
     	}
     	if(frame==-1)
     	{
@@ -189,22 +181,19 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 	        vertexFloatBuffer.position(0);
 	        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexFloatBuffer);
 	        gl.glColor4f(0.5f, 0.7f, 1.0f, 0.5f);
-	        gl.glEnable( GL10.GL_POLYGON_OFFSET_FILL );
-	        gl.glPolygonOffset( 1f, 1f );
+	        gl.glEnable(GL10.GL_POLYGON_OFFSET_FILL);
+	        gl.glPolygonOffset(1f, 1f);
 	        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, count);
-	        gl.glDisable( GL10.GL_POLYGON_OFFSET_FILL );  
+	        gl.glDisable(GL10.GL_POLYGON_OFFSET_FILL);
 	        gl.glEnable(GL10.GL_DEPTH_TEST);
 	        gl.glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
 	        gl.glDisable(GL10.GL_BLEND);
-			gl.glDrawArrays(GL10.GL_LINES,0, count);
 
 	        gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
     	}
     }
     @Override
     public void onDrawFrame(GL10 gl) {
-		if(!render)
-			return;
 
     	cameraAngleX +=deltaX;
     	cameraAngleY +=deltaY;
@@ -218,6 +207,9 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         gl.glRotatef(cameraAngleX, 0, 1, 0);
         
         gl.glRotatef(rotationDegrees[this.initialScreenRotation], 0, 0, 1);  // portrait/landscape rotation
+
+		if(!render)
+			return;
         renderFusionData(gl, set, -1, mode);
     }
 

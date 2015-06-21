@@ -42,10 +42,10 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         super();
     }
 
-    FlicqDevice flicqDevice = null;
-    ShotRenderer shotRenderer = null;
+    public FlicqDevice flicqDevice = null;
+    public ShotRenderer shotRenderer = null;
     SystemState currentSystemState;
-    LocalSensorDataSimulator simulator;
+    public LocalSensorDataSimulator simulator;
     boolean simulator_mode = true;
 
     @Override
