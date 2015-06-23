@@ -31,6 +31,7 @@ public class LocalSensorDataSimulator implements SensorEventListener {
     public void Start()
     {
         handler.Reset();
+        count  = 0;
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this, rotationVector, SensorManager.SENSOR_DELAY_NORMAL);
         activityAdapter.writeToUi("Simulator starting ...",false);
@@ -52,8 +53,7 @@ public class LocalSensorDataSimulator implements SensorEventListener {
     @Override
     public synchronized void onSensorChanged(SensorEvent sensorEvent) {
         int type = sensorEvent.sensor.getType();
-        switch (type)
-        {
+        switch (type) {
             case Sensor.TYPE_ACCELEROMETER:
                 handler.setAcc(sensorEvent.values);
                 break;
@@ -62,7 +62,7 @@ public class LocalSensorDataSimulator implements SensorEventListener {
                 SensorManager.getQuaternionFromVector(quaternion, sensorEvent.values);
                 handler.setQuat(quaternion);
                 activityAdapter.writeToUi("Acquiring data : " + String.valueOf(count), false);
-                if(count++ == 50)
+                if (count++ == 50)
                     Stop();
                 break;
         }

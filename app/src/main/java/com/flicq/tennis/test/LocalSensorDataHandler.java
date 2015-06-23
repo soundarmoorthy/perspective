@@ -1,5 +1,7 @@
 package com.flicq.tennis.test;
 
+import android.hardware.SensorManager;
+
 import com.flicq.tennis.framework.IActivityAdapter;
 
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ public class LocalSensorDataHandler {
     private ArrayList<float[]> sensorData;
     private float ax,ay,az;
     IActivityAdapter adapter;
+    protected final float gravity = (float) SensorManager.GRAVITY_EARTH;
     public LocalSensorDataHandler(IActivityAdapter adapter)
     {
         this.adapter = adapter;
@@ -34,9 +37,9 @@ public class LocalSensorDataHandler {
 
     public synchronized void setQuat(float[] values) {
         busy = true;
-        this.values[0] = ax;
-        this.values[1] = ay;
-        this.values[2] = az;
+        this.values[0] = ax / gravity;
+        this.values[1] = ay / gravity;
+        this.values[2] = az / gravity;
         busy = false;
         this.values[3] = values[0];
         this.values[4] = values[1];

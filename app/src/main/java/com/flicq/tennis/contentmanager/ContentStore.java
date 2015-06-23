@@ -31,38 +31,44 @@ public class ContentStore {
         }
     }
 
-    public void Dump(final float[] values) {
+    public void Dump(final short[] content) {
         synchronized (currentShotLock) {
-            float quaternionTimeScale = 30000f;
-            values[0] = values[0] / quaternionTimeScale;
-            values[1] = values[1] / quaternionTimeScale;
-            values[2] = values[2] / quaternionTimeScale;
-            values[3] = values[3] / quaternionTimeScale;
-            double normalize = (values[0] * values[0])
-                             + (values[1] * values[1])
-                             + (values[2] * values[2])
-                             + (values[3] * values[3]);
+
+        /*  Remember, 2 bytes each
+            ------------------------------------------------------------------
+           | ax.2 | ay.2 | az.2 | q0.2 | q1.2 | q2.2 | q3.2 | seqNo.1 | n/a |
+           ------------------------------------------------------------------ */
+            final float quaternionTimeScale = 30000f;
+            float[] values = new float[content.length];
+            for(int i=3;i<7;i++)
+            values[i] = content[i] / quaternionTimeScale;
+
+            float ax = content[0];
+            float ay = content[1];
+            float az = content[2];
+
+            double normalize = 0.0;
+            for(int i=3;i<7;i++)
+                normalize = normalize + (values[i] * values[i]);
             normalize = Math.sqrt(normalize);
-            values[0] /= normalize;
-            values[1] /= normalize;
-            values[2] /= normalize;
-            values[3] /= normalize;
+            for(int i=3;i<7;i++)
+                values[i] /= normalize;
 
-            float q1 = values[2];
-            float q2 = values[1];
-            float q3 = -values[3];
+            // Incoming quaternion is NED.
+            // We need to do a minor translation on the quaternion axis,
+            // as the app needs it in Android form
+            float q1 = values[5];
+            float q2 = values[4];
+            float q3 = -values[6];
 
-            float ax = values[4];
-            float ay = values[5];
-            float az = values[6];
+            values[4] = q1;
+            values[5] = q2;
+            values[6] = q3;
 
-            values[1] = q1;
-            values[2] = q2;
-            values[3] = q3;
-
-            values[4] = ax * 0.00012207f;
-            values[5] = ay * 0.00012207f;
-            values[6] = az * 0.00012207f;
+            final float acc_lsb = 0.00012207f;
+            values[0] = ax * acc_lsb;
+            values[1] = ay * acc_lsb;
+            values[2] = az * acc_lsb;
             currentShot.add(values);
         }
     }
@@ -75,7 +81,6 @@ public class ContentStore {
 
     private static void UploadAsync(final FlicqShot shot) {
         new AsyncTask<Void,Void,Void>(){
-
             @Override
             protected Void doInBackground(Void... voids) {
                 FlicqCloudRequestHandler handler = new FlicqCloudRequestHandler();

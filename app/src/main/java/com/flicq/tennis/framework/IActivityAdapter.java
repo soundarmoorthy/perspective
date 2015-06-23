@@ -12,4 +12,6 @@ public interface IActivityAdapter {
     Context GetApplicationContext();
 
     void writeToUi(String str,boolean differs);
+
+    void onDisconnected();
 }

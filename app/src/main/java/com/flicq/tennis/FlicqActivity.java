@@ -28,7 +28,6 @@ import com.flicq.tennis.contentmanager.FlicqShot;
 import com.flicq.tennis.external.ButtonAwesome;
 import com.flicq.tennis.external.TextAwesome;
 import com.flicq.tennis.framework.IActivityAdapter;
-import com.flicq.tennis.framework.SampleData;
 import com.flicq.tennis.framework.StatusType;
 import com.flicq.tennis.framework.SystemState;
 import com.flicq.tennis.opengl.ShotRenderer;
@@ -46,7 +45,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     public ShotRenderer shotRenderer = null;
     SystemState currentSystemState;
     public LocalSensorDataSimulator simulator;
-    boolean simulator_mode = true;
+    boolean simulator_mode = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,7 +110,6 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
                 confirmWithUserAndExit();
             }
         });
-
     }
 
     private void confirmWithUserAndExit() {
@@ -251,6 +249,11 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     }
 
     @Override
+    public void onDisconnected() {
+        handleUIAction(R.id.btn_capture);
+    }
+
+    @Override
     public void SetStatus(final StatusType type, final String s) {
         runOnUiThread(new Runnable() {
             @Override
@@ -279,6 +282,11 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     @Override
     public void onClick(View view) {
         int itemId = view.getId();
+        handleUIAction(itemId);
+    }
+
+    private void handleUIAction(int itemId)
+    {
         switch (itemId) {
             case R.id.btn_capture:
                 handleCapture();
@@ -304,7 +312,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
 
     private void renderLocalSensorData() {
         float[] data = simulator.getSensorData();
-        shotRenderer.Render(SampleData.set);
+        shotRenderer.Render(data);
     }
 
     private void renderDeviceData() {
@@ -312,7 +320,6 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         float[] data = shot.getDataForRendering();
         shotRenderer.Render(data);
     }
-
 
     private void setupUIForLogging() {
         setVisibility(View.VISIBLE, View.GONE);

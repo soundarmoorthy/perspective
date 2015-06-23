@@ -11,7 +11,6 @@ import com.flicq.tennis.contentmanager.AsyncContentProcessor;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.Utils;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -21,11 +20,11 @@ import java.util.UUID;
 
 public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattCallback {
 
-    IActivityAdapter helper;
+    IActivityAdapter activityAdapter;
     AsyncContentProcessor processor;
 
     public FlicqBluetoothGattCallback(IActivityAdapter helper) {
-        this.helper = helper;
+        this.activityAdapter = helper;
         processor = new AsyncContentProcessor(helper);
     }
 
@@ -38,11 +37,12 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             processor.disconnected();
             endShotFormally(gatt);
+            activityAdapter.onDisconnected();
         }
     }
 
     public static final String FLICQ_SERVICE_GATT_UUID = "ffffffff-1111-1111-ccc0-000000000000";
-    public static final String FLICQ_SENSOR_DATA_CHARACTERISTICC ="ffffffff-1111-1111-ccc0-000000000001";
+    public static final String FLICQ_SENSOR_DATA_CHARACTERISTICC = "ffffffff-1111-1111-ccc0-000000000001";
     public static final String FLICQ_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805f9b34fb";
 
     @Override
@@ -50,17 +50,17 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         try {
             //Try to first initialize device and gatt database.
             BluetoothGattService service = gatt.getService(UUID.fromString(FLICQ_SERVICE_GATT_UUID));
-            helper.writeToUi("BLE : Found Service : " + service.toString(), false);
+            activityAdapter.writeToUi("BLE : Found Service : " + service.toString(), false);
             BluetoothGattCharacteristic characteristic = service.getCharacteristic(
                     UUID.fromString(FLICQ_SENSOR_DATA_CHARACTERISTICC));
             gatt.setCharacteristicNotification(characteristic, true);
-            helper.writeToUi("BLE : Found Characteristic : " + characteristic.getUuid(), false);
+            activityAdapter.writeToUi("BLE : Found Characteristic : " + characteristic.getUuid(), false);
 
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
                     UUID.fromString(FLICQ_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID));
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             boolean success = gatt.writeDescriptor(descriptor);
-            helper.writeToUi("BLE : Enable Notification + " + descriptor.toString() + ", Status = " + String.valueOf(success), false);
+            activityAdapter.writeToUi("BLE : Enable Notification + " + descriptor.toString() + ", Status = " + String.valueOf(success), false);
             processor.beginShot();
         } catch (Exception ex) {
             Log.e("BLE", "Error in OnServices Discovered implementation. ");
@@ -69,40 +69,39 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     }
 
     long previous = 0, current;
-    public static final int END=250;
+    public static final int END = 40;
     private boolean enough = false;
+    private static final int PACKET_CONTENT_SIZE = 7;
+    byte seqNum;
+
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
         if (characteristic == null || enough)
             return;
         current = Calendar.getInstance().getTimeInMillis();
 
-        byte[] content = characteristic.getValue();
-        byte[] copied = new byte[content.length];
-        for (int i = 0; i < content.length; i++)
-            copied[i] = content[i];
+        /* packet size 16 bytes, packet content 15 bytes */
+        /* ------------------------------------------------------------------
+           | ax.2 | ay.2 | az.2 | q0.2 | q1.2 | q2.2 | q3.2 | seqNo.1 | n/a |
+           ------------------------------------------------------------------ */
+        short[] copied = new short[PACKET_CONTENT_SIZE];
+        for (int i = 0; i < PACKET_CONTENT_SIZE; i++)
+            copied[i] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, i * 2).shortValue();
 
-        int seqNum = copied[14];
-        if(seqNum == 0x0F)
-            errorPackets++;
-        else {
-            if (seqNum >= END) {
-                endShotFormally(gatt);
-            }
+        seqNum = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 14).byteValue(); //till 255
+        if (seqNum >= END) {
+            endShotFormally(gatt);
         }
         processor.RunAsync(current - previous, copied);
         previous = current;
     }
 
-    private void endShotFormally(BluetoothGatt gatt)
-    {
+    private void endShotFormally(BluetoothGatt gatt) {
         enough = true;
         processor.endShot();
         gatt.disconnect();
         gatt.close();
-        helper.writeToUi("No of 0x0F packets : " + String.valueOf(errorPackets), false);
-        errorPackets = 0;
-        helper.writeToUi("BLE ; Disconnected after receiving all packets", false);
+        activityAdapter.writeToUi("BLE ; Disconnected after receiving all shot data", false);
+        current = 0;
     }
-    int errorPackets = 0;
 }

@@ -25,7 +25,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     // a plot information. ax, ay, az, q0, q1, q2, q3
     public ShotRenderer(int initialScreenRotation, int mode) {
         this.initialScreenRotation = initialScreenRotation;
-        setMode(mode);
+        setMode(1);
 		//The camera angle by default is tilted to 45 degree to get a 3d view.
 		//To run the OpenGL rendering tests make sure you set this to 0 degree and
 		//90 degree properly.
@@ -242,7 +242,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 	private boolean render = false;
 	private boolean animation_play = false;
 	private int mode = 1;
-	
+
 
 	//Rotation Quaternions
     /*
@@ -256,6 +256,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     }
 
     public void Render(float[] data) {
+			render  = false;
             SetData(data);
             render = true;
     }
