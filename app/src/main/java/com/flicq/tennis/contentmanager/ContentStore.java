@@ -38,14 +38,16 @@ public class ContentStore {
             ------------------------------------------------------------------
            | ax.2 | ay.2 | az.2 | q0.2 | q1.2 | q2.2 | q3.2 | seqNo.1 | n/a |
            ------------------------------------------------------------------ */
-            final float quaternionTimeScale = 30000f;
+            //Android (a x=East, y=North, z=Up or ENU standard.
+
             float[] values = new float[content.length];
+            final float acc_lsb = 0.00012207f;
+            values[0] = content[0] * acc_lsb;
+            values[1] = content[1] * acc_lsb;
+            values[2] = content[2] * acc_lsb;
+            final float quaternionTimeScale = 30000f;
             for(int i=3;i<7;i++)
             values[i] = content[i] / quaternionTimeScale;
-
-            float ax = content[0];
-            float ay = content[1];
-            float az = content[2];
 
             double normalize = 0.0;
             for(int i=3;i<7;i++)
@@ -54,21 +56,6 @@ public class ContentStore {
             for(int i=3;i<7;i++)
                 values[i] /= normalize;
 
-            // Incoming quaternion is NED.
-            // We need to do a minor translation on the quaternion axis,
-            // as the app needs it in Android form
-            float q1 = values[5];
-            float q2 = values[4];
-            float q3 = -values[6];
-
-            values[4] = q1;
-            values[5] = q2;
-            values[6] = q3;
-
-            final float acc_lsb = 0.00012207f;
-            values[0] = ax * acc_lsb;
-            values[1] = ay * acc_lsb;
-            values[2] = az * acc_lsb;
             currentShot.add(values);
         }
     }

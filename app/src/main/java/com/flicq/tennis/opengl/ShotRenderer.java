@@ -238,9 +238,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 	private int cameraAngleX;
 	private int cameraAngleY;
     
-	private boolean screenshot_request = false;
 	private boolean render = false;
-	private boolean animation_play = false;
 	private int mode = 1;
 
 
