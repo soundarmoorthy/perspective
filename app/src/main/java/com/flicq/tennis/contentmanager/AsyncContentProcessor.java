@@ -59,15 +59,37 @@ public class AsyncContentProcessor {
             @Override
             public void run() {
                 count++;
-                //String str = parse(content) + " -> " + relativeTimeDiffInMilli;
                 UpdateStatus();
-                //float[] parsedContent = getParsedContent(content);
+
+        /*  Remember, 2 bytes each
+            ------------------------------------------------------------------
+           | ax.2 | ay.2 | az.2 | q0.2 | q1.2 | q2.2 | q3.2 | seqNo.1 | n/a |
+           ------------------------------------------------------------------ */
+                //Android (a x=East, y=North, z=Up or ENU standard.
+
+                float[] values = new float[content.length];
+                final float acc_lsb = 0.00012207f;
+                values[0] = content[0] * acc_lsb;
+                values[1] = content[1] * acc_lsb;
+                values[2] = content[2] * acc_lsb;
+                //final float quaternionTimeScale = 30000f;
+                for(int i=3;i<7;i++)
+                    values[i] = 0.0f;
+
+                   // values[i] = content[i] / quaternionTimeScale;
+
+//                double normalize = 0.0;
+//                for(int i=3;i<7;i++)
+//                    normalize = normalize + (values[i] * values[i]);
+//                normalize = Math.sqrt(normalize);
+//                for(int i=3;i<7;i++)
+//                    values[i] /= normalize;
 
                 StringBuilder builder = new StringBuilder();
                 for(int i=0;i<7;i++)
-                    builder.append(String.valueOf(content[i])+ ",");
+                    builder.append(String.valueOf(values[i])+ ",");
                 adapter.writeToUi(builder.toString(), false);
-                store.Dump(content);
+                store.Dump(values);
             }
         });
     }

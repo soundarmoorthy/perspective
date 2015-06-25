@@ -69,7 +69,7 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     }
 
     long previous = 0, current;
-    public static final int END = 40;
+    public static final int END = 250;
     private boolean enough = false;
     private static final int PACKET_CONTENT_SIZE = 7;
     byte seqNum;
@@ -85,8 +85,10 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
            | ax.2 | ay.2 | az.2 | q0.2 | q1.2 | q2.2 | q3.2 | seqNo.1 | n/a |
            ------------------------------------------------------------------ */
         short[] copied = new short[PACKET_CONTENT_SIZE];
-        for (int i = 0; i < PACKET_CONTENT_SIZE; i++)
+        for (int i = 0; i < 3; i++)
             copied[i] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, i * 2).shortValue();
+        for(int i=3;i<PACKET_CONTENT_SIZE;i++)
+            copied[i] = 0;
 
         seqNum = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 14).byteValue(); //till 255
         if (seqNum >= END) {
