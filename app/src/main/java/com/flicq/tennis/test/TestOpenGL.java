@@ -25,7 +25,7 @@ public class TestOpenGL {
         //}, 10000);
     }
 
-    private static void TestAccelerometerX() {
+    private static float[] TestAccelerometerX() {
         int count = 30;
         float[] values = new float[count * 7];
         int j = 0;
@@ -39,10 +39,11 @@ public class TestOpenGL {
             values[j++] = 0.0f; //q2
             values[j++] = 0.0f; //q3
         }
+        return values;
         //ShotRenderer.SetData(values);
     }
 
-    private static void TestAccelerometerY() {
+    private static float[] TestAccelerometerY() {
         int count = 30;
         float[] values = new float[count * 7];
         int j = 0;
@@ -56,6 +57,7 @@ public class TestOpenGL {
             values[j++] = 0.0f; //q2
             values[j++] = 0.0f; //q3
         }
+        return values;
         //ShotRenderer.SetData(values);
     }
 

@@ -1,5 +1,7 @@
 package com.flicq.tennis.contentmanager;
 
+import android.util.FloatMath;
+
 import com.flicq.tennis.ble.FlicqBluetoothGattCallback;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.StatusType;
@@ -53,8 +55,7 @@ public class AsyncContentProcessor {
         adapter.writeToUi("Packets Received" + String.valueOf(count), false);
     }
 
-    public void RunAsync(final long relativeTimeDiffInMilli,final short[] content)
-    {
+    public void RunAsync(final long relativeTimeDiffInMilli,final short[] content) {
         executorQueue.submit(new Runnable() {
             @Override
             public void run() {
@@ -72,22 +73,20 @@ public class AsyncContentProcessor {
                 values[0] = content[0] * acc_lsb;
                 values[1] = content[1] * acc_lsb;
                 values[2] = content[2] * acc_lsb;
-                //final float quaternionTimeScale = 30000f;
-                for(int i=3;i<7;i++)
-                    values[i] = 0.0f;
+                final float quaternionTimeScale = 30000f;
+                for (int i = 3; i < 7; i++)
+                    values[i] = content[i] / quaternionTimeScale;
 
-                   // values[i] = content[i] / quaternionTimeScale;
-
-//                double normalize = 0.0;
-//                for(int i=3;i<7;i++)
-//                    normalize = normalize + (values[i] * values[i]);
-//                normalize = Math.sqrt(normalize);
-//                for(int i=3;i<7;i++)
-//                    values[i] /= normalize;
+                float normalize = 0.0f;
+                for (int i = 3; i < 7; i++)
+                    normalize = normalize + (values[i] * values[i]);
+                normalize = FloatMath.sqrt(normalize);
+                for (int i = 3; i < 7; i++)
+                    values[i] /= normalize;
 
                 StringBuilder builder = new StringBuilder();
-                for(int i=0;i<7;i++)
-                    builder.append(String.valueOf(values[i])+ ",");
+                for (int i = 0; i < 7; i++)
+                    builder.append(String.valueOf(values[i]) + ",");
                 adapter.writeToUi(builder.toString(), false);
                 store.Dump(values);
             }

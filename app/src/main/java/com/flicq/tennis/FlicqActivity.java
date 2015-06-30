@@ -12,10 +12,12 @@ import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.FloatMath;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -28,6 +30,7 @@ import com.flicq.tennis.contentmanager.FlicqShot;
 import com.flicq.tennis.external.ButtonAwesome;
 import com.flicq.tennis.external.TextAwesome;
 import com.flicq.tennis.framework.IActivityAdapter;
+import com.flicq.tennis.framework.SampleData;
 import com.flicq.tennis.framework.StatusType;
 import com.flicq.tennis.framework.SystemState;
 import com.flicq.tennis.opengl.ShotRenderer;
@@ -44,24 +47,27 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     public FlicqDevice flicqDevice = null;
     public ShotRenderer shotRenderer = null;
     SystemState currentSystemState;
-    public LocalSensorDataSimulator simulator;
-    boolean simulator_mode = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         onCreateInitialSetup(savedInstanceState);
         //Do anything after this.
-        setupDeviceCapture();
-        setupDeviceSimulator();
-        setupRendering();
         setupLog();
+        setupDeviceCapture();
+        setupRendering();
         setupExitButton();
         this.SetStatus(StatusType.INFO, "Welcome !");
     }
 
+    boolean simulator_mode = false; //For experimental purposes
     private void setupDeviceSimulator() {
-        IActivityAdapter adapter = this;
-        simulator = new LocalSensorDataSimulator(adapter);
+        if(simulator_mode)
+        {
+            IActivityAdapter adapter = this;
+            LocalSensorDataSimulator simulator = new LocalSensorDataSimulator(adapter, shotRenderer);
+            shotRenderer.setSimulator(simulator);
+            simulator.Start();
+        }
     }
 
     private void onCreateInitialSetup(Bundle savedInstanceState) {
@@ -70,30 +76,34 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         currentSystemState = SystemState.STOPPED;
     }
 
-    private void setupDeviceCapture()
-    {
+    private void setupDeviceCapture() {
+        if(simulator_mode) {
+            this.writeToUi("SImulator mode, no device will be detected", false);
+            return;
+        }
         IActivityAdapter adapter = this;
         flicqDevice = new FlicqDevice(adapter);
     }
 
-    private void setupLog()
-    {
+    private void setupLog() {
         txtShotDataCached = (TextView) findViewById(R.id.txtShotData);
         scrollViewTxtShotDataCached = (ScrollView) findViewById(R.id.txtShotDataScrollView);
         txtShotDataCached.setLineSpacing(0.0f, 1.2f);
     }
-
-    private void setupRendering()
-    {
+    private void setupRendering() {
         int initialScreenRotation = getScreenRotation();
         GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
-        shotRenderer = new ShotRenderer(initialScreenRotation, 1);
+        shotRenderer = new ShotRenderer(1 /* Relative acceleration data */, initialScreenRotation);
         shotView.setRenderer(shotRenderer);
+        View.OnTouchListener listener = createOnTouchListener();
+        shotView.setOnTouchListener(listener);
+        if (simulator_mode)
+            setupDeviceSimulator();
         setupUIForRender();
     }
 
-    int getScreenRotation()
-    {
+
+    int getScreenRotation() {
         Display display = ((WindowManager) this
                 .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         int initialScreenRotation = display.getRotation();
@@ -101,8 +111,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     }
 
 
-    private void setupExitButton()
-    {
+    private void setupExitButton() {
         Button exitButton = (Button) findViewById(R.id.exit_button);
         exitButton.setOnClickListener(new View.OnClickListener() {
 
@@ -226,13 +235,14 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
 
     TextView txtShotDataCached;
     ScrollView scrollViewTxtShotDataCached;
+
     @Override
     public void writeToUi(final String str, final boolean differs) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 txtShotDataCached.append("\n");
-                if(differs)
+                if (differs)
                     txtShotDataCached.setTextColor(Color.RED);
                 txtShotDataCached.append(str);
 
@@ -273,23 +283,22 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     }
 
     @Override
-    public Context GetApplicationContext()
-    {
+    public Context GetApplicationContext() {
         return getApplicationContext();
     }
 
     static boolean ble_on = false;
+
     @Override
     public void onClick(View view) {
         int itemId = view.getId();
         handleUIAction(itemId);
     }
 
-    private void handleUIAction(int itemId)
-    {
+    private void handleUIAction(int itemId) {
         switch (itemId) {
             case R.id.btn_capture:
-                handleCapture();
+                handleRealDevice();
                 break;
             case R.id.btn_render:
                 setupUIForRender();
@@ -304,18 +313,12 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     }
 
     private void getLastShotAndDraw() {
-        if(simulator_mode)
-            renderLocalSensorData();
-        else
-            renderDeviceData();
-    }
-
-    private void renderLocalSensorData() {
-        float[] data = simulator.getSensorData();
-        shotRenderer.Render(data);
+        renderDeviceData();
     }
 
     private void renderDeviceData() {
+        if(simulator_mode)
+            return;
         FlicqShot shot = ContentStore.Instance().getShot();
         float[] data = shot.getDataForRendering();
         shotRenderer.Render(data);
@@ -325,48 +328,26 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         setVisibility(View.VISIBLE, View.GONE);
     }
 
-    private void setupUIForRender(){
+    private void setupUIForRender() {
         setVisibility(View.GONE, View.VISIBLE);
     }
 
-    private void setVisibility(int display, int render)
-    {
+    private void setVisibility(int display, int render) {
         findViewById(R.id.txtShotDataScrollView).setVisibility(display);
         findViewById(R.id.txtShotData).setVisibility(display);
         findViewById(R.id.shotView).setVisibility(render);
     }
 
-    private void handleCapture()
-    {
-        if(!simulator_mode)
-            handleRealDevice();
-        else
-            handleSimulator();
-    }
-
-    private void handleSimulator()
-    {
-        final LocalSensorDataSimulator simu = simulator;
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-               simu.Start();
-                return null;
-            }
-        }.execute();
-    }
-
-    private void handleRealDevice()
-    {
+    private void handleRealDevice() {
         ble_on = !ble_on;
         currentSystemState = ble_on ? SystemState.CAPTURE : SystemState.STOPPED;
-        if(currentSystemState == SystemState.CAPTURE)
+        if (currentSystemState == SystemState.CAPTURE)
             ConnectDevice();
     }
 
     private void updateUI(int itemId) {
-        int []ids = {R.id.btn_capture, R.id.btn_render, R.id.btn_engineering};
-        for(int i=0;i<ids.length;i++) {
+        int[] ids = {R.id.btn_capture, R.id.btn_render, R.id.btn_engineering};
+        for (int i = 0; i < ids.length; i++) {
             if (itemId == ids[i]) {
                 Button button = (Button) findViewById(ids[i]);
                 button.setBackgroundColor(Color.argb(255, 240, 240, 240));//A more lighter gray
@@ -376,9 +357,37 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
             }
         }
         ButtonAwesome awesome = (ButtonAwesome) findViewById(R.id.btn_capture);
-        if(ble_on)
+        if (ble_on)
             awesome.setText(R.string.fa_toggle_on);
         else
             awesome.setText(R.string.fa_toggle_off);
+
+    }
+
+    View.OnTouchListener createOnTouchListener() {
+        View.OnTouchListener listener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+            int maskedAction = event.getActionMasked();
+            switch (maskedAction) {
+                case MotionEvent.ACTION_DOWN: {
+                    shotRenderer.setXY(event.getX(), event.getY());
+                    break;
+                }
+                case MotionEvent.ACTION_UP: {
+                    shotRenderer.resetDeltaXY();
+                    break;
+                }
+
+                case MotionEvent.ACTION_MOVE: { // a pointer was moved
+                    shotRenderer.move(event.getX(), event.getY());
+                    break;
+                }
+            }
+                return false;
+            }
+        };
+        return listener;
     }
 }
+

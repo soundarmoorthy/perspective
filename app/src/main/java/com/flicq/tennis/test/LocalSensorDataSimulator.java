@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import com.flicq.tennis.framework.IActivityAdapter;
+import com.flicq.tennis.opengl.ShotRenderer;
 
 /**
  * Created by soundararajan on 5/31/2015.
@@ -18,8 +19,10 @@ public class LocalSensorDataSimulator implements SensorEventListener {
     private final Sensor rotationVector;
     float[] quaternion = new float[4];
     LocalSensorDataHandler handler;
-    public LocalSensorDataSimulator(IActivityAdapter adapter)
+    ShotRenderer renderer;
+    public LocalSensorDataSimulator(IActivityAdapter adapter, ShotRenderer renderer)
     {
+        this.renderer = renderer;
         this.activityAdapter = adapter;
         handler = new LocalSensorDataHandler(adapter);
         Context context  = activityAdapter.GetApplicationContext();
@@ -30,24 +33,15 @@ public class LocalSensorDataSimulator implements SensorEventListener {
 
     public void Start()
     {
-        handler.Reset();
-        count  = 0;
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this, rotationVector, SensorManager.SENSOR_DELAY_NORMAL);
         activityAdapter.writeToUi("Simulator starting ...",false);
         activityAdapter.writeToUi("Setup acceleromenter and rotation vector from local android",false);
     }
 
-    public float[] getSensorData()
+    public synchronized float[] getSensorData()
     {
         return handler.getData();
-    }
-
-    public void Stop()
-    {
-        sensorManager.unregisterListener(this, rotationVector);
-        sensorManager.unregisterListener(this, accelerometer);
-        activityAdapter.writeToUi("Stopped simulator",false);
     }
 
     @Override
@@ -61,13 +55,17 @@ public class LocalSensorDataSimulator implements SensorEventListener {
             case Sensor.TYPE_ROTATION_VECTOR:
                 SensorManager.getQuaternionFromVector(quaternion, sensorEvent.values);
                 handler.setQuat(quaternion);
-                activityAdapter.writeToUi("Acquiring data : " + String.valueOf(count), false);
-                if (count++ == 50)
-                    Stop();
+                count ++;
                 break;
         }
+
+        if(count++ >= 500) {
+            renderer.Render(handler.getData());
+            handler.Reset();
+            count =0;
+        }
     }
-    private int count;
+    int count = 0;
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {

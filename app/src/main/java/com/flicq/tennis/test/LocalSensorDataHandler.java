@@ -1,6 +1,7 @@
 package com.flicq.tennis.test;
 
 import android.hardware.SensorManager;
+import android.support.v4.util.CircularArray;
 
 import com.flicq.tennis.framework.IActivityAdapter;
 
@@ -16,6 +17,7 @@ public class LocalSensorDataHandler {
     private boolean busy;
 
     private ArrayList<float[]> sensorData;
+
     private float ax,ay,az;
     IActivityAdapter adapter;
     protected final float gravity = (float) SensorManager.GRAVITY_EARTH;
@@ -35,7 +37,10 @@ public class LocalSensorDataHandler {
         az = values[2];
     }
 
+    boolean getting_data;
     public synchronized void setQuat(float[] values) {
+        if(getting_data)
+            return;
         busy = true;
         this.values[0] = ax / gravity;
         this.values[1] = ay / gravity;
@@ -49,19 +54,23 @@ public class LocalSensorDataHandler {
     }
 
     public float[] getData() {
+        getting_data = true;
         int count = 0;
-        StringBuilder  builder = new StringBuilder();
-        float[] data = new float[sensorData.size() * 7];
+        //StringBuilder  builder = new StringBuilder();
+        float[] data;
+        data = new float[sensorData.size() * 7];
         for (int i = 0; i < sensorData.size(); i++) {
             float[] row = sensorData.get(i);
             for (int j = 0; j < 7; j++) {
                 data[count++] = row[j];
-                builder.append(row[j]);
+                //builder.append(row[j]);
+                //adapter.writeToUi(builder.toString(), false);
+                //builder.delete(0, builder.length());
             }
-            adapter.writeToUi(builder.toString(), false);
-            builder.delete(0,builder.length());
         }
+        getting_data = false;
         return data;
+
     }
 
     public void Reset() {

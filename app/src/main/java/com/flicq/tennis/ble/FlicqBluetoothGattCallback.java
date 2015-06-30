@@ -11,6 +11,9 @@ import com.flicq.tennis.contentmanager.AsyncContentProcessor;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.Utils;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.ShortBuffer;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -84,13 +87,17 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         /* ------------------------------------------------------------------
            | ax.2 | ay.2 | az.2 | q0.2 | q1.2 | q2.2 | q3.2 | seqNo.1 | n/a |
            ------------------------------------------------------------------ */
-        short[] copied = new short[PACKET_CONTENT_SIZE];
-        for (int i = 0; i < 3; i++)
-            copied[i] = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, i * 2).shortValue();
-        for(int i=3;i<PACKET_CONTENT_SIZE;i++)
-            copied[i] = 0;
+        byte[] values = characteristic.getValue();
+        ByteBuffer bb = ByteBuffer.allocateDirect(values.length);
+        bb.order(null); //Little endian
+        for(int i=0;i<values.length;i++)
+            bb.put(values[i]);
 
-        seqNum = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 14).byteValue(); //till 255
+        short[] copied = new short[PACKET_CONTENT_SIZE];
+        for (int i = 0; i < PACKET_CONTENT_SIZE; i++)
+            copied[i] = bb.getShort(i*2);
+
+        seqNum = bb.get(14); //Reads a byte
         if (seqNum >= END) {
             endShotFormally(gatt);
         }

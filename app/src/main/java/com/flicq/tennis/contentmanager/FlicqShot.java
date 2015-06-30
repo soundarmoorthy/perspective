@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class FlicqShot {
     private ArrayList<Float> values;
@@ -18,10 +19,16 @@ public class FlicqShot {
     }
 
     public float[] getDataForRendering() {
-        float[] f = new float[values.size()];
-        for (int i=0;i<values.size();i++)
-            f[i] = values.get(i);
-        return f;
+        if(values == null)
+            return null;
+        synchronized (values) {
+            float[] f = new float[values.size()];
+            for (int i = 0; i < values.size(); i++)
+                f[i] = values.get(i);
+
+            return f;
+        }
+
     }
 
     public List<Float> getDataForUpload() {
@@ -34,9 +41,9 @@ public class FlicqShot {
             Assert.fail("The expected size of array should be 7, did you changed the size of the BLE input ?");
         //After processing the data we need to make sure that we
         //get them in the order we want, i.e ax,ay,az, q0,q1,q2,q3
-        for(int i=0;i<7;i++)
-        {
-            this.values.add(contents[i]);
+        synchronized (values) {
+            for (int i = 0; i < 7; i++)
+                this.values.add(contents[i]);
         }
     }
 }
