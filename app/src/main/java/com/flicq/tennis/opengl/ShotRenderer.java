@@ -40,9 +40,11 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         grid = new Grid();
         axis = new Axis();
         helper = new Helper();
-        cameraAngleX = -45;
-        cameraAngleY = 45;
+        cameraAngleX = CAMERA_ANGLE_X_RESET_VALUE;
+        cameraAngleY = CAMERA_ANGLE_Y_RESET_VALUE;
     }
+    private static final int CAMERA_ANGLE_X_RESET_VALUE = -45;
+    private static final int CAMERA_ANGLE_Y_RESET_VALUE = 45;
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -69,7 +71,8 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         this.height = height;
     }
 
-    public float idealZ = -6.0f;
+    private static final float IDEAL_Z_RESET_VALUE = -6.0f;
+    public float idealZ = IDEAL_Z_RESET_VALUE ;
     final float matrix[] = {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0};
     private int animation = 0;
 
@@ -176,7 +179,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
             gl.glMultMatrixf(matrix, 0);
             if (i == frame) {
-                line.draw(gl, true);
+                line.draw(gl, false);
             }
             gl.glPopMatrix();
 
@@ -204,7 +207,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
             gl.glEnable(GL10.GL_DEPTH_TEST);
             gl.glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
             gl.glDisable(GL10.GL_BLEND);
-            gl.glDrawArrays(GL10.GL_LINES, 0, count);
+            //gl.glDrawArrays(GL10.GL_LINES, 0, count);
 
             gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
         }
@@ -361,6 +364,22 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         oldX = x;
         oldY = y;
     }
+
+    public void zoomIn() {
+        idealZ *= 1.2;
+    }
+
+    public void zoomOut() {
+        idealZ *= 0.8;
+    }
+
+    public void resetView()
+    {
+        idealZ = IDEAL_Z_RESET_VALUE;
+        cameraAngleX = CAMERA_ANGLE_X_RESET_VALUE;
+        cameraAngleY = CAMERA_ANGLE_Y_RESET_VALUE;
+    }
+
 
     LocalSensorDataSimulator simulator;
     boolean simu_mode = false;

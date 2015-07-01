@@ -60,9 +60,9 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     }
 
     boolean simulator_mode = false; //For experimental purposes
+
     private void setupDeviceSimulator() {
-        if(simulator_mode)
-        {
+        if (simulator_mode) {
             IActivityAdapter adapter = this;
             LocalSensorDataSimulator simulator = new LocalSensorDataSimulator(adapter, shotRenderer);
             shotRenderer.setSimulator(simulator);
@@ -77,7 +77,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     }
 
     private void setupDeviceCapture() {
-        if(simulator_mode) {
+        if (simulator_mode) {
             this.writeToUi("SImulator mode, no device will be detected", false);
             return;
         }
@@ -90,13 +90,12 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         scrollViewTxtShotDataCached = (ScrollView) findViewById(R.id.txtShotDataScrollView);
         txtShotDataCached.setLineSpacing(0.0f, 1.2f);
     }
+
     private void setupRendering() {
         int initialScreenRotation = getScreenRotation();
         GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
-        shotRenderer = new ShotRenderer(1 /* Relative acceleration data */, initialScreenRotation);
+        shotRenderer = new ShotRenderer(2 /* Relative acceleration data */, initialScreenRotation);
         shotView.setRenderer(shotRenderer);
-        View.OnTouchListener listener = createOnTouchListener();
-        shotView.setOnTouchListener(listener);
         if (simulator_mode)
             setupDeviceSimulator();
         setupUIForRender();
@@ -302,26 +301,40 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
                 break;
             case R.id.btn_render:
                 setupUIForRender();
-                getLastShotAndDraw();
+                renderDeviceData();
                 break;
             case R.id.btn_engineering:
                 setupUIForLogging();
+                break;
+            case R.id.btn_zoomin:
+                zoomIn();
+                break;
+            case R.id.btn_zoomout:
+                zoomOut();
             default:
                 currentSystemState = SystemState.UNKNOWN;
         }
         updateUI(itemId);
     }
 
-    private void getLastShotAndDraw() {
-        renderDeviceData();
+    private void zoomIn()
+    {
+        shotRenderer.zoomIn();
+    }
+
+    private void zoomOut()
+    {
+        shotRenderer.zoomOut();
     }
 
     private void renderDeviceData() {
-        if(simulator_mode)
+        if (simulator_mode)
             return;
         FlicqShot shot = ContentStore.Instance().getShot();
-        float[] data = shot.getDataForRendering();
-        shotRenderer.Render(data);
+        if(shot != null) {
+            float[] data = shot.getDataForRendering();
+            shotRenderer.Render(data);
+        }
     }
 
     private void setupUIForLogging() {
@@ -330,6 +343,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
 
     private void setupUIForRender() {
         setVisibility(View.GONE, View.VISIBLE);
+        shotRenderer.resetView();
     }
 
     private void setVisibility(int display, int render) {
@@ -364,30 +378,25 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
 
     }
 
-    View.OnTouchListener createOnTouchListener() {
-        View.OnTouchListener listener = new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent event) {
-            int maskedAction = event.getActionMasked();
-            switch (maskedAction) {
-                case MotionEvent.ACTION_DOWN: {
-                    shotRenderer.setXY(event.getX(), event.getY());
-                    break;
-                }
-                case MotionEvent.ACTION_UP: {
-                    shotRenderer.resetDeltaXY();
-                    break;
-                }
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int maskedAction = event.getActionMasked();
+        switch (maskedAction) {
+            case MotionEvent.ACTION_DOWN: {
+                shotRenderer.setXY(event.getX(), event.getY());
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                shotRenderer.resetDeltaXY();
+                break;
+            }
 
-                case MotionEvent.ACTION_MOVE: { // a pointer was moved
-                    shotRenderer.move(event.getX(), event.getY());
-                    break;
-                }
+            case MotionEvent.ACTION_MOVE: { // a pointer was moved
+                shotRenderer.move(event.getX(), event.getY());
+                break;
             }
-                return false;
-            }
-        };
-        return listener;
+        }
+        return true;
     }
 }
 
