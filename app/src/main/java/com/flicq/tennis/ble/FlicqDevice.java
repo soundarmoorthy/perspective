@@ -33,6 +33,13 @@ public final class FlicqDevice
         stopScanAndConnectGatt(callback, adapter);
     }
 
+    private boolean stopRequested = false;
+    public void requestStopScan()
+    {
+        stopRequested = true;
+    }
+
+
     private void stopScanAndConnectGatt(final FlicqLeScanCallback callback,final BluetoothAdapter adapter)
     {
         new AsyncTask<Void, Void, Void>() {
@@ -42,8 +49,8 @@ public final class FlicqDevice
                     if (callback.connectionSuccessful()) {
                         adapter.stopLeScan(callback);
                         activityAdapter.writeToUi("BLE : LE Scan stopped.", false);
-                        BluetoothDevice device = callback.device();
-                        device.connectGatt(activityAdapter.GetApplicationContext(), false, new FlicqBluetoothGattCallback(activityAdapter));
+                            BluetoothDevice device = callback.device();
+                            device.connectGatt(activityAdapter.GetApplicationContext(), false, new FlicqBluetoothGattCallback(activityAdapter));
                         break;
                     }
                     Utils.SleepSomeTime(500);

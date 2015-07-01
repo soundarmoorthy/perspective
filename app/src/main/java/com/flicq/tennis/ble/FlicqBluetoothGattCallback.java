@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.flicq.tennis.contentmanager.AsyncContentProcessor;
 import com.flicq.tennis.framework.IActivityAdapter;
+import com.flicq.tennis.framework.StatusType;
 import com.flicq.tennis.framework.Utils;
 
 import java.nio.ByteBuffer;
@@ -111,6 +112,7 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         gatt.disconnect();
         gatt.close();
         activityAdapter.writeToUi("BLE ; Disconnected after receiving all shot data", false);
+        activityAdapter.SetStatus(StatusType.INFO, "Disconnected");
         current = 0;
     }
 }

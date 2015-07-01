@@ -25,10 +25,8 @@ public class FlicqShot {
             float[] f = new float[values.size()];
             for (int i = 0; i < values.size(); i++)
                 f[i] = values.get(i);
-
             return f;
         }
-
     }
 
     public List<Float> getDataForUpload() {

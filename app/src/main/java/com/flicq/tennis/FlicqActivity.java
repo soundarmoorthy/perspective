@@ -357,6 +357,11 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         currentSystemState = ble_on ? SystemState.CAPTURE : SystemState.STOPPED;
         if (currentSystemState == SystemState.CAPTURE)
             ConnectDevice();
+        if(currentSystemState == SystemState.STOPPED)
+        {
+            if(this.flicqDevice != null)
+                flicqDevice.requestStopScan();
+        }
     }
 
     private void updateUI(int itemId) {

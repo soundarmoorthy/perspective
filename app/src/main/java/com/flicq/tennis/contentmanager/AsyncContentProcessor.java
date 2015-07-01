@@ -70,8 +70,8 @@ public class AsyncContentProcessor {
 
                 float[] values = new float[content.length];
                 final float acc_lsb = 0.00012207f;
-                values[0] = content[0] * acc_lsb;
-                values[1] = content[1] * acc_lsb;
+                values[0] = content[1] * acc_lsb; //swap x and y
+                values[1] = content[0] * acc_lsb;
                 values[2] = content[2] * acc_lsb;
                 final float quaternionTimeScale = 30000f;
                 for (int i = 3; i < 7; i++)

@@ -41,11 +41,7 @@ public class Helper {
         vertexFloatBuffer.position(0);
     }
 
-    final boolean draw = false;
     public void draw(GL10 gl, float x, float y, float z) {
-        if(!draw)
-            return;
-
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 
         gl.glPushMatrix();
