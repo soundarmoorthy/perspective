@@ -9,9 +9,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class FlicqShot {
-    private ArrayList<Float> values;
+    private final Object valuesLock = new Object();
+    private final ArrayList<Float> values;
 
-    Time time;
+    private final Time time;
 
     public FlicqShot(Time time) {
         this.time = time;
@@ -21,7 +22,7 @@ public class FlicqShot {
     public float[] getDataForRendering() {
         if(values == null)
             return null;
-        synchronized (values) {
+        synchronized (valuesLock) {
             float[] f = new float[values.size()];
             for (int i = 0; i < values.size(); i++)
                 f[i] = values.get(i);
@@ -39,7 +40,7 @@ public class FlicqShot {
             Assert.fail("The expected size of array should be 7, did you changed the size of the BLE input ?");
         //After processing the data we need to make sure that we
         //get them in the order we want, i.e ax,ay,az, q0,q1,q2,q3
-        synchronized (values) {
+        synchronized (valuesLock) {
             for (int i = 0; i < 7; i++)
                 this.values.add(contents[i]);
         }

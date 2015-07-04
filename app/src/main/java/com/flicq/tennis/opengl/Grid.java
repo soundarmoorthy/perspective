@@ -6,8 +6,8 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-public class Grid {
-    private FloatBuffer vertexFloatBuffer; // Buffer for vertex-array
+class Grid {
+    private final FloatBuffer vertexFloatBuffer; // Buffer for vertex-array
 
     private float[] vertices = { // Vertices for top and bottom
     };

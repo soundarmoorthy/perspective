@@ -4,7 +4,6 @@ package com.flicq.tennis.contentmanager;
 import android.os.AsyncTask;
 import android.text.format.Time;
 import com.flicq.tennis.appengine.FlicqCloudRequestHandler;
-import com.flicq.tennis.framework.IActivityAdapter;
 
 /**
  * Created by soundararajan on 4/26/2015.

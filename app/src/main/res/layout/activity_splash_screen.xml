@@ -14,6 +14,7 @@
                 android:src="@mipmap/flicq_logo_splash"
                 android:maxHeight="400dp"
                 android:maxWidth="300dp"
+                android:contentDescription="This is the flicq logo"
                 />
         </LinearLayout>
 </FrameLayout>

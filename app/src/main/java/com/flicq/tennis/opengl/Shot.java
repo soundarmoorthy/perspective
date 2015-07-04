@@ -6,10 +6,10 @@ import java.nio.ByteBuffer;
 
         import javax.microedition.khronos.opengles.GL10;
 
-public class Shot {
-    private FloatBuffer vertexFloatBuffer; // Buffer for vertex-array
+class Shot {
+    private final FloatBuffer vertexFloatBuffer; // Buffer for vertex-array
 
-    private float[] vertices = { // Vertices for top and bottom
+    private final float[] vertices = { // Vertices for top and bottom
             0.0f, 0.0f, 0.0f,
             1.0f, 0.0f, 0.0f,
             0.0f, 0.2f, 0.0f,
@@ -48,7 +48,7 @@ public class Shot {
         //Disable the client state before leaving
         gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
     }
-    public void draw(GL10 gl) {
+    private void draw(GL10 gl) {
     	draw(gl);        
     }
 }

@@ -6,34 +6,33 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-public class Helper {
-    private FloatBuffer vertexFloatBuffer; // Buffer for vertex-array
+class Helper {
+    private final FloatBuffer vertexFloatBuffer; // Buffer for vertex-array
 
-    private float[] vertices = { // Vertices for top and bottom
-    		0.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 0.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-    		1.0f, 1.0f, 0.0f,
-            1.0f, 1.0f, 1.0f,
-
-            1.0f, 1.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
-            1.0f, 1.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            1.0f, 0.0f, 1.0f,
-            1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f,
-            0.0f, 1.0f, 1.0f,
-            0.0f, 1.0f, 0.0f,
-            0.0f, 1.0f, 1.0f,
-            0.0f, 0.0f, 1.0f
-    };
-    
 
     public Helper() {
 
+        float[] vertices = { // Vertices for top and bottom
+                0.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f, 0.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, 0.0f,
+                1.0f, 1.0f, 1.0f,
+
+                1.0f, 1.0f, 0.0f,
+                1.0f, 0.0f, 0.0f,
+                1.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,
+                1.0f, 0.0f, 1.0f,
+                1.0f, 0.0f, 0.0f,
+                1.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 1.0f,
+                0.0f, 1.0f, 1.0f,
+                0.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 1.0f,
+                0.0f, 0.0f, 1.0f
+        };
         ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect(vertices.length * 4);
         vertexByteBuffer.order(ByteOrder.nativeOrder());
         vertexFloatBuffer = vertexByteBuffer.asFloatBuffer();

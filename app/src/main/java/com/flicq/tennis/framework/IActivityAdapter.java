@@ -1,9 +1,6 @@
 package com.flicq.tennis.framework;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothGatt;
 import android.content.Context;
-import android.content.Intent;
 
 public interface IActivityAdapter {
 
@@ -11,7 +8,7 @@ public interface IActivityAdapter {
 
     Context GetApplicationContext();
 
-    void writeToUi(String str,boolean differs);
+    void writeToUi(String str);
 
     void onDisconnected();
 }

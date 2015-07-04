@@ -8,10 +8,10 @@ import android.bluetooth.BluetoothDevice;
 /**
  * Created by soundararajan on 4/13/2015.
  */
-public final class FlicqLeScanCallback implements BluetoothAdapter.LeScanCallback
+final class FlicqLeScanCallback implements BluetoothAdapter.LeScanCallback
 {
-    IActivityAdapter helper;
-    BluetoothDevice firstFoundDevice;
+    private final IActivityAdapter helper;
+    private BluetoothDevice firstFoundDevice;
     public FlicqLeScanCallback(IActivityAdapter helper)
     {
         this.helper = helper;
@@ -25,7 +25,7 @@ public final class FlicqLeScanCallback implements BluetoothAdapter.LeScanCallbac
                 address.equals("00:07:80:06:5B:4E")) { //Flicq demo device
             try {
                 helper.SetStatus(StatusType.INFO, "Yo, Connected to " + device.getName() + " !");
-                helper.writeToUi("Yo, Found Device " + device.getName() + " !. Let's Pair :-)", false);
+                helper.writeToUi("Yo, Found Device " + device.getName() + " !. Let's Pair :-)");
                 firstFoundDevice  = device;
             } catch (Exception ex) {
                 ex.printStackTrace();

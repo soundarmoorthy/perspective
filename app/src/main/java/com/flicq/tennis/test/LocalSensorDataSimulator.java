@@ -13,13 +13,13 @@ import com.flicq.tennis.opengl.ShotRenderer;
  * Created by soundararajan on 5/31/2015.
  */
 public class LocalSensorDataSimulator implements SensorEventListener {
-    IActivityAdapter activityAdapter;
+    private final IActivityAdapter activityAdapter;
     private final SensorManager sensorManager;
     private final Sensor accelerometer;
     private final Sensor rotationVector;
-    float[] quaternion = new float[4];
-    LocalSensorDataHandler handler;
-    ShotRenderer renderer;
+    private final float[] quaternion = new float[4];
+    private final LocalSensorDataHandler handler;
+    private final ShotRenderer renderer;
     public LocalSensorDataSimulator(IActivityAdapter adapter, ShotRenderer renderer)
     {
         this.renderer = renderer;
@@ -35,8 +35,8 @@ public class LocalSensorDataSimulator implements SensorEventListener {
     {
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this, rotationVector, SensorManager.SENSOR_DELAY_NORMAL);
-        activityAdapter.writeToUi("Simulator starting ...",false);
-        activityAdapter.writeToUi("Setup acceleromenter and rotation vector from local android",false);
+        activityAdapter.writeToUi("Simulator starting ...");
+        activityAdapter.writeToUi("Setup acceleromenter and rotation vector from local android");
     }
 
     public synchronized float[] getSensorData()
@@ -65,7 +65,7 @@ public class LocalSensorDataSimulator implements SensorEventListener {
             count =0;
         }
     }
-    int count = 0;
+    private int count = 0;
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {

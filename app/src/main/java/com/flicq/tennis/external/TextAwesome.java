@@ -10,7 +10,7 @@ import android.widget.TextView;
 public class TextAwesome extends TextView {
 
 	private final static String NAME = "FONTAWESOME";
-	private static LruCache<String, Typeface> sTypefaceCache = new LruCache<String, Typeface>(12);
+	private static final LruCache<String, Typeface> sTypefaceCache = new LruCache<String, Typeface>(12);
 
 	public TextAwesome(Context context) {
 		super(context);
@@ -23,7 +23,7 @@ public class TextAwesome extends TextView {
 		init();
 	}
 
-	public void init() {
+	private void init() {
 
 		Typeface typeface = sTypefaceCache.get(NAME);
 

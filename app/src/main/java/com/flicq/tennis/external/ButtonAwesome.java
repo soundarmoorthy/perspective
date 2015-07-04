@@ -10,7 +10,7 @@ import android.widget.Button;
 public class ButtonAwesome extends Button{
 
 	private final static String NAME = "FONTAWESOME";
-	private static LruCache<String, Typeface> sTypefaceCache = new LruCache<String, Typeface>(12);
+	private static final LruCache<String, Typeface> sTypefaceCache = new LruCache<String, Typeface>(12);
 
 	
 	public ButtonAwesome(Context context) {
@@ -27,7 +27,7 @@ public class ButtonAwesome extends Button{
 		init();	
 	}
 	
-	public void init(){
+	private void init(){
 		Typeface typeface = sTypefaceCache.get(NAME);
 
 		if (typeface == null) {

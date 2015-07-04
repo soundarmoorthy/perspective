@@ -1,7 +1,5 @@
 package com.flicq.tennis.appengine;
 
-import android.util.Log;
-
 import com.flicq.tennis.appengine.model.Shot;
 import com.flicq.tennis.contentmanager.FlicqShot;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -14,8 +12,8 @@ import java.io.IOException;
  * Created by soundararajan on 4/5/2015.
  */
 public final class FlicqCloudRequestHandler {
-    final Flicq flicq;
-    final Flicq.Builder builder;
+    private final Flicq flicq;
+    private final Flicq.Builder builder;
     public FlicqCloudRequestHandler() {
         builder = new Flicq.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null);
         flicq = builder.build();
@@ -28,13 +26,13 @@ public final class FlicqCloudRequestHandler {
             ioe.printStackTrace();
         }
     }
-    Flicq.FlicqEndpointService.Shots.Add query;
+    private Flicq.FlicqEndpointService.Shots.Add query;
 
-    public com.google.api.client.util.DateTime getTimestamp()
+    private com.google.api.client.util.DateTime getTimestamp()
     {
         return new com.google.api.client.util.DateTime(new java.util.Date().getTime());
     }
-    Shot shot;
+    private Shot shot;
     public void SendShot(FlicqShot source) {
         try {
             shot.setTime(getTimestamp());
@@ -53,8 +51,7 @@ public final class FlicqCloudRequestHandler {
             Flicq.Builder builder = new Flicq.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null);
             Flicq flicq = builder.build();
             query = flicq.flicqEndpointService().shots().list();
-            Flicq.FlicqEndpointService.Shots shots = query.execute();
-            return shots;
+            return query.execute();
         }catch(IOException ex)
         {
             ex.printStackTrace();

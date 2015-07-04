@@ -38,7 +38,7 @@ public class Flicq extends com.google.api.client.googleapis.services.json.Abstra
    *
    * @since 1.7
    */
-  public static final String DEFAULT_ROOT_URL = "https://united-creek-4711.appspot.com/_ah/api/";
+  private static final String DEFAULT_ROOT_URL = "https://united-creek-4711.appspot.com/_ah/api/";
 
   /**
    * The default encoded service path of the service. This is determined when the library is
@@ -46,7 +46,7 @@ public class Flicq extends com.google.api.client.googleapis.services.json.Abstra
    *
    * @since 1.7
    */
-  public static final String DEFAULT_SERVICE_PATH = "flicq/v1/";
+  private static final String DEFAULT_SERVICE_PATH = "flicq/v1/";
 
   /**
    * The default encoded base URL of the service. This is determined when the library is generated
@@ -88,7 +88,7 @@ public class Flicq extends com.google.api.client.googleapis.services.json.Abstra
   /**
    * @param builder builder
    */
-  Flicq(Builder builder) {
+  private Flicq(Builder builder) {
     super(builder);
   }
 
@@ -171,7 +171,7 @@ public class Flicq extends com.google.api.client.googleapis.services.json.Abstra
          * @param content the {@link com.flicq.tennis.appengine.model.Shot}
          * @since 1.13
          */
-        protected Add(Shot content) {
+        Add(Shot content) {
           super(Flicq.this, "PUT", REST_PATH, content, Void.class);
         }
 
@@ -247,7 +247,7 @@ public class Flicq extends com.google.api.client.googleapis.services.json.Abstra
          *
          * @since 1.13
          */
-        protected List() {
+        List() {
           super(Flicq.this, "GET", REST_PATH, null,Shots.class);
         }
 

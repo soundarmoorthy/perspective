@@ -20,14 +20,14 @@ public class SplashScreen extends Activity {
         setContentView(R.layout.activity_splash_screen);
         final View controlsView = findViewById(R.id.fullscreen_content_controls);
 
-        SystemUiHider mSystemUiHider = SystemUiHider.getInstance(this, controlsView, SystemUiHider.FLAG_HIDE_NAVIGATION);
+        SystemUiHider mSystemUiHider = SystemUiHider.getInstance(this, controlsView);
        mSystemUiHider.setup();
         mSystemUiHider
                 .setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
                     @Override
                     public void onVisibilityChange(boolean visible) {
                         controlsView.setVisibility(visible ? View.VISIBLE : View.GONE);
-                        delayedHide(AUTO_HIDE_DELAY_MILLIS);
+                        delayedHide();
                     }
                 });
     }
@@ -35,19 +35,19 @@ public class SplashScreen extends Activity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        delayedHide(AUTO_HIDE_DELAY_MILLIS);
+        delayedHide();
     }
 
     View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            delayedHide(AUTO_HIDE_DELAY_MILLIS);
+            delayedHide();
             return false;
         }
     };
 
-    Handler mHideHandler = new Handler();
-    Runnable mHideRunnable = new Runnable() {
+    private final Handler mHideHandler = new Handler();
+    private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
             startActivity(new Intent(SplashScreen.this, FlicqActivity.class));
@@ -55,8 +55,8 @@ public class SplashScreen extends Activity {
         }
     };
 
-    private void delayedHide(int delayMillis) {
+    private void delayedHide() {
         mHideHandler.removeCallbacks(mHideRunnable);
-        mHideHandler.postDelayed(mHideRunnable, delayMillis);
+        mHideHandler.postDelayed(mHideRunnable, SplashScreen.AUTO_HIDE_DELAY_MILLIS);
     }
 }

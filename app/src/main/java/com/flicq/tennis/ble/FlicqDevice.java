@@ -5,11 +5,10 @@ import android.os.AsyncTask;
 import com.flicq.tennis.framework.Utils;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.StatusType;
-import com.flicq.tennis.test.LocalSensorDataSimulator;
 
 public final class FlicqDevice
 {
-    IActivityAdapter activityAdapter;
+    private final IActivityAdapter activityAdapter;
     public FlicqDevice(IActivityAdapter activityAdapter)
     {
         this.activityAdapter = activityAdapter;
@@ -28,15 +27,14 @@ public final class FlicqDevice
         //UUID []flicqServiceUUID = {UUID.fromString(FlicqBluetoothGattCallback.FLICQ_SERVICE_GATT_UUID)};
         //adapter.startLeScan(flicqServiceUUID, callback);
         adapter.startLeScan(callback);
-        activityAdapter.writeToUi("BLE : LE Scan started", false);
+        activityAdapter.writeToUi("BLE : LE Scan started");
 
         stopScanAndConnectGatt(callback, adapter);
     }
 
-    private boolean stopRequested = false;
     public void requestStopScan()
     {
-        stopRequested = true;
+        boolean stopRequested = true;
     }
 
 
@@ -48,13 +46,13 @@ public final class FlicqDevice
                 while (true) {
                     if (callback.connectionSuccessful()) {
                         adapter.stopLeScan(callback);
-                        activityAdapter.writeToUi("BLE : LE Scan stopped.", false);
+                        activityAdapter.writeToUi("BLE : LE Scan stopped.");
                             BluetoothDevice device = callback.device();
                             device.connectGatt(activityAdapter.GetApplicationContext(), false, new FlicqBluetoothGattCallback(activityAdapter));
                         break;
                     }
                     Utils.SleepSomeTime(500);
-                    activityAdapter.writeToUi("BLE : StopScan() : Poll conn. complete with 500ms interval", false);
+                    activityAdapter.writeToUi("BLE : StopScan() : Poll conn. complete with 500ms interval");
                 }
                 return null;
             }

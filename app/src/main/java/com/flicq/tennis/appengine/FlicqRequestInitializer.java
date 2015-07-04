@@ -79,7 +79,7 @@ package com.flicq.tennis.appengine;
  *
  * @since 1.12
  */
-public class FlicqRequestInitializer extends com.google.api.client.googleapis.services.json.CommonGoogleJsonClientRequestInitializer {
+class FlicqRequestInitializer extends com.google.api.client.googleapis.services.json.CommonGoogleJsonClientRequestInitializer {
 
   public FlicqRequestInitializer() {
     super();
@@ -116,6 +116,6 @@ public class FlicqRequestInitializer extends com.google.api.client.googleapis.se
    *
    * @throws java.io.IOException I/O exception
    */
-  protected void initializeFlicqRequest(FlicqRequest<?> request) throws java.io.IOException {
+  private void initializeFlicqRequest(FlicqRequest<?> request) throws java.io.IOException {
   }
 }

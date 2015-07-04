@@ -6,21 +6,20 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-public class Axis {
-    private FloatBuffer vertexFloatBuffer; // Buffer for vertex-array
+class Axis {
+    private final FloatBuffer vertexFloatBuffer; // Buffer for vertex-array
 
-    private float[] vertices = { // Vertices for top and bottom
-    		10.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.0f,
-            0.0f, 10.0f, 0.0f,
-            0.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 10.0f,
-            0.0f, 0.0f, 0.0f
-    };
-    
 
     public Axis() {
 
+        float[] vertices = { // Vertices for top and bottom
+                10.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, 0.0f,
+                0.0f, 10.0f, 0.0f,
+                0.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, 10.0f,
+                0.0f, 0.0f, 0.0f
+        };
         ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect(vertices.length * 4);
         vertexByteBuffer.order(ByteOrder.nativeOrder());
         vertexFloatBuffer = vertexByteBuffer.asFloatBuffer();

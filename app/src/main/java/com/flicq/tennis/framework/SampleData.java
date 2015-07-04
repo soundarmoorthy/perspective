@@ -1,6 +1,6 @@
 package com.flicq.tennis.framework;
 
-public final class SampleData {
+final class SampleData {
 
     //Ax, Ay, Az, q0, q1, q2, q3
     public static float set[] = {

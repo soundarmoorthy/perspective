@@ -21,11 +21,12 @@ at any given time. Unlike the otherwise equivalent newScheduledThreadPool(1) the
 executor is guaranteed not to be reconfigurable to use additional threads.*/
 public class AsyncContentProcessor {
 
-    ExecutorService executorQueue;
-    private IActivityAdapter adapter;
-    int count;
-    long startTime, endTime;
-    ContentStore store;
+    private final ExecutorService executorQueue;
+    private final IActivityAdapter adapter;
+    private int count;
+    private long startTime;
+    private long endTime;
+    private final ContentStore store;
 
    public AsyncContentProcessor(IActivityAdapter varAdapter)
    {
@@ -38,7 +39,7 @@ public class AsyncContentProcessor {
     public void connected() {
         count = 0;
         startTime = System.currentTimeMillis();
-        adapter.writeToUi("BLE : Connected Device", false);
+        adapter.writeToUi("BLE : Connected Device");
     }
 
     public void disconnected()
@@ -49,13 +50,13 @@ public class AsyncContentProcessor {
     private void displayStats()
     {
         endTime = System.currentTimeMillis();
-        adapter.writeToUi("BLE : Disconnected Device ", false);
-        adapter.writeToUi("BLE Report", false);
-        adapter.writeToUi("Time taken : " + String.valueOf((endTime - startTime) / 1000) + " seconds", false);
-        adapter.writeToUi("Packets Received" + String.valueOf(count), false);
+        adapter.writeToUi("BLE : Disconnected Device ");
+        adapter.writeToUi("BLE Report");
+        adapter.writeToUi("Time taken : " + String.valueOf((endTime - startTime) / 1000) + " seconds");
+        adapter.writeToUi("Packets Received" + String.valueOf(count));
     }
 
-    public void RunAsync(final long relativeTimeDiffInMilli,final short[] content) {
+    public void RunAsync(final short[] content) {
         executorQueue.submit(new Runnable() {
             @Override
             public void run() {
@@ -86,21 +87,12 @@ public class AsyncContentProcessor {
 
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < 7; i++)
-                    builder.append(String.valueOf(values[i]) + ",");
-                adapter.writeToUi(builder.toString(), false);
+                    builder.append(String.valueOf(values[i])).append(",");
+                adapter.writeToUi(builder.toString());
                 store.Dump(values);
             }
         });
     }
-
-//    private static float[] getParsedContent(byte[] content) {
-//       float[] parsedData = new float[content.length /2];
-//        for(int i=0;i<parsedData.length;i++)
-//        {
-//            parsedData[i] = content[i] + (content[i+1] << 8);
-//        }
-//        return parsedData;
-//    }
 
     public void beginShot()
     {
@@ -112,23 +104,6 @@ public class AsyncContentProcessor {
         store.ShotDone();
     }
 
-//    private static String parse(final byte[] data) {
-//        if (data == null || data.length == 0)
-//            return "";
-//        final char[] out = new char[data.length * 3 - 1];
-//        for (int j = 0; j < data.length; j++) {
-//            int v = data[j] & 0xFF;
-//            out[j * 3] = HEX_ARRAY[v >>> 4];
-//            out[j * 3 + 1] = HEX_ARRAY[v & 0x0F];
-//            if (j != data.length - 1)
-//                out[j * 3 + 2] = '-';
-//        }
-//        return new String(out);
-//    }
-//    final private static char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
-
-    private long previousTime = 0;
-    private boolean show = true;
     private void UpdateStatus() {
         int percent = ((count * 100) / FlicqBluetoothGattCallback.END);
         if (percent > 100) percent = 100;

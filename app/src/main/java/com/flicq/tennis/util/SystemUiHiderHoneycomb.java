@@ -42,7 +42,7 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
      * Constructor not intended to be called by clients. Use
      * {@link SystemUiHider#getInstance} to obtain an instance.
      */
-    protected SystemUiHiderHoneycomb(Activity activity, View anchorView, int flags) {
+    SystemUiHiderHoneycomb(Activity activity, View anchorView, int flags) {
         super(activity, anchorView, flags);
 
         mShowFlags = View.SYSTEM_UI_FLAG_VISIBLE;
@@ -100,7 +100,7 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
         return mVisible;
     }
 
-    private View.OnSystemUiVisibilityChangeListener mSystemUiVisibilityChangeListener
+    private final View.OnSystemUiVisibilityChangeListener mSystemUiVisibilityChangeListener
             = new View.OnSystemUiVisibilityChangeListener() {
         @Override
         public void onSystemUiVisibilityChange(int vis) {

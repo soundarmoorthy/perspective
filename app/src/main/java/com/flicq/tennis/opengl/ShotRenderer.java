@@ -19,22 +19,22 @@ import android.opengl.GLU;
 import android.os.Environment;
 
 import com.flicq.tennis.contentmanager.ContentStore;
-import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.test.LocalSensorDataSimulator;
 
 
 public class ShotRenderer implements GLSurfaceView.Renderer {
 
-    Line line;
-    Grid grid;
-    Axis axis;
-    Helper helper;
-    int screenRotation;
-    int width, height;
-    private float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
+    private final Line line;
+    private final Grid grid;
+    private final Axis axis;
+    private final Helper helper;
+    private final int screenRotation;
+    private int width;
+    private int height;
+    private final float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
 
-    public ShotRenderer(int mode, int screenRotation) {
-        this.mode = mode;
+    public ShotRenderer(int screenRotation) {
+        this.mode = 2;
         this.screenRotation = screenRotation;
         line = new Line();
         grid = new Grid();
@@ -73,7 +73,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
     private static final float IDEAL_Z_RESET_VALUE = -6.0f;
     public float idealZ = IDEAL_Z_RESET_VALUE ;
-    final float matrix[] = {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0};
+    private final float[] matrix = {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0};
     private int animation = 0;
 
     private void renderFusionData(GL10 gl, float[] data, int frame, int mode) {
@@ -179,7 +179,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
             gl.glMultMatrixf(matrix, 0);
             if (i == frame) {
-                line.draw(gl, false);
+                line.draw(gl);
             }
             gl.glPopMatrix();
 
@@ -315,7 +315,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     }
 
     private boolean render = false;
-    float[] set;
+    private float[] set;
 
 
     private void SetData(float[] set) {
@@ -333,18 +333,22 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     }
 
     float q0f, q1f, q2f, q3;
-    float af, xf, yf, z;
-    public float deltaX;
-    public float deltaY;
+    float af;
+    private float xf;
+    private float yf;
+    float z;
+    private float deltaX;
+    private float deltaY;
     private int cameraAngleX;
     private int cameraAngleY;
 
-    public boolean screenshot_request = false;
-    public boolean animation_use = false;
-    public boolean animation_play = false;
+    private boolean screenshot_request = false;
+    private final boolean animation_use = false;
+    private final boolean animation_play = false;
     private int mode = 2;
 
-    float oldX, oldY;
+    private float oldX;
+    private float oldY;
 
     public void resetDeltaXY() {
         deltaX = 0.0f;
@@ -365,14 +369,6 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         oldY = y;
     }
 
-    public void zoomIn() {
-        idealZ *= 1.2;
-    }
-
-    public void zoomOut() {
-        idealZ *= 0.8;
-    }
-
     public void resetView()
     {
         idealZ = IDEAL_Z_RESET_VALUE;
@@ -381,8 +377,8 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     }
 
 
-    LocalSensorDataSimulator simulator;
-    boolean simu_mode = false;
+    private LocalSensorDataSimulator simulator;
+    private boolean simu_mode = false;
 
     public void setSimulator(LocalSensorDataSimulator simulator) {
         this.simulator = simulator;

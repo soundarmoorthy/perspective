@@ -49,31 +49,13 @@
                 android:onClick="onClick"
                 android:text="@string/fa_pencil_square_o"/>
 
-            <com.flicq.tennis.external.ButtonAwesome
-                android:id="@+id/btn_zoomin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:textColor="@color/flicq_red"
-                android:onClick="onClick"
-                android:text="@string/fa_minus_square_o"/>
-
-            <com.flicq.tennis.external.ButtonAwesome
-                android:id="@+id/btn_zoomout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:textColor="@color/flicq_red"
-                android:onClick="onClick"
-                android:text="@string/fa_plus_square_o"/>
-
         </LinearLayout>
     </HorizontalScrollView>
 
     <LinearLayout
         android:id="@+id/graphicFrame"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="0dp"
         android:layout_weight="50"
         android:background="@color/white"
         android:orientation="vertical"
@@ -100,7 +82,7 @@
             android:textColor="@color/black_overlay"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="10sp"
+            android:textSize="12sp"
             android:textIsSelectable="true"
             android:visibility="gone" />
         </ScrollView>
