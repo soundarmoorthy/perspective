@@ -71,8 +71,6 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         }
     }
 
-    private long previous = 0;
-    private long current;
     public static final int END = 249; //In 250 packets last packet seems meaningless
     private boolean enough = false;
     private static final int PACKET_CONTENT_SIZE = 7;
@@ -82,7 +80,6 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
         if (characteristic == null || enough)
             return;
-        current = Calendar.getInstance().getTimeInMillis();
 
         /* packet size 16 bytes, packet content 15 bytes */
         /* ------------------------------------------------------------------
@@ -91,18 +88,16 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         byte[] values = characteristic.getValue();
         ByteBuffer bb = ByteBuffer.allocateDirect(values.length);
         bb.order(ByteOrder.LITTLE_ENDIAN); //Little endian
-        for (byte value : values) bb.put(value);
-
+        bb.put(values);
         short[] copied = new short[PACKET_CONTENT_SIZE];
         for (int i = 0; i < PACKET_CONTENT_SIZE; i++)
-            copied[i] = bb.getShort(i*2);
+            copied[i] = bb.getShort(i * 2);
 
         seqNum = bb.get(14); //Reads a byte
         if (seqNum >= END) {
             endShotFormally(gatt);
         }
         processor.RunAsync(copied);
-        previous = current;
     }
 
     private void endShotFormally(BluetoothGatt gatt) {
@@ -112,6 +107,5 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         gatt.close();
         activityAdapter.writeToUi("BLE ; Disconnected after receiving all shot data");
         activityAdapter.SetStatus(StatusType.INFO, "Disconnected");
-        current = 0;
     }
 }

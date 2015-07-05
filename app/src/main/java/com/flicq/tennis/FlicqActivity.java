@@ -20,7 +20,11 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -60,6 +64,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     public void onCreate(Bundle savedInstanceState) {
         onCreateInitialSetup(savedInstanceState);
         //Do anything after this.
+        showSplashScreenAnimation();
         setupLog();
         setupDeviceCapture();
         setupRendering();
@@ -71,6 +76,44 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
 
         setupExitButton();
         this.SetStatus(StatusType.INFO, "Welcome !");
+    }
+
+    private void showSplashScreenAnimation() {
+        final View image = findViewById(R.id.fullscreen_content_controls);
+        Animation fadeOut = new AlphaAnimation(1,0);
+        fadeOut.setDuration(2000);
+        image.setAnimation(fadeOut);
+        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                findViewById(R.id.fullscreen_content_controls).setVisibility(View.GONE);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+        });
+        fadeOut.start();
+
+        Animation fadeIn = new AlphaAnimation(0,1);
+        fadeIn.setDuration(2000);
+        final View panelView = findViewById(R.id.flicq_app_controls);
+        panelView.setAnimation(fadeIn);
+        fadeIn.setStartTime(System.currentTimeMillis()+1200);
+        fadeIn.start();
+        fadeIn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                findViewById(R.id.flicq_app_controls).setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+        });
     }
 
     private void setupDeviceSimulator() {

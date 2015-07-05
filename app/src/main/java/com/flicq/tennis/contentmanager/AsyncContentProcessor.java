@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
  * Created by soundararajan on 5/10/2015.
  */
 
-/*Creates a single-threaded executor that can invoke commands to execute periodically.
+/*Creates a single-threaded executor that can invoke commands to execute in order.
 (Note however that if this single thread terminates due to a failure during execution
 prior to shutdown, a new one will take its place if needed to execute subsequent tasks.)
 Tasks are guaranteed to execute sequentially, and no more than one task will be active
@@ -75,8 +75,8 @@ public class AsyncContentProcessor {
 
                 float[] curr_vector = new float[content.length];
                 final float acc_lsb = 0.00012207f;
-                curr_vector[0] = content[1] * acc_lsb; //swap x and y
-                curr_vector[1] = content[0] * acc_lsb;
+                curr_vector[0] = content[0] * acc_lsb;
+                curr_vector[1] = content[1] * acc_lsb;
                 curr_vector[2] = content[2] * acc_lsb;
                 final float quaternionTimeScale = 30000f;
                 for (int i = 3; i < 7; i++)
@@ -93,7 +93,7 @@ public class AsyncContentProcessor {
                 Apply a low pass filter to the input data, there is some noise with the data.
                 For details on why the coefficient and the formula are designed as below refer
                 https://docs.google.com/a/flicq.com/spreadsheets/d/1dJ7NqB53NAxAjDWXhSqR6GC9I7OR9dAnqYcR0ZxxliU/edit?usp=sharing
-                You should have a authorized flicq account to see this document.
+                You should have a authorized flicq account to see the above document.
                 */
                 final float filterCoefficient = 0.9f;
                 for(int i=3,k=0;i < 7; i++, k++)

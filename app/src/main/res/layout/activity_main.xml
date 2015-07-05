@@ -1,7 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?> <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
     android:layout_height="match_parent"
     android:gravity="top"
     android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/flicq_app_controls"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
     <HorizontalScrollView
         android:layout_width="fill_parent"
@@ -53,6 +61,8 @@
     </HorizontalScrollView>
 
     <LinearLayout
+
+
         android:id="@+id/graphicFrame"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
@@ -95,6 +105,7 @@
                 android:background="@color/white"
                 android:layout_width="5dp"
                 android:layout_height="fill_parent" />
+
         <com.flicq.tennis.external.TextAwesome
             android:id="@+id/txt_status_icon"
             android:layout_width="wrap_content"
@@ -117,3 +128,21 @@
             android:text="@string/fa_info"/>
         </LinearLayout>
 </LinearLayout>
+        <LinearLayout android:id="@+id/fullscreen_content_controls" style="?metaButtonBarButtonStyle"
+            android:layout_width="fill_parent" android:layout_height="fill_parent"
+            android:layout_gravity="center_horizontal"
+            android:visibility="visible"
+            android:background="@color/white" android:orientation="vertical"
+            android:weightSum="1">
+            <ImageView
+                android:layout_width="94dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/img_flicq_logo_splash"
+                android:src="@mipmap/flicq_logo_splash"
+                android:maxHeight="400dp"
+                android:maxWidth="300dp"
+                android:contentDescription="This is the flicq logo"
+                android:layout_gravity="center"
+                android:layout_weight="0.33" />
+        </LinearLayout>
+    </LinearLayout>
