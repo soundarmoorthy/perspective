@@ -73,7 +73,7 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
 
     private long previous = 0;
     private long current;
-    public static final int END = 250;
+    public static final int END = 249; //In 250 packets last packet seems meaningless
     private boolean enough = false;
     private static final int PACKET_CONTENT_SIZE = 7;
     private byte seqNum;
