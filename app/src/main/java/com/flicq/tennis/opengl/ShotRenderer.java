@@ -34,7 +34,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     private final float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
 
     public ShotRenderer(int screenRotation) {
-        this.mode = 2;
+        this.mode = 1;
         this.screenRotation = screenRotation;
         line = new Line();
         grid = new Grid();
@@ -79,7 +79,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     private void renderFusionData(GL10 gl, float[] data, int frame, int mode) {
 
         int count = data.length / 7;
-        float x = 0f, y = 0f, z = 0;
+        float x = 0.0f, y = 0.0f, z = 0.0f;
         float vx = 0f, vy = 0f, vz = 0;
         float[] pointData = new float[count * 6 * 2];
         for (int i = 0; i < count; i++) {
@@ -115,56 +115,56 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
             matrix[10] = 1.0f - 2.0f * (x2 + y2);
             matrix[11] = 0.0f;
 
-            switch (mode) {
-                case 0: {
-                    x = data[i * 7 + 0];
-                    y = data[i * 7 + 1];
-                    z = data[i * 7 + 2];
-                    break;
-                }
-                case 1: {
-                    vx += data[i * 7 + 0];
-                    vy += data[i * 7 + 1];
-                    vz += data[i * 7 + 2];
-
-                    float friction = 0.8f;
-                    vx *= friction;
-                    vy *= friction;
-                    vz *= friction;
-
-                    x += vx * 0.01f;
-                    y += vy * 0.01f;
-                    z += vz * 0.01f;
-                    break;
-                }
-                case 2: {
-
-                    float ax = data[i * 7 + 0];
-                    float ay = data[i * 7 + 1];
-                    float az = data[i * 7 + 2];
-
-                    float qax = ax * matrix[0] + ay * matrix[4] + az * matrix[8];
-                    float qay = ax * matrix[1] + ay * matrix[5] + az * matrix[9];
-                    float qaz = ax * matrix[2] + ay * matrix[6] + az * matrix[10];
-
-                    ax = qax;
-                    ay = qay;
-                    az = qaz;
-                    vx += ax;
-                    vy += ay;
-                    vz += az;
-                    float friction = 0.8f;
-                    vx *= friction;
-                    vy *= friction;
-                    vz *= friction;
-
-                    x += vx * 0.01f;
-                    y += vy * 0.01f;
-                    z += vz * 0.01f;
-
-                    break;
-                }
-            }
+//            switch (mode) {
+//                case 0: {
+//                    x = data[i * 7 + 0];
+//                    y = data[i * 7 + 1];
+//                    z = data[i * 7 + 2];
+//                    break;
+//                }
+//                case 1: {
+//                    vx += data[i * 7 + 0];
+//                    vy += data[i * 7 + 1];
+//                    vz += data[i * 7 + 2];
+//
+//                    float friction = 0.8f;
+//                    vx *= friction;
+//                    vy *= friction;
+//                    vz *= friction;
+//
+//                    x += vx * 0.01f;
+//                    y += vy * 0.01f;
+//                    z += vz * 0.01f;
+//                    break;
+//                }
+//                case 2: {
+//
+//                    float ax = data[i * 7 + 0];
+//                    float ay = data[i * 7 + 1];
+//                    float az = data[i * 7 + 2];
+//
+//                    float qax = ax * matrix[0] + ay * matrix[4] + az * matrix[8];
+//                    float qay = ax * matrix[1] + ay * matrix[5] + az * matrix[9];
+//                    float qaz = ax * matrix[2] + ay * matrix[6] + az * matrix[10];
+//
+//                    ax = qax;
+//                    ay = qay;
+//                    az = qaz;
+//                    vx += ax;
+//                    vy += ay;
+//                    vz += az;
+//                    float friction = 0.8f;
+//                    vx *= friction;
+//                    vy *= friction;
+//                    vz *= friction;
+//
+//                    x += vx * 0.01f;
+//                    y += vy * 0.01f;
+//                    z += vz * 0.01f;
+//
+//                    break;
+//                }
+//            }
 
             pointData[i * 6 + 0] = x;
             pointData[i * 6 + 1] = y;
@@ -215,8 +215,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        if (simu_mode)
-            SetData(simulator.getSensorData());
+        render = false;
         cameraAngleX += deltaX;
         cameraAngleY += deltaY;
         deltaX = 0;
@@ -230,7 +229,12 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
         gl.glRotatef(rotationDegrees[this.screenRotation], 0f, 0f, 1);  // portrait/landscape rotation
 
-        if (ContentStore.Instance() != null) {
+
+        if (simu_mode) {
+            SetData(simulator.getSensorData());
+            render = true;
+        }
+        else if (ContentStore.Instance() != null ) {
             if (ContentStore.Instance().getShot() != null) {
                 if (ContentStore.Instance().getShot().getDataForRendering() != null) {
                     SetData(ContentStore.Instance().getShot().getDataForRendering());
@@ -345,7 +349,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     private boolean screenshot_request = false;
     private final boolean animation_use = false;
     private final boolean animation_play = false;
-    private int mode = 2;
+    private int mode = 1;
 
     private float oldX;
     private float oldY;

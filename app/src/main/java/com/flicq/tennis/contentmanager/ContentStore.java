@@ -22,10 +22,11 @@ public class ContentStore {
     private final Object currentShotLock = new Object();
 
     public void NewShot() {
-        synchronized (currentShotLock) {
             long id = System.currentTimeMillis();
             Time time = new Time();
             time.setToNow();
+        synchronized (currentShotLock) {
+            currentShot = null;
             currentShot = new FlicqShot(time);
         }
     }
