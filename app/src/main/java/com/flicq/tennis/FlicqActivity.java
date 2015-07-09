@@ -31,21 +31,25 @@ import android.widget.TextView;
 import com.flicq.tennis.ble.FlicqDevice;
 import com.flicq.tennis.contentmanager.ContentStore;
 import com.flicq.tennis.contentmanager.FlicqShot;
+import com.flicq.tennis.contentmanager.SensorData;
 import com.flicq.tennis.external.ButtonAwesome;
 import com.flicq.tennis.external.TextAwesome;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.StatusType;
 import com.flicq.tennis.framework.SystemState;
 import com.flicq.tennis.opengl.ShotRenderer;
+import com.flicq.tennis.opengl.TextureCubeRenderer;
 import com.flicq.tennis.test.LocalSensorDataSimulator;
 import com.flicq.tennis.events.*;
+
+import java.util.List;
 
 public class FlicqActivity extends Activity implements IActivityAdapter, View.OnClickListener
 {
 
     private static final int BLUETOOTH_ENABLE_REQUEST_CODE = 4711;
     private FlicqDevice flicqDevice = null;
-    private ShotRenderer shotRenderer = null;
+    private TextureCubeRenderer shotRenderer = null;
     private SystemState currentSystemState;
     private final boolean simulator_mode = false; //For experimental purposes
     private TextView txtShotDataCached;
@@ -69,10 +73,10 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         setupDeviceCapture();
         setupRendering();
 
-        mScaleDetector = new ScaleGestureDetector(this,new ScaleListener(shotRenderer));
-        DoubleTapListener dTapListener = new DoubleTapListener(shotRenderer);
-        mDetector = new GestureDetectorCompat(getApplicationContext(), dTapListener);
-        mDetector.setOnDoubleTapListener(dTapListener);
+//        mScaleDetector = new ScaleGestureDetector(this,new ScaleListener(shotRenderer));
+//        DoubleTapListener dTapListener = new DoubleTapListener(shotRenderer);
+//        mDetector = new GestureDetectorCompat(getApplicationContext(), dTapListener);
+//        mDetector.setOnDoubleTapListener(dTapListener);
 
         setupExitButton();
         this.SetStatus(StatusType.INFO, "Welcome !");
@@ -118,10 +122,10 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
 
     private void setupDeviceSimulator() {
         if (simulator_mode) {
-            IActivityAdapter adapter = this;
-            LocalSensorDataSimulator simulator = new LocalSensorDataSimulator(adapter, shotRenderer);
-            shotRenderer.setSimulator(simulator);
-            simulator.Start();
+//            IActivityAdapter adapter = this;
+//            LocalSensorDataSimulator simulator = new LocalSensorDataSimulator(adapter, shotRenderer);
+//            //shotRenderer.setSimulator(simulator);
+//            simulator.Start();
         }
     }
 
@@ -146,11 +150,65 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         txtShotDataCached.setLineSpacing(0.0f, 1.2f);
     }
 
+    final int roomSurfaces[] = { R.drawable.front_wall,
+            R.drawable.left_wall_with_door, R.drawable.back_wall,
+            R.drawable.right_wall_with_door, R.drawable.roof, R.drawable.floor };
+    final int pcbSurfaces[] = { R.drawable.pcb_sides, R.drawable.pcb_sides,
+            R.drawable.pcb_sides, R.drawable.pcb_sides, R.drawable.rev5_pcb_top,
+            R.drawable.rev5_pcb_bottom };
+    final int wigoSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
+            R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.wigo_top,
+            R.drawable.wigo_bottom };
+    final int kl25zMultiSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
+            R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
+            R.drawable.kl25z_bottom };
+    final int kl26zMultiSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
+            R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
+            R.drawable.kl26z_bottom };
+    final int kl46zMultiSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
+            R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
+            R.drawable.kl46z_bottom };
+    final int kl46zSingleSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
+            R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.kl46z_top,
+            R.drawable.kl46z_bottom };
+    final int k64fMultiSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
+            R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
+            R.drawable.k64f_bottom };
+    final int k20d50mMultiSurfaces[] = { R.drawable.wigo_sides, R.drawable.wigo_sides,
+            R.drawable.wigo_sides, R.drawable.wigo_sides, R.drawable.sensor_shield_top,
+            R.drawable.k20d50m_bottom };
+
+    // define standard dimensions for the graphics files above
+    final float roomDimensions[] = { 4.8f, 4.8f, 1.456f, 0.0f }; // width, length,
+    // height and Z
+    // offset. Room
+    // dimensions are
+    // twice these
+    // numbers
+    final float pcbDimensions[] = { 0.96f, 1.5f, 0.05f, -2.5f };
+    final float freedomDimensions[] = { 1.05f, 1.55f, 0.05f, -2.5f };
+    final float wigoDimensions[] = { 1.05f, 1.875f, 0.05f, -2.5f };
+
     private void setupRendering() {
         int initialScreenRotation = getScreenRotation();
         GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
-        shotRenderer = new ShotRenderer( /* Relative acceleration data */ initialScreenRotation);
+        shotRenderer = new TextureCubeRenderer( /* Relative acceleration data */ initialScreenRotation, this);
+
+       //shotRenderer = new TextureCubeRenderer(initialScreenRotation, this);
+
+        shotRenderer.addCube(pcbSurfaces, pcbDimensions, "Rev5 board")	;
+        shotRenderer.addCube(kl25zMultiSurfaces, freedomDimensions, "KL25Z with MULTI-sensor board")	;
+        shotRenderer.addCube(k20d50mMultiSurfaces, freedomDimensions, "K20D50M with MULTI-sensor board")	;
+        shotRenderer.addCube(wigoSurfaces, wigoDimensions, "WiGo board")	;
+        shotRenderer.addCube(kl26zMultiSurfaces, freedomDimensions, "KL26Z with MULTI-sensor board")	;
+        shotRenderer.addCube(k64fMultiSurfaces, freedomDimensions, "K64F with MULTI-sensor board")	;
+        shotRenderer.addCube(pcbSurfaces, pcbDimensions, "Rev5 board")	;	// This is a dummy for the space reserved for KL16Z
+        shotRenderer.addCube(kl46zMultiSurfaces, freedomDimensions, "KL46Z with MULTI-sensor board")	;
+        shotRenderer.addCube(kl46zSingleSurfaces, freedomDimensions, "Standalone KL46Z board")	;
+        shotRenderer.selectCube();
+
         shotView.setRenderer(shotRenderer);
+
         if (simulator_mode)
             setupDeviceSimulator();
         setupUIForRender();
@@ -365,8 +423,8 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
             return;
         FlicqShot shot = ContentStore.Instance().getShot();
         if (shot != null) {
-            float[] data = shot.getDataForRendering();
-            shotRenderer.Render(data);
+            //List<SensorData> data= shot.getDataForRendering();
+            //shotRenderer.Render(data);
         }
     }
 
@@ -376,7 +434,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
 
     private void setupUIForRender() {
         setVisibility(View.GONE, View.VISIBLE);
-        shotRenderer.resetView();
+        //shotRenderer.resetView();
     }
 
     private void setVisibility(int display, int render) {
@@ -421,17 +479,17 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         if(handled)
             return true;
         int maskedAction = event.getActionMasked();
-        switch (maskedAction) {
-            case MotionEvent.ACTION_DOWN:
-                shotRenderer.setXY(event.getX(), event.getY());
-                return true;
-            case MotionEvent.ACTION_UP:
-                shotRenderer.resetDeltaXY();
-                return true;
-            case MotionEvent.ACTION_MOVE:
-                shotRenderer.move(event.getX(), event.getY());
-                return true;
-        }
+//        switch (maskedAction) {
+//            case MotionEvent.ACTION_DOWN:
+//                shotRenderer.setXY(event.getX(), event.getY());
+//                return true;
+//            case MotionEvent.ACTION_UP:
+//                shotRenderer.resetDeltaXY();
+//                return true;
+//            case MotionEvent.ACTION_MOVE:
+//                shotRenderer.move(event.getX(), event.getY());
+//                return true;
+//        }
         return super.onTouchEvent(event);
     }
 

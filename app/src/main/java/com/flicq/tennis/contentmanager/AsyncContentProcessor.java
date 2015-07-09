@@ -92,11 +92,9 @@ public class AsyncContentProcessor {
                 for (int i = 3; i < 7; i++)
                     curr_vector[i] /= normalize;
 
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < 7; i++)
-                    builder.append(String.valueOf(curr_vector[i])).append(",");
-                adapter.writeToUi(builder.toString());
-                store.Dump(curr_vector);
+                SensorData sensorData = new SensorData(curr_vector);
+                adapter.writeToUi(sensorData.toString());
+                store.Dump(sensorData);
                 count++;
             }
         });

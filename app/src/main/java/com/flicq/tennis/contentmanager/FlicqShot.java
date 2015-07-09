@@ -1,5 +1,6 @@
 package com.flicq.tennis.contentmanager;
 
+import android.hardware.Sensor;
 import android.text.format.Time;
 
 import junit.framework.Assert;
@@ -11,83 +12,94 @@ import static java.util.Arrays.*;
 
 public class FlicqShot {
     private final Object valuesLock = new Object();
-    private final ArrayList<Float> values;
+    private final ArrayList<SensorData> values;
 
     private final Time time;
 
     public FlicqShot(Time time) {
         this.time = time;
-        values = new ArrayList<Float>();
+        values = new ArrayList<SensorData>();
     }
 
-    public float[] getDataForRendering() {
+    public List<SensorData> getDataForRendering() {
         if(values == null)
             return null;
-        if(values.size() < 2)
+        if(values.size() < 1)
             return null;
         synchronized (valuesLock) {
-            float[] f = new float[values.size()];
-            for (int i = 0; i < values.size(); i++)
-                f[i] = values.get(i);
-            return f;
+            return medianFilter(values);
         }
     }
 
-    private static float[] medianFilter(float[] f) {
-        float[] r =  new float[f.length];
+//    private float[] accelerationToXYZ(float[] floats) {
+//        static final float NS2S = 1.0f / 1000000000.0f;
+//        float[] last_values = null;
+//        float[] velocity = null;
+//        float[] position = null;
+//        long last_timestamp = 0;
+//
+//            if(last_values != null){
+//                float dt = (event.timestamp - last_timestamp) * NS2S;
+//
+//                for(int index = 0; index < 3;++index){
+//                    velocity[index] += (event.values[index] + last_values[index])/2 * dt;
+//                    position[index] += velocity[index] * dt;
+//                }
+//            }
+//            else{
+//                last_values = new float[3];
+//                velocity = new float[3];
+//                position = new float[3];
+//                velocity[0] = velocity[1] = velocity[2] = 0f;
+//                position[0] = position[1] = position[2] = 0f;
+//            }
+//            System.arraycopy(event.values, 0, last_values, 0, 3);
+//            last_timestamp = event.timestamp;
+//        }
+//    }
+
+    private static List<SensorData> medianFilter(final List<SensorData> values) {
+
+        List<Float> p, c, n;
         float[] w = new float[3];
-        for(int i=0;i<7;i++)
-        r[i] = f[i];
-        for(int i=1;i<(f.length/7) - 1; i++) {
-            int c = i  * 7,   //Current vector
-                p = (i - 1) * 7, //Previous vector
-                n = (i + 1) * 7; //Next vector
-            int ox = 0, oy = 1, oz = 2, oq0 = 3, oq1 = 4, oq2 = 5, oq3 = 6;
+        float[] t = new float[7];
+        List<SensorData> r = new ArrayList<SensorData>();
+        p = values.get(0).asVector();
+        for(int i=1;i<values.size() - 1;i++) {
+            c = values.get(i).asVector();
+            n = values.get(i + 1).asVector();
 
-            w[0] = f[p + ox];  w[1] = f[c + ox];  w[2] = f[n + ox];
-            sort(w);  //Sorted data will be stored back in w.
-            r[c + ox] = w[1];//Take the middle value
-
-            w[0] = f[p + oy];  w[1] = f[c + oy];  w[2] = f[n + oy];
-            sort(w);  //Sorted data will be stored back in w.
-            r[c + oy] = w[1];//Take the middle value
-
-            w[0] = f[p + oz];  w[1] = f[c + oz];  w[2] = f[n + oz];
-            sort(w);  //Sorted data will be stored back in w.
-            r[c + oz] = w[1];//Take the middle value
-
-            w[0] = f[p + oq0];  w[1] = f[c + oq0];  w[2] = f[n + oq0];
-            sort(w);  //Sorted data will be stored back in w.
-            r[c + oq0] = w[1];//Take the middle value
-
-            w[0] = f[p + oq1];  w[1] = f[c + oq1];  w[2] = f[n + oq1];
-            sort(w);  //Sorted data will be stored back in w.
-            r[c + oq1] = w[1];//Take the middle value
-
-            w[0] = f[p + oq2];  w[1] = f[c + oq2];  w[2] = f[n + oq2];
-            sort(w);  //Sorted data will be stored back in w.
-            r[c + oq2] = w[1];//Take the middle value
-
-            w[0] = f[p + oq3];  w[1] = f[c + oq3];  w[2] = f[n + oq3];
-            sort(w);  //Sorted data will be stored back in w.
-            r[c + oq3] = w[1];//Take the middle value
+            for (int l = 0; l < 7; l++)
+            {
+                w[0] = p.get(l);
+                w[1] = c.get(l);
+                w[2] = n.get(l);
+                sort(w);
+                t[l] = w[1];
+            }
+            r.add(new SensorData(t));
+            p = c;
         }
         return r;
     }
 
     public List<Float> getDataForUpload() {
-        return values;
+        ArrayList<Float> f = new ArrayList<Float>();
+        synchronized (valuesLock) {
+            for (SensorData value: values){
+                f.addAll(value.asVector());
+            }
+        }
+        return f;
     }
 
-    public void add(float []contents)
+
+    public void add(final SensorData data)
     {
-        if(contents.length != 7)
-            Assert.fail("The expected size of array should be 7, did you changed the size of the BLE input ?");
         //After processing the data we need to make sure that we
         //get them in the order we want, i.e ax,ay,az, q0,q1,q2,q3
         synchronized (valuesLock) {
-            for (int i = 0; i < 7; i++)
-                this.values.add(contents[i]);
+                this.values.add(data);
         }
     }
 }

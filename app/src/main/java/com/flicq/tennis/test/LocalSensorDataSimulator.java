@@ -60,7 +60,7 @@ public class LocalSensorDataSimulator implements SensorEventListener {
         }
 
         if(count++ >= 500) {
-            renderer.Render(handler.getData());
+            //renderer.Render(handler.getData());
             handler.Reset();
             count =0;
         }
