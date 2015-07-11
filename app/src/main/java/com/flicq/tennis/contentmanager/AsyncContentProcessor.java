@@ -56,16 +56,17 @@ public class AsyncContentProcessor {
         adapter.writeToUi("Packets Received" + String.valueOf(count));
     }
 
-    float cx,cy,cz;
+    SensorData previous  = null;
     public void RunAsync(final short[] content) {
         executorQueue.submit(new Runnable() {
             @Override
             public void run() {
-                SensorData sensorData = new SensorData(content);
-                adapter.writeToUi(sensorData.toString());
-                store.Dump(sensorData);
+                SensorData current = new SensorData(content, previous);
+                adapter.writeToUi(current.toString());
+                store.Dump(current);
                 count++;
                 UpdateStatus();
+                previous = current;
             }
         });
     }

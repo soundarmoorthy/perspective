@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     private final float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
 
     public ShotRenderer(int screenRotation) {
-        this.mode = 1;
+        this.mode = 2;
         this.screenRotation = screenRotation;
         line = new Line();
         grid = new Grid();
@@ -78,7 +79,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     private final float[] matrix = {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0};
     private int animation = 0;
 
-    private void renderFusionData(GL10 gl, List<SensorData> sensorData, int frame, int mode) {
+    private void renderFusionData(GL10 gl, List<SensorData> sensorData, int frame) {
 
         int count = sensorData.size();
         float x = 0.0f, y = 0.0f, z = 0.0f;
@@ -119,56 +120,56 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
             matrix[10] = 1.0f - 2.0f * (x2 + y2);
             matrix[11] = 0.0f;
 
-//            switch (mode) {
-//                case 0: {
+            switch (mode) {
+                case 0: {
                     x = data.getX();
                     y = data.getY();
                     z = data.getZ();
-//                    break;
-//                }
-//                case 1: {
-//                    vx += data[i * 7 + 0];
-//                    vy += data[i * 7 + 1];
-//                    vz += data[i * 7 + 2];
-//
-//                    float friction = 0.8f;
-//                    vx *= friction;
-//                    vy *= friction;
-//                    vz *= friction;
-//
-//                    x += vx * 0.01f;
-//                    y += vy * 0.01f;
-//                    z += vz * 0.01f;
-//                    break;
-//                }
-//                case 2: {
-//
-//                    float ax = data[i * 7 + 0];
-//                    float ay = data[i * 7 + 1];
-//                    float az = data[i * 7 + 2];
-//
-//                    float qax = ax * matrix[0] + ay * matrix[4] + az * matrix[8];
-//                    float qay = ax * matrix[1] + ay * matrix[5] + az * matrix[9];
-//                    float qaz = ax * matrix[2] + ay * matrix[6] + az * matrix[10];
-//
-//                    ax = qax;
-//                    ay = qay;
-//                    az = qaz;
-//                    vx += ax;
-//                    vy += ay;
-//                    vz += az;
-//                    float friction = 0.8f;
-//                    vx *= friction;
-//                    vy *= friction;
-//                    vz *= friction;
-//
-//                    x += vx * 0.01f;
-//                    y += vy * 0.01f;
-//                    z += vz * 0.01f;
-//
-//                    break;
-//                }
-//            }
+                    break;
+                }
+               case 1: {
+                    vx += data.getX();
+                    vy += data.getY();
+                   vz += data.getZ();
+
+                    float friction = 0.8f;
+                    vx *= friction;
+                    vy *= friction;
+                   vz *= friction;
+
+                    x += vx * 0.01f;
+                    y += vy * 0.01f;
+                    z += vz * 0.01f;
+                    break;
+                }
+                case 2: {
+
+                    float ax = data.getX();
+                    float ay = data.getY();
+                    float az = data.getZ();
+
+                    float qax = ax * matrix[0] + ay * matrix[4] + az * matrix[8];
+                    float qay = ax * matrix[1] + ay * matrix[5] + az * matrix[9];
+                    float qaz = ax * matrix[2] + ay * matrix[6] + az * matrix[10];
+
+                    ax = qax;
+                    ay = qay;
+                    az = qaz;
+                    vx += ax;
+                    vy += ay;
+                    vz += az;
+                    float friction = 0.8f;
+                    vx *= friction;
+                    vy *= friction;
+                    vz *= friction;
+
+                    x += vx * 0.01f;
+                    y += vy * 0.01f;
+                    z += vz * 0.01f;
+
+                    break;
+                }
+            }
 
             pointData[i * 6 + 0] = x;
             pointData[i * 6 + 1] = y;
@@ -192,15 +193,19 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
                 helper.draw(gl, xf, yf, z);
             }
         }
+
+        //The first couple of data are not so nice.
+        float[] strippedContent = Arrays.copyOfRange(pointData, (2 * 6), pointData.length);
+
         if (frame == -1) {
             gl.glEnable(GL10.GL_BLEND);
             gl.glDisable(GL10.GL_DEPTH_TEST);
             gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
             gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-            ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect(pointData.length * 4);
+            ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect(strippedContent.length * 4);
             vertexByteBuffer.order(ByteOrder.nativeOrder());
             FloatBuffer vertexFloatBuffer = vertexByteBuffer.asFloatBuffer();
-            vertexFloatBuffer.put(pointData);
+            vertexFloatBuffer.put(strippedContent);
             vertexFloatBuffer.position(0);
             gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexFloatBuffer);
             gl.glColor4f(0.5f, 0.7f, 1.0f, 0.5f);
@@ -256,9 +261,9 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
             int i = (animation) % set.size();
             if (animation_play)
                 animation++;
-            renderFusionData(gl, set, i, mode);
+            renderFusionData(gl, set, i);
         } else
-            renderFusionData(gl, set, -1, mode);
+            renderFusionData(gl, set, -1);
 
         if (this.screenshot_request) {
             take_screenshot(gl);
@@ -305,26 +310,8 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
     int ai;
 
-    static public final float degreesPerRadian = (float) (180.0f / 3.14159f);
-
-    public void setMode(int i) {
-        mode = i;
-        if (mode < 0)
-            mode = 0;
-        if (mode > 3)
-            mode = 3;
-
-    }
-
-    public int length()
-
-    {
-        return set.size();
-    }
-
     private boolean render = false;
     private List<SensorData> set;
-
 
     private void SetData(List<SensorData> set) {
         this.set = set;
@@ -336,15 +323,6 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         render = true;
     }
 
-    public void Stop() {
-        render = false;
-    }
-
-    float q0f, q1f, q2f, q3;
-    float af;
-    private float xf;
-    private float yf;
-    float z;
     private float deltaX;
     private float deltaY;
     private int cameraAngleX;
@@ -353,7 +331,8 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     private boolean screenshot_request = false;
     private final boolean animation_use = false;
     private final boolean animation_play = false;
-    private int mode = 1;
+    private float xf, yf;
+    private int mode = 2;
 
     private float oldX;
     private float oldY;
@@ -391,6 +370,6 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     public void setSimulator(LocalSensorDataSimulator simulator) {
         this.simulator = simulator;
         this.simu_mode = true;
-        //this.Render(simulator.getSensorData());
+        this.Render(simulator.getSensorData());
     }
 }

@@ -29,38 +29,10 @@ public class FlicqShot {
         if(values.size() < 1)
             return null;
         synchronized (valuesLock) {
-                return medianFilter(accelerationToXYZ(values));
+                return medianFilter(values);
         }
     }
 
-    private static List<SensorData> accelerationToXYZ(final List<SensorData> sensorData) {
-        SensorData previous;
-        try {
-            final float NS2S = 1.0f / 1000000000.0f;
-            float v[], p[];
-            v = new float[3];
-            p = new float[3];
-            //for us dt is constant, assuming we get 25 packets per second.
-            float dt = ((1 * 1000) / 25) * NS2S;
-            previous = sensorData.get(0);
-            for (int i = 1; i < sensorData.size(); i++) {
-                SensorData current = sensorData.get(i);
-
-                float[] c_acc = current.getAcceleration();
-                float[] p_acc = previous.getAcceleration();
-                for (int k = 0; k < 3; k++) {
-                    v[k] += (c_acc[k] + p_acc[k]) / 2 * dt;
-                    p[k] += v[k] * dt;
-                    current.set(p[k], k);
-                }
-                previous = current;
-            }
-        } catch (Exception ex) {
-            Log.e("async", ex.toString());
-            ex.printStackTrace();
-        }
-        return sensorData;
-    }
 
     private static List<SensorData> medianFilter(final List<SensorData> values) {
 

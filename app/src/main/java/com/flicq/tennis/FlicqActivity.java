@@ -123,8 +123,8 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         if (simulator_mode) {
             IActivityAdapter adapter = this;
             LocalSensorDataSimulator simulator = new LocalSensorDataSimulator(adapter, shotRenderer);
-            shotRenderer.setSimulator(simulator);
             simulator.Start();
+            shotRenderer.setSimulator(simulator);
         }
     }
 

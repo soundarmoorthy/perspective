@@ -1,5 +1,6 @@
 package com.flicq.tennis.contentmanager;
 
+import android.hardware.Sensor;
 import android.util.FloatMath;
 
 import junit.framework.Assert;
@@ -15,10 +16,7 @@ public class SensorData {
     private float[] acceleration;
     private float[] quaternion;
     private float[] xyz;
-
-    public SensorData() {
-        init();
-    }
+    SensorData previous;
 
     private void init()
     {
@@ -29,14 +27,10 @@ public class SensorData {
         quaternionLock = new Object();
     }
 
-    public SensorData(float[] data) {
-        init();
-        process(data);
-    }
-
     public SensorData(float[] xyz, float[] quaternion)
     {
         init();
+        this.previous = null;
 
         for (int i = 0; i < 3; i++) {
             this.xyz[i] = xyz[i]; //x
@@ -51,6 +45,7 @@ public class SensorData {
         Assert.assertEquals(7, data.length);
         for (int i = 0; i < 3; i++) {
             this.acceleration[i] = data[i]; //Raw acceleration
+            this.xyz[i] = data[i]; //currently no processing;
         }
 
         for (int i = 0, k = 3; i < 4; i++, k++) {
@@ -58,8 +53,9 @@ public class SensorData {
         }
     }
 
-    public SensorData(short[] content) {
+    public SensorData(short[] content, SensorData previous) {
         init();
+        this.previous = previous;
         /*  Remember, 2 bytes each
             ------------------------------------------------------------------
            | ax.2 | ay.2 | az.2 | q0.2 | q1.2 | q2.2 | q3.2 | seqNo.1 | n/a |
@@ -87,13 +83,6 @@ public class SensorData {
 
     private Object quaternionLock, accelerationLock;
 
-    //    public float[] getQuaternion()
-//    {
-//        synchronized (quaternionLock) {
-//            return quaternion;
-//        }
-//    }
-//
     public float[] getAcceleration() {
         synchronized (accelerationLock) {
             return acceleration;
@@ -102,7 +91,7 @@ public class SensorData {
 
     public void set(float value, int index) {
         if (index < 3) //0,1,2 are for x,y,z
-            xyz[index] = value;
+            acceleration[index] = value;
         else //3,4,5,6 are for q0,q1,q2,q3
         {
             quaternion[index - 3] = value;
@@ -110,15 +99,15 @@ public class SensorData {
     }
 
     public float getZ() {
-        return xyz[2];
+        return acceleration[2];
     }
 
     public float getY() {
-        return xyz[1];
+        return acceleration[1];
     }
 
     public float getX() {
-        return xyz[0];
+        return acceleration[0];
     }
 
     public float getQ0() {
@@ -167,4 +156,30 @@ public class SensorData {
             f.add(q);
         return f;
     }
+
+//    final float NS2S = 1.0f / 1000000000.0f;
+//    private void accelerationToXYZ() {
+//        SensorData previous;
+//        try {
+//            float v[], p[];
+//            v = new float[3];
+//            p = new float[3];
+//            //for us dt is constant, assuming we get 25 packets per second.
+//            float dt = ((1 * 1000) / 25) * NS2S;
+//
+//                float[] c_acc = this.getAcceleration();
+//                float[] p_acc = previous.getAcceleration();
+//                for (int k = 0; k < 3; k++) {
+//                    v[k] += (c_acc[k] + p_acc[k]) / 2 * dt;
+//                    p[k] += v[k] * dt;
+//                    current.set(p[k], k);
+//                }
+//                previous = current;
+//            }
+//        } catch (Exception ex) {
+//            Log.e("async", ex.toString());
+//            ex.printStackTrace();
+//        }
+//        return sensorData;
+//    }
 }
