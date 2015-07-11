@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.flicq.tennis.ble.FlicqDevice;
 import com.flicq.tennis.contentmanager.ContentStore;
 import com.flicq.tennis.contentmanager.FlicqShot;
+import com.flicq.tennis.contentmanager.SensorData;
 import com.flicq.tennis.external.ButtonAwesome;
 import com.flicq.tennis.external.TextAwesome;
 import com.flicq.tennis.framework.IActivityAdapter;
@@ -39,6 +40,8 @@ import com.flicq.tennis.framework.SystemState;
 import com.flicq.tennis.opengl.ShotRenderer;
 import com.flicq.tennis.test.LocalSensorDataSimulator;
 import com.flicq.tennis.events.*;
+
+import java.util.List;
 
 public class FlicqActivity extends Activity implements IActivityAdapter, View.OnClickListener
 {
@@ -365,7 +368,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
             return;
         FlicqShot shot = ContentStore.Instance().getShot();
         if (shot != null) {
-            float[] data = shot.getDataForRendering();
+            List<SensorData> data = shot.getDataForRendering();
             shotRenderer.Render(data);
         }
     }

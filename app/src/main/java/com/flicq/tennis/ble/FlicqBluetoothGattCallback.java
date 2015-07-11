@@ -81,7 +81,6 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
         if (characteristic == null || enough)
             return;
 
-
         /* packet size 16 bytes, packet content 15 bytes */
         /* ------------------------------------------------------------------
            | ax.2 | ay.2 | az.2 | q0.2 | q1.2 | q2.2 | q3.2 | seqNo.1 | n/a |

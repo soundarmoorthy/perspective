@@ -6,8 +6,12 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import com.flicq.tennis.contentmanager.SensorData;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.opengl.ShotRenderer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by soundararajan on 5/31/2015.
@@ -39,7 +43,7 @@ public class LocalSensorDataSimulator implements SensorEventListener {
         activityAdapter.writeToUi("Setup acceleromenter and rotation vector from local android");
     }
 
-    public synchronized float[] getSensorData()
+    public synchronized List<SensorData> getSensorData()
     {
         return handler.getData();
     }

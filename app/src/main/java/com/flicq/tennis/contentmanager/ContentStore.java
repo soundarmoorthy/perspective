@@ -33,9 +33,9 @@ public class ContentStore {
 
 
 
-    public void Dump(final float[] values) {
+    public void Dump(final SensorData data) {
         synchronized (currentShotLock) {
-            currentShot.add(values);
+            currentShot.add(data);
         }
     }
 

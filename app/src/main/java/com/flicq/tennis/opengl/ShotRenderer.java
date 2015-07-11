@@ -9,6 +9,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -19,6 +20,7 @@ import android.opengl.GLU;
 import android.os.Environment;
 
 import com.flicq.tennis.contentmanager.ContentStore;
+import com.flicq.tennis.contentmanager.SensorData;
 import com.flicq.tennis.test.LocalSensorDataSimulator;
 
 
@@ -76,19 +78,21 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     private final float[] matrix = {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0};
     private int animation = 0;
 
-    private void renderFusionData(GL10 gl, float[] data, int frame, int mode) {
+    private void renderFusionData(GL10 gl, List<SensorData> sensorData, int frame, int mode) {
 
-        int count = data.length / 7;
+        int count = sensorData.size();
         float x = 0.0f, y = 0.0f, z = 0.0f;
         float vx = 0f, vy = 0f, vz = 0;
         float[] pointData = new float[count * 6 * 2];
         for (int i = 0; i < count; i++) {
+
+            SensorData data = sensorData.get(i);
             gl.glPushMatrix();
 
-            float q0 = data[i * 7 + 3];
-            float q1 = data[i * 7 + 4];
-            float q2 = data[i * 7 + 5];
-            float q3 = data[i * 7 + 6];
+            float q0 = data.getQ0();
+            float q1 = data.getQ1();
+            float q2 = data.getQ2();
+            float q3 = data.getQ3();
 
             float x2 = q0 * q0;
             float y2 = q1 * q1;
@@ -117,9 +121,9 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
 //            switch (mode) {
 //                case 0: {
-//                    x = data[i * 7 + 0];
-//                    y = data[i * 7 + 1];
-//                    z = data[i * 7 + 2];
+                    x = data.getX();
+                    y = data.getY();
+                    z = data.getZ();
 //                    break;
 //                }
 //                case 1: {
@@ -249,7 +253,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         axis.draw(gl);
 
         if (animation_use) {
-            int i = (animation) % (set.length / 7);
+            int i = (animation) % set.size();
             if (animation_play)
                 animation++;
             renderFusionData(gl, set, i, mode);
@@ -315,18 +319,18 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
     public int length()
 
     {
-        return set.length / 7;
+        return set.size();
     }
 
     private boolean render = false;
-    private float[] set;
+    private List<SensorData> set;
 
 
-    private void SetData(float[] set) {
+    private void SetData(List<SensorData> set) {
         this.set = set;
     }
 
-    public void Render(float[] data) {
+    public void Render(List<SensorData> data) {
         render = false;
         SetData(data);
         render = true;
