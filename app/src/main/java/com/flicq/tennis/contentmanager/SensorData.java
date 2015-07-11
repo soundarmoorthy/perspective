@@ -1,0 +1,170 @@
+package com.flicq.tennis.contentmanager;
+
+import android.util.FloatMath;
+
+import junit.framework.Assert;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * Created by soundararajan on 7/8/2015.
+ */
+public class SensorData {
+    private float[] acceleration;
+    private float[] quaternion;
+    private float[] xyz;
+
+    public SensorData() {
+        init();
+    }
+
+    private void init()
+    {
+        acceleration = new float[3];
+        xyz = new float[3];
+        quaternion = new float[4];
+        accelerationLock = new Object();
+        quaternionLock = new Object();
+    }
+
+    public SensorData(float[] data) {
+        init();
+        process(data);
+    }
+
+    public SensorData(float[] xyz, float[] quaternion)
+    {
+        init();
+
+        for (int i = 0; i < 3; i++) {
+            this.xyz[i] = xyz[i]; //x
+        }
+
+        for (int i = 0; i < 4; i++) {
+            this.quaternion[i] = quaternion[i]; //q0, q1,q2,q3
+        }
+    }
+
+    private void process(float[] data) {
+        Assert.assertEquals(7, data.length);
+        for (int i = 0; i < 3; i++) {
+            this.acceleration[i] = data[i]; //Raw acceleration
+        }
+
+        for (int i = 0, k = 3; i < 4; i++, k++) {
+            this.quaternion[i] = data[k]; //q0, q1,q2,q3
+        }
+    }
+
+    public SensorData(short[] content) {
+        init();
+        /*  Remember, 2 bytes each
+            ------------------------------------------------------------------
+           | ax.2 | ay.2 | az.2 | q0.2 | q1.2 | q2.2 | q3.2 | seqNo.1 | n/a |
+           ------------------------------------------------------------------ */
+        //Android (a x=East, y=North, z=Up or ENU standard. Currently
+        //not applicable
+        final float[] curr_vector = new float[content.length];
+        final float acc_lsb = 0.00012207f;
+        curr_vector[0] = (content[0] * acc_lsb);
+        curr_vector[1] = (content[1] * acc_lsb);
+        curr_vector[2] = (content[2] * acc_lsb);
+        final float quaternionTimeScale = 30000f;
+        for (int i = 3; i < 7; i++)
+            curr_vector[i] = content[i] / quaternionTimeScale;
+
+        float normalize = 0.0f;
+        for (int i = 3; i < 7; i++)
+            normalize = normalize + (curr_vector[i] * curr_vector[i]);
+        normalize = FloatMath.sqrt(normalize);
+        for (int i = 3; i < 7; i++)
+            curr_vector[i] /= normalize;
+
+        process(curr_vector);
+    }
+
+    private Object quaternionLock, accelerationLock;
+
+    //    public float[] getQuaternion()
+//    {
+//        synchronized (quaternionLock) {
+//            return quaternion;
+//        }
+//    }
+//
+    public float[] getAcceleration() {
+        synchronized (accelerationLock) {
+            return acceleration;
+        }
+    }
+
+    public void set(float value, int index) {
+        if (index < 3) //0,1,2 are for x,y,z
+            xyz[index] = value;
+        else //3,4,5,6 are for q0,q1,q2,q3
+        {
+            quaternion[index - 3] = value;
+        }
+    }
+
+    public float getZ() {
+        return xyz[2];
+    }
+
+    public float getY() {
+        return xyz[1];
+    }
+
+    public float getX() {
+        return xyz[0];
+    }
+
+    public float getQ0() {
+        return quaternion[0];
+    }
+
+    public float getQ1() {
+        return quaternion[1];
+    }
+
+    public float getQ2() {
+        return quaternion[2];
+    }
+
+    public float getQ3() {
+        return quaternion[3];
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 3; i++)
+            builder.append(String.valueOf(xyz[i])).append(",");
+
+        for (int i = 0; i < 4; i++)
+            builder.append(String.valueOf(quaternion[i])).append(",");
+        return builder.toString();
+    }
+
+    public float[] asVector() {
+        float[] f = new float[7];
+        int i = 0;
+        for (float v : xyz)
+            f[i++] = v;
+        for (float q : quaternion)
+            f[i++] = q;
+        return f;
+    }
+
+    public List<Float> asList() {
+        ArrayList<Float> f = new ArrayList<Float>();
+        int i = 0;
+        for (float v : xyz)
+            f.add(v);
+        for (float q : quaternion)
+            f.add(q);
+        return f;
+    }
+}
