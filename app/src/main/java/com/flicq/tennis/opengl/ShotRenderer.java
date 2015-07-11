@@ -251,11 +251,12 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
                 }
             }
         }
-        if (!render)
-            return;
 
         //grid.draw(gl);
         axis.draw(gl);
+
+        if (!render)
+            return;
 
         if (animation_use) {
             int i = (animation) % set.size();

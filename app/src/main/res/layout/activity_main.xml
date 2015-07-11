@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent"
     android:layout_height="match_parent"
-    android:gravity="top"
-    android:orientation="vertical" >
-
-    <LinearLayout
-        android:id="@+id/flicq_app_controls"
-        android:visibility="gone"
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
+    android:gravity="center"
+    android:orientation="vertical"
+    android:id="@+id/parent_frame"
+    >
     <HorizontalScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -19,38 +13,61 @@
 
         <LinearLayout
             android:id="@+id/control_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:layout_marginTop="20dp"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center_horizontal"
             android:orientation="horizontal" >
 
             <com.flicq.tennis.external.ButtonAwesome
                 android:id="@+id/exit_button"
                 android:background="@color/white"
                 android:textColor="@color/flicq_red"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="30sp"
+                android:alpha="0.4"
                 android:layout_height="wrap_content"
                 android:text="@string/fa_power_off" />
+            <Space
+                android:layout_width="30dp"
+                android:layout_height="10dp" />
 
             <com.flicq.tennis.external.ButtonAwesome
                 android:id="@+id/btn_capture"
                 android:background="@color/white"
                 android:textColor="@color/flicq_red"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:textSize="30sp"
+                android:layout_weight="1"
+                android:alpha="0.4"
                 android:layout_height="wrap_content"
                 android:onClick="onClick"
                 android:text="@string/fa_toggle_off" />
+            <Space
+                android:layout_width="30dp"
+                android:layout_height="10dp" />
             <com.flicq.tennis.external.ButtonAwesome
                 android:id="@+id/btn_render"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:textSize="30sp"
                 android:background="@color/white"
+                android:alpha="0.4"
                 android:textColor="@color/flicq_red"
                 android:onClick="onClick"
                 android:text="@string/fa_play_circle_o"/>
 
+            <Space
+                android:layout_width="30dp"
+                android:layout_height="10dp" />
             <com.flicq.tennis.external.ButtonAwesome
                 android:id="@+id/btn_engineering"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="30sp"
+                android:alpha="0.4"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
                 android:textColor="@color/flicq_red"
@@ -61,12 +78,10 @@
     </HorizontalScrollView>
 
     <LinearLayout
-
-
         android:id="@+id/graphicFrame"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="50"
+        android:layout_weight="46.44"
         android:background="@color/white"
         android:orientation="vertical"
         android:padding="5dip"
@@ -76,6 +91,15 @@
             android:id="@+id/shotView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/imgAnimationOnStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:src="@mipmap/flicq_logo"
             android:visibility="visible" />
 
         <ScrollView
@@ -124,25 +148,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:background="@color/white"
-            android:textColor="@color/grey"
+            android:textColor="@color/black_overlay"
             android:text="@string/fa_info"/>
         </LinearLayout>
 </LinearLayout>
-        <LinearLayout android:id="@+id/fullscreen_content_controls" style="?metaButtonBarButtonStyle"
-            android:layout_width="fill_parent" android:layout_height="fill_parent"
-            android:layout_gravity="center_horizontal"
-            android:visibility="visible"
-            android:background="@color/white" android:orientation="vertical"
-            android:weightSum="1">
-            <ImageView
-                android:layout_width="94dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/img_flicq_logo_splash"
-                android:src="@mipmap/flicq_logo_splash"
-                android:maxHeight="400dp"
-                android:maxWidth="300dp"
-                android:contentDescription="This is the flicq logo"
-                android:layout_gravity="center"
-                android:layout_weight="0.33" />
-        </LinearLayout>
-    </LinearLayout>

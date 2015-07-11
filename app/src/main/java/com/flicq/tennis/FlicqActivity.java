@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -67,56 +68,36 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     public void onCreate(Bundle savedInstanceState) {
         onCreateInitialSetup(savedInstanceState);
         //Do anything after this.
-        showSplashScreenAnimation();
         setupLog();
         setupDeviceCapture();
+        writeToUi("Setup Bluetooth device capture complete.");
         setupRendering();
+        writeToUi("Setup Rendering engine complete.");
+        setupEventListeners();
+        writeToUi("Setup event listeners complete.");
+        setupExitButton();
+        this.SetStatus(StatusType.INFO, "Welcome !");
+        writeToUi("System initialization complete. Now switch on the device and press the start button");
 
+        showFlicqBrandingStuff();
+    }
+
+    private void showFlicqBrandingStuff() {
+        setVisibility(View.GONE, View.GONE);
+        View view = findViewById(R.id.imgAnimationOnStart);
+        if (view != null)
+            view.setVisibility(View.VISIBLE);
+        else
+            setVisibility(View.INVISIBLE, View.VISIBLE);
+    }
+
+
+    private void setupEventListeners()
+    {
         mScaleDetector = new ScaleGestureDetector(this,new ScaleListener(shotRenderer));
         DoubleTapListener dTapListener = new DoubleTapListener(shotRenderer);
         mDetector = new GestureDetectorCompat(getApplicationContext(), dTapListener);
         mDetector.setOnDoubleTapListener(dTapListener);
-
-        setupExitButton();
-        this.SetStatus(StatusType.INFO, "Welcome !");
-    }
-
-    private void showSplashScreenAnimation() {
-        final View image = findViewById(R.id.fullscreen_content_controls);
-        Animation fadeOut = new AlphaAnimation(1,0);
-        fadeOut.setDuration(2000);
-        image.setAnimation(fadeOut);
-        fadeOut.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) { }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                findViewById(R.id.fullscreen_content_controls).setVisibility(View.GONE);
-            }
-            @Override
-            public void onAnimationRepeat(Animation animation) { }
-        });
-        fadeOut.start();
-
-        Animation fadeIn = new AlphaAnimation(0,1);
-        fadeIn.setDuration(2000);
-        final View panelView = findViewById(R.id.flicq_app_controls);
-        panelView.setAnimation(fadeIn);
-        fadeIn.setStartTime(System.currentTimeMillis()+1200);
-        fadeIn.start();
-        fadeIn.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) { }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                findViewById(R.id.flicq_app_controls).setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) { }
-        });
     }
 
     private void setupDeviceSimulator() {
@@ -378,7 +359,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     }
 
     private void setupUIForRender() {
-        setVisibility(View.GONE, View.VISIBLE);
+        setVisibility(View.INVISIBLE, View.VISIBLE);
         shotRenderer.resetView();
     }
 
@@ -404,10 +385,10 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         for (int id : ids) {
             if (itemId == id) {
                 Button button = (Button) findViewById(id);
-                button.setBackgroundColor(Color.argb(255, 240, 240, 240));//A more lighter gray
+                button.setAlpha(0.9f);
             } else {
                 Button button = (Button) findViewById(id);
-                button.setBackgroundColor(Color.WHITE);
+                button.setAlpha(0.4f);
             }
         }
         ButtonAwesome awesome = (ButtonAwesome) findViewById(R.id.btn_capture);
