@@ -156,30 +156,4 @@ public class SensorData {
             f.add(q);
         return f;
     }
-
-//    final float NS2S = 1.0f / 1000000000.0f;
-//    private void accelerationToXYZ() {
-//        SensorData previous;
-//        try {
-//            float v[], p[];
-//            v = new float[3];
-//            p = new float[3];
-//            //for us dt is constant, assuming we get 25 packets per second.
-//            float dt = ((1 * 1000) / 25) * NS2S;
-//
-//                float[] c_acc = this.getAcceleration();
-//                float[] p_acc = previous.getAcceleration();
-//                for (int k = 0; k < 3; k++) {
-//                    v[k] += (c_acc[k] + p_acc[k]) / 2 * dt;
-//                    p[k] += v[k] * dt;
-//                    current.set(p[k], k);
-//                }
-//                previous = current;
-//            }
-//        } catch (Exception ex) {
-//            Log.e("async", ex.toString());
-//            ex.printStackTrace();
-//        }
-//        return sensorData;
-//    }
 }
