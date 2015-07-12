@@ -10,7 +10,6 @@ import com.flicq.tennis.contentmanager.SensorData;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.opengl.ShotRenderer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

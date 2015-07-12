@@ -1,7 +1,5 @@
 package com.flicq.tennis.contentmanager;
 
-import android.util.FloatMath;
-
 import com.flicq.tennis.ble.FlicqBluetoothGattCallback;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.StatusType;
@@ -23,7 +21,7 @@ public class AsyncContentProcessor {
 
     private final ExecutorService executorQueue;
     private final IActivityAdapter adapter;
-    private int count;
+    private static int count;
     private long startTime;
     private long endTime;
     private final ContentStore store;
@@ -52,8 +50,10 @@ public class AsyncContentProcessor {
         endTime = System.currentTimeMillis();
         adapter.writeToUi("BLE : Disconnected Device ");
         adapter.writeToUi("BLE Report");
+        adapter.writeToUi("-------------------------");
         adapter.writeToUi("Time taken : " + String.valueOf((endTime - startTime) / 1000) + " seconds");
-        adapter.writeToUi("Packets Received" + String.valueOf(count));
+        adapter.writeToUi("Packets Received : " + String.valueOf(count));
+        adapter.writeToUi("-------------------------");
     }
 
     SensorData previous  = null;

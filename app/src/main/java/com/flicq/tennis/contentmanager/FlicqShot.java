@@ -1,16 +1,9 @@
 package com.flicq.tennis.contentmanager;
 
-import android.hardware.Sensor;
 import android.text.format.Time;
-import android.util.Log;
-
-import junit.framework.Assert;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import static java.util.Arrays.*;
+import static java.util.Arrays.sort;
 
 public class FlicqShot {
     private final Object valuesLock = new Object();
@@ -20,22 +13,24 @@ public class FlicqShot {
 
     public FlicqShot(Time time) {
         this.time = time;
-        values = new ArrayList<SensorData>();
+        values = new ArrayList<>();
     }
 
+    int size;
     public List<SensorData> getDataForRendering() {
-        if(values == null)
-            return null;
-        if(values.size() < 1)
+        if(values == null || values.isEmpty())
             return null;
         synchronized (valuesLock) {
+            if(size  == values.size())
+                return values;
+            else {
+                size = values.size();
                 return medianFilter(values);
+            }
         }
     }
 
-
     private static List<SensorData> medianFilter(final List<SensorData> values) {
-
         float[] p, c, n;
         p = new float[7];
         c = new float[7];
