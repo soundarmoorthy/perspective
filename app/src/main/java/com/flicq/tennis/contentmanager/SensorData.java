@@ -15,25 +15,23 @@ import java.util.List;
 public class SensorData {
     private float[] acceleration;
     private float[] quaternion;
-    private float[] xyz;
-    SensorData previous;
+    final SensorData previous;
 
     private void init()
     {
         acceleration = new float[3];
-        xyz = new float[3];
         quaternion = new float[4];
-        accelerationLock = new Object();
-        quaternionLock = new Object();
     }
 
-    public SensorData(float[] xyz, float[] quaternion)
+    //This constructor is used for Android local sensor data
+    public SensorData(float[] acceleration, float[] quaternion)
     {
         init();
         this.previous = null;
 
+
         for (int i = 0; i < 3; i++) {
-            this.xyz[i] = xyz[i]; //x
+            this.acceleration[i] = acceleration[i];
         }
 
         for (int i = 0; i < 4; i++) {
@@ -41,52 +39,30 @@ public class SensorData {
         }
     }
 
-    private void process(float[] data) {
-        Assert.assertEquals(7, data.length);
-        for (int i = 0; i < 3; i++) {
-            this.acceleration[i] = data[i]; //Raw acceleration
-            this.xyz[i] = data[i]; //currently no processing;
-        }
-
-        for (int i = 0, k = 3; i < 4; i++, k++) {
-            this.quaternion[i] = data[k]; //q0, q1,q2,q3
-        }
-    }
-
+    private static final float acc_lsb = 0.00012207f;
+    private static final float quaternionTimeScale = 30000f;
     public SensorData(short[] content, SensorData previous) {
         init();
         this.previous = previous;
+        Assert.assertEquals(content.length, 7);
         /*  Remember, 2 bytes each
             ------------------------------------------------------------------
            | ax.2 | ay.2 | az.2 | q0.2 | q1.2 | q2.2 | q3.2 | seqNo.1 | n/a |
            ------------------------------------------------------------------ */
-        //Android (a x=East, y=North, z=Up or ENU standard. Currently
-        //not applicable
-        final float[] curr_vector = new float[content.length];
-        final float acc_lsb = 0.00012207f;
-        curr_vector[0] = (content[0] * acc_lsb);
-        curr_vector[1] = (content[1] * acc_lsb);
-        curr_vector[2] = (content[2] * acc_lsb);
-        final float quaternionTimeScale = 30000f;
-        for (int i = 3; i < 7; i++)
-            curr_vector[i] = content[i] / quaternionTimeScale;
+        //Android (a x=East, y=North, z=Up or ENU standard. Currently not applicable
+        acceleration[0] = (content[0] * acc_lsb);
+        acceleration[1] = (content[1] * acc_lsb);
+        acceleration[2] = (content[2] * acc_lsb);
 
         float normalize = 0.0f;
-        for (int i = 3; i < 7; i++)
-            normalize = normalize + (curr_vector[i] * curr_vector[i]);
-        normalize = FloatMath.sqrt(normalize);
-        for (int i = 3; i < 7; i++)
-            curr_vector[i] /= normalize;
-
-        process(curr_vector);
-    }
-
-    private Object quaternionLock, accelerationLock;
-
-    public float[] getAcceleration() {
-        synchronized (accelerationLock) {
-            return acceleration;
+        for (int i = 3, k=0; i < 7; i++, k++) {
+            quaternion[k] = content[i] / quaternionTimeScale;
+            normalize = normalize + (quaternion[k] * quaternion[k]);
         }
+        normalize = FloatMath.sqrt(normalize);
+
+        for (int k = 0; k < 4; k++)
+            quaternion[k] /= normalize;
     }
 
     public void set(float value, int index) {
@@ -130,7 +106,7 @@ public class SensorData {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 3; i++)
-            builder.append(String.valueOf(xyz[i])).append(",");
+            builder.append(String.valueOf(acceleration[i])).append(",");
 
         for (int i = 0; i < 4; i++)
             builder.append(String.valueOf(quaternion[i])).append(",");
@@ -140,7 +116,7 @@ public class SensorData {
     public float[] asVector() {
         float[] f = new float[7];
         int i = 0;
-        for (float v : xyz)
+        for (float v : acceleration)
             f[i++] = v;
         for (float q : quaternion)
             f[i++] = q;
@@ -150,7 +126,7 @@ public class SensorData {
     public List<Float> asList() {
         ArrayList<Float> f = new ArrayList<Float>();
         int i = 0;
-        for (float v : xyz)
+        for (float v : acceleration)
             f.add(v);
         for (float q : quaternion)
             f.add(q);

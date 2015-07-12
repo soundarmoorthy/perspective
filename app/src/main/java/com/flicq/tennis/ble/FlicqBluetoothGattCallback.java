@@ -38,7 +38,6 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
             processor.connected();
             Utils.SleepSomeTime(20);
             gatt.discoverServices();
-            enough = false;
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             endShotFormally(gatt);
             processor.disconnected();
@@ -74,15 +73,11 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     }
 
     public static final int END = 249; //In 250 packets last packet seems meaningless
-    private boolean enough = false;
     private static final int PACKET_CONTENT_SIZE = 7;
     private byte seqNum;
 
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-        if (characteristic == null || enough)
-            return;
-
         /* packet size 16 bytes, packet content 15 bytes */
         /* ------------------------------------------------------------------
            | ax.2 | ay.2 | az.2 | q0.2 | q1.2 | q2.2 | q3.2 | seqNo.1 | n/a |
@@ -103,8 +98,6 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     }
 
     private void endShotFormally(BluetoothGatt gatt) {
-        //The order matters.
-        enough = true;
         processor.endShot();
         activityAdapter.SetStatus(StatusType.INFO, "Disconnected");
         activityAdapter.onDisconnected();

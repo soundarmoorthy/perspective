@@ -5,10 +5,12 @@
     android:orientation="vertical"
     android:id="@+id/parent_frame"
     >
+
     <HorizontalScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
+        android:id="@+id/hsview"
         android:scrollbars="none" >
 
         <LinearLayout
@@ -95,9 +97,9 @@
 
         <ImageView
             android:id="@+id/imgAnimationOnStart"
-            android:layout_width="wrap_content"
+            android:layout_width="98dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="1.96"
             android:layout_gravity="center"
             android:src="@mipmap/flicq_logo"
             android:visibility="visible" />
