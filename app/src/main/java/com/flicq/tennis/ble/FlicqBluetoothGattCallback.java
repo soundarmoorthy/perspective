@@ -12,6 +12,8 @@ import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.StatusType;
 import com.flicq.tennis.framework.Utils;
 
+import org.apache.http.impl.conn.tsccm.WaitingThread;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Calendar;
@@ -38,9 +40,8 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
             gatt.discoverServices();
             enough = false;
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-            processor.disconnected();
             endShotFormally(gatt);
-            activityAdapter.onDisconnected();
+            processor.disconnected();
         }
     }
 
@@ -49,21 +50,22 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     private static final String FLICQ_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805f9b34fb";
 
     @Override
-    public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+    public synchronized void onServicesDiscovered(BluetoothGatt gatt, int status) {
         try {
             //Try to first initialize device and gatt database.
             BluetoothGattService service = gatt.getService(UUID.fromString(FLICQ_SERVICE_GATT_UUID));
-            activityAdapter.writeToUi("BLE : Found Service : " + service.toString());
             BluetoothGattCharacteristic characteristic = service.getCharacteristic(
                     UUID.fromString(FLICQ_SENSOR_DATA_CHARACTERISTICC));
+
+//            activityAdapter.notifyWhenReady(this);
+//            this.wait();
             gatt.setCharacteristicNotification(characteristic, true);
-            activityAdapter.writeToUi("BLE : Found Characteristic : " + characteristic.getUuid());
 
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
                     UUID.fromString(FLICQ_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID));
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             boolean success = gatt.writeDescriptor(descriptor);
-            activityAdapter.writeToUi("BLE : Enable Notification + " + descriptor.toString() + ", Status = " + String.valueOf(success));
+            activityAdapter.writeToUi("Subscribing for shot data [Status=" + String.valueOf(success) + "]");
             processor.beginShot();
         } catch (Exception ex) {
             Log.e("BLE", "Error in OnServices Discovered implementation. ");
@@ -101,11 +103,10 @@ public class FlicqBluetoothGattCallback extends android.bluetooth.BluetoothGattC
     }
 
     private void endShotFormally(BluetoothGatt gatt) {
+        //The order matters.
         enough = true;
         processor.endShot();
-        gatt.disconnect();
-        gatt.close();
-        activityAdapter.writeToUi("BLE ; Disconnected after receiving all shot data");
         activityAdapter.SetStatus(StatusType.INFO, "Disconnected");
+        activityAdapter.onDisconnected();
     }
 }

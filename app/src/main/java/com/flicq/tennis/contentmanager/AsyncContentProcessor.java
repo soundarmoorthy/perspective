@@ -30,7 +30,6 @@ public class AsyncContentProcessor {
 
    public AsyncContentProcessor(IActivityAdapter varAdapter)
    {
-
        store = ContentStore.Instance();
        executorQueue = Executors.newSingleThreadExecutor();
        adapter = varAdapter;
@@ -38,22 +37,20 @@ public class AsyncContentProcessor {
 
     public void connected() {
         count = 0;
-        startTime = System.currentTimeMillis();
         adapter.writeToUi("BLE : Connected Device");
     }
 
     public void disconnected()
     {
-        displayStats();
+
     }
 
     private void displayStats()
     {
-        endTime = System.currentTimeMillis();
         adapter.writeToUi("BLE : Disconnected Device ");
         adapter.writeToUi("BLE Report");
         adapter.writeToUi("Time taken : " + String.valueOf((endTime - startTime) / 1000) + " seconds");
-        adapter.writeToUi("Packets Received" + String.valueOf(count));
+        adapter.writeToUi("Packets Received : " + String.valueOf(count));
     }
 
     SensorData previous  = null;
@@ -73,12 +70,15 @@ public class AsyncContentProcessor {
 
     public void beginShot()
     {
+        startTime = System.currentTimeMillis();
         store.NewShot();
     }
 
     public void endShot()
     {
+        endTime = System.currentTimeMillis();
         store.ShotDone();
+        displayStats();
     }
 
     private void UpdateStatus() {

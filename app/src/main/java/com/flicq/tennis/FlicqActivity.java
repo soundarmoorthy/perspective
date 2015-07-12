@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.view.Display;
@@ -292,6 +293,50 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     @Override
     public void onDisconnected() {
         handleUIAction(R.id.btn_capture);
+        setupUIForRender();
+    }
+
+    @Override
+    public void notifyWhenReady(final Object waitingObject) {
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public synchronized void run() {
+
+                readySetGoAnimation();
+                setupUIForLogging();
+                waitingObject.notify();
+            }
+        });
+    }
+
+    private void readySetGoAnimation() {
+        showFlicqBrandingStuff();
+
+        AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
+        anim.setRepeatMode(3);
+        anim.setDuration(1000);
+        final ImageView imgView = (ImageView) findViewById(R.id.imgAnimationOnStart);
+        imgView.setAnimation(anim);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            int i = 0;
+            int[] res = {R.mipmap.three, R.mipmap.two, R.mipmap.one};
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+                imgView.setImageResource(res[i++]);
+            }
+        });
+        anim.startNow();
     }
 
     @Override

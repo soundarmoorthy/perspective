@@ -195,8 +195,7 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
         }
 
         //The first couple of data are not so nice.
-        float[] strippedContent = Arrays.copyOfRange(pointData, (2 * 6), pointData.length);
-
+        float[] strippedContent = Arrays.copyOfRange(pointData, (4 * 6), pointData.length);
         if (frame == -1) {
             gl.glEnable(GL10.GL_BLEND);
             gl.glDisable(GL10.GL_DEPTH_TEST);
