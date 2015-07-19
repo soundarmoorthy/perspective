@@ -21,7 +21,8 @@ public class AsyncContentProcessor {
 
     private final ExecutorService executorQueue;
     private final IActivityAdapter adapter;
-    private static int count; private long startTime;
+    private static int count;
+    private long startTime;
     private long endTime;
     private final ContentStore store;
 
