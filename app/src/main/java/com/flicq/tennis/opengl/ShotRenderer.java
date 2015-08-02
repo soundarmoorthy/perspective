@@ -25,62 +25,37 @@ import com.flicq.tennis.contentmanager.SensorData;
 import com.flicq.tennis.test.LocalSensorDataSimulator;
 
 
-public class ShotRenderer implements GLSurfaceView.Renderer {
+public class ShotRenderer extends AbstractRenderer implements GLSurfaceView.Renderer {
 
     private final Line line;
     private final Grid grid;
     private final Axis axis;
     private final Helper helper;
-    private final int screenRotation;
-    private int width;
-    private int height;
-    private final float[] rotationDegrees = {0.0f, 90.0f, 180.0f, 270.0f};
+    private final boolean animation_use = false;
+    private final boolean animation_play = false;
 
     public ShotRenderer(int screenRotation) {
-        this.mode = 2;
-        this.screenRotation = screenRotation;
+        super(screenRotation);
         line = new Line();
         grid = new Grid();
         axis = new Axis();
         helper = new Helper();
-        cameraAngleX = CAMERA_ANGLE_X_RESET_VALUE;
-        cameraAngleY = CAMERA_ANGLE_Y_RESET_VALUE;
     }
-    private static final int CAMERA_ANGLE_X_RESET_VALUE = -45;
-    private static final int CAMERA_ANGLE_Y_RESET_VALUE = 45;
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         //Setup
-        gl.glClearColor(1.0f, 1.0f, 1.0f, 0.1f);
-        gl.glClearDepthf(1.0f);
-        gl.glEnable(GL10.GL_DEPTH_TEST);
-        gl.glDepthFunc(GL10.GL_LEQUAL);
-        gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
+        super.onSurfaceCreatedBase(gl, config);
     }
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        if (height == 0) {
-            height = 1;
-        }
-        gl.glMatrixMode(GL10.GL_PROJECTION);
-        gl.glLoadIdentity();
-        float ratio = (float) width / height;
-        GLU.gluPerspective(gl, 60.0f, ratio, 0.1f, 30.0f);
-        gl.glViewport(0, 0, width, height);
-        gl.glMatrixMode(GL10.GL_MODELVIEW);
-        gl.glLoadIdentity();
-        this.width = width;
-        this.height = height;
+        super.onSurfaceChangedBase(gl, width, height);
     }
 
-    private static final float IDEAL_Z_RESET_VALUE = -6.0f;
-    public float idealZ = IDEAL_Z_RESET_VALUE ;
     private final float[] matrix = {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0};
     private int animation = 0;
 
     private void renderFusionData(GL10 gl, List<SensorData> sensorData, int frame) {
-
         int count = sensorData.size();
         float x = 0.0f, y = 0.0f, z = 0.0f;
         float vx = 0f, vy = 0f, vz = 0;
@@ -120,56 +95,28 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
             matrix[10] = 1.0f - 2.0f * (x2 + y2);
             matrix[11] = 0.0f;
 
-            switch (mode) {
-                case 0: {
-                    x = data.getX();
-                    y = data.getY();
-                    z = data.getZ();
-                    break;
-                }
-               case 1: {
-                    vx += data.getX();
-                    vy += data.getY();
-                   vz += data.getZ();
+            float ax = data.getX();
+            float ay = data.getY();
+            float az = data.getZ();
 
-                    float friction = 0.8f;
-                    vx *= friction;
-                    vy *= friction;
-                   vz *= friction;
+            float qax = ax * matrix[0] + ay * matrix[4] + az * matrix[8];
+            float qay = ax * matrix[1] + ay * matrix[5] + az * matrix[9];
+            float qaz = ax * matrix[2] + ay * matrix[6] + az * matrix[10];
 
-                    x += vx * 0.01f;
-                    y += vy * 0.01f;
-                    z += vz * 0.01f;
-                    break;
-                }
-                case 2: {
+            ax = qax;
+            ay = qay;
+            az = qaz;
+            vx += ax;
+            vy += ay;
+            vz += az;
+            float friction = 0.8f;
+            vx *= friction;
+            vy *= friction;
+            vz *= friction;
 
-                    float ax = data.getX();
-                    float ay = data.getY();
-                    float az = data.getZ();
-
-                    float qax = ax * matrix[0] + ay * matrix[4] + az * matrix[8];
-                    float qay = ax * matrix[1] + ay * matrix[5] + az * matrix[9];
-                    float qaz = ax * matrix[2] + ay * matrix[6] + az * matrix[10];
-
-                    ax = qax;
-                    ay = qay;
-                    az = qaz;
-                    vx += ax;
-                    vy += ay;
-                    vz += az;
-                    float friction = 0.8f;
-                    vx *= friction;
-                    vy *= friction;
-                    vz *= friction;
-
-                    x += vx * 0.01f;
-                    y += vy * 0.01f;
-                    z += vz * 0.01f;
-
-                    break;
-                }
-            }
+            x += vx * 0.01f;
+            y += vy * 0.01f;
+            z += vz * 0.01f;
 
             pointData[i * 6 + 0] = x;
             pointData[i * 6 + 1] = y;
@@ -223,29 +170,14 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        render = false;
-        cameraAngleX += deltaX;
-        cameraAngleY += deltaY;
-        deltaX = 0;
-        deltaY = 0;
-        gl.glClear(GL10.GL_DEPTH_BUFFER_BIT | GL10.GL_COLOR_BUFFER_BIT);
-        gl.glMatrixMode(GL10.GL_MODELVIEW);
-        gl.glLoadIdentity();
-        gl.glTranslatef(0.0f, 0.0f, idealZ);
-        gl.glRotatef(cameraAngleY, 1f, 0f, 0);
-        gl.glRotatef(cameraAngleX, 0f, 1f, 0);
+        super.onDrawFrameBase(gl);
+        render =false;
 
-        gl.glRotatef(rotationDegrees[this.screenRotation], 0f, 0f, 1);  // portrait/landscape rotation
-
-
-        if (simu_mode) {
-            SetData(simulator.getSensorData());
-            render = true;
-        }
-        else if (ContentStore.Instance() != null ) {
+        if (ContentStore.Instance() != null ) {
             if (ContentStore.Instance().getShot() != null) {
-                if (ContentStore.Instance().getShot().getDataForRendering() != null) {
-                    SetData(ContentStore.Instance().getShot().getDataForRendering());
+                List<SensorData>  data = ContentStore.Instance().getShot().getDataForRendering();
+                if (data != null) {
+                    SetData(data);
                     render = true;
                 }
             }
@@ -269,107 +201,6 @@ public class ShotRenderer implements GLSurfaceView.Renderer {
             take_screenshot(gl);
             this.screenshot_request = false;
         }
-
-
     }
-
-    private void take_screenshot(GL10 gl) {
-        int screenshotSize = this.width * this.height;
-        ByteBuffer bb = ByteBuffer.allocateDirect(screenshotSize * 4);
-        bb.order(ByteOrder.nativeOrder());
-        gl.glReadPixels(0, 0, width, height, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, bb);
-        int pixelsBuffer[] = new int[screenshotSize];
-        bb.asIntBuffer().get(pixelsBuffer);
-        bb = null;
-
-        for (int i = 0; i < screenshotSize; ++i) {
-            // The alpha and green channels' positions are preserved while the red and blue are swapped
-            pixelsBuffer[i] = ((pixelsBuffer[i] & 0xff00ff00)) | ((pixelsBuffer[i] & 0x000000ff) << 16) | ((pixelsBuffer[i] & 0x00ff0000) >> 16);
-        }
-
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        bitmap.setPixels(pixelsBuffer, screenshotSize - width, -width, 0, 0, width, height);
-        // TODO Auto-generated method stub
-        String root = Environment.getExternalStorageDirectory().toString();
-        File myDir = new File(root + "/fusion_screenshots");
-        myDir.mkdirs();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-        Date now = new Date();
-        String fileName = formatter.format(now) + ".jpg";
-        File file = new File(myDir, fileName);
-        if (file.exists()) file.delete();
-        try {
-            FileOutputStream out = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out); // ERROR 341 LINE
-            out.flush();
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    int ai;
-
     private boolean render = false;
-    private List<SensorData> set;
-
-    private void SetData(List<SensorData> set) {
-        this.set = set;
-    }
-
-    public void Render(List<SensorData> data) {
-        render = false;
-        SetData(data);
-        render = true;
-    }
-
-    private float deltaX;
-    private float deltaY;
-    private int cameraAngleX;
-    private int cameraAngleY;
-
-    private boolean screenshot_request = false;
-    private final boolean animation_use = false;
-    private final boolean animation_play = false;
-    private float xf, yf;
-    private int mode = 2;
-
-    private float oldX;
-    private float oldY;
-
-    public void resetDeltaXY() {
-        deltaX = 0.0f;
-        deltaY = 0.0f;
-    }
-
-    public void setXY(float x, float y) {
-        oldX = x;
-        oldY = y;
-    }
-
-    public void move(float x, float y) {
-        float _deltaX = (x - oldX);
-        float _deltaY = (y - oldY);
-        deltaX = _deltaX;
-        deltaY = _deltaY;
-        oldX = x;
-        oldY = y;
-    }
-
-    public void resetView()
-    {
-        idealZ = IDEAL_Z_RESET_VALUE;
-        cameraAngleX = CAMERA_ANGLE_X_RESET_VALUE;
-        cameraAngleY = CAMERA_ANGLE_Y_RESET_VALUE;
-    }
-
-
-    private LocalSensorDataSimulator simulator;
-    private boolean simu_mode = false;
-
-    public void setSimulator(LocalSensorDataSimulator simulator) {
-        this.simulator = simulator;
-        this.simu_mode = true;
-        this.Render(simulator.getSensorData());
-    }
 }

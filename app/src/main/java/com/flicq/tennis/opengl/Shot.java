@@ -52,4 +52,3 @@ class Shot {
     	draw(gl);        
     }
 }
-

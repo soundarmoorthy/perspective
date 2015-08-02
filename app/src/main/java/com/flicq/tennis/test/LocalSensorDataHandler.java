@@ -2,6 +2,7 @@ package com.flicq.tennis.test;
 
 import android.hardware.SensorManager;
 
+import com.flicq.tennis.contentmanager.ISensorDataBuilder;
 import com.flicq.tennis.contentmanager.SensorData;
 import com.flicq.tennis.framework.IActivityAdapter;
 
@@ -39,7 +40,7 @@ class LocalSensorDataHandler {
             for (int i = 0; i < 4; i++)
                 quat[i] = values[i];
             busy = true;
-            sensorData.add(new SensorData(acc,quat));
+            sensorData.add(new SensorData(new AndroidSensorDataBuilder(acc,quat)));
             busy = false;
         }
     }
@@ -53,5 +54,32 @@ class LocalSensorDataHandler {
     public void Reset() {
         this.busy = false;
         this.sensorData.clear();
+    }
+
+    public class AndroidSensorDataBuilder implements ISensorDataBuilder
+    {
+
+        float[] a;
+        float[] q;
+        public AndroidSensorDataBuilder(float[] a, float[] q)
+        {
+            this.a = a;
+            this.q = q;
+        }
+        @Override
+        public float[] getAcceleration() {
+            return a;
+        }
+
+        @Override
+        public float[] getQuaternion() {
+
+            return q;
+        }
+
+        @Override
+        public String dump() {
+            return "";
+        }
     }
 }

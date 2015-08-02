@@ -22,10 +22,8 @@ public class LocalSensorDataSimulator implements SensorEventListener {
     private final Sensor rotationVector;
     private final float[] quaternion = new float[4];
     private final LocalSensorDataHandler handler;
-    private final ShotRenderer renderer;
-    public LocalSensorDataSimulator(IActivityAdapter adapter, ShotRenderer renderer)
+    public LocalSensorDataSimulator(IActivityAdapter adapter)
     {
-        this.renderer = renderer;
         this.activityAdapter = adapter;
         handler = new LocalSensorDataHandler(adapter);
         Context context  = activityAdapter.GetApplicationContext();
@@ -63,7 +61,7 @@ public class LocalSensorDataSimulator implements SensorEventListener {
         }
 
         if(count++ >= 500) {
-            renderer.Render(handler.getData());
+            //renderer.Render(handler.getData());
             handler.Reset();
             count =0;
         }

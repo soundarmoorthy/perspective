@@ -39,10 +39,14 @@ import com.flicq.tennis.external.TextAwesome;
 import com.flicq.tennis.framework.IActivityAdapter;
 import com.flicq.tennis.framework.StatusType;
 import com.flicq.tennis.framework.SystemState;
+import com.flicq.tennis.opengl.AbstractRenderer;
 import com.flicq.tennis.opengl.ShotRenderer;
 import com.flicq.tennis.test.LocalSensorDataSimulator;
 import com.flicq.tennis.events.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 public class FlicqActivity extends Activity implements IActivityAdapter, View.OnClickListener
@@ -50,7 +54,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
 
     private static final int BLUETOOTH_ENABLE_REQUEST_CODE = 4711;
     private FlicqDevice flicqDevice = null;
-    private ShotRenderer shotRenderer = null;
+    private AbstractRenderer shotRenderer = null;
     private SystemState currentSystemState;
     private final boolean simulator_mode = false; //For experimental purposes
     private TextView txtShotDataCached;
@@ -104,9 +108,8 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     private void setupDeviceSimulator() {
         if (simulator_mode) {
             IActivityAdapter adapter = this;
-            LocalSensorDataSimulator simulator = new LocalSensorDataSimulator(adapter, shotRenderer);
+            LocalSensorDataSimulator simulator = new LocalSensorDataSimulator(adapter);
             simulator.Start();
-            shotRenderer.setSimulator(simulator);
         }
     }
 
@@ -135,7 +138,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         int initialScreenRotation = getScreenRotation();
         GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
         shotRenderer = new ShotRenderer( /* Relative acceleration data */ initialScreenRotation);
-        shotView.setRenderer(shotRenderer);
+        shotView.setRenderer((ShotRenderer)shotRenderer);
         if (simulator_mode)
             setupDeviceSimulator();
         setupUIForRender();
@@ -294,6 +297,41 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     public void onDisconnected() {
         handleUIAction(R.id.btn_capture);
         setupUIForRender();
+
+        logDataToFile();
+    }
+
+    private void logDataToFile() {
+        if (ContentStore.Instance() == null)
+            return;
+        if (ContentStore.Instance().getShot() == null)
+            return;
+
+        List<SensorData> values = ContentStore.Instance().getShot().getDataForRendering();
+        if (values == null)
+            return;
+
+        FileOutputStream outputStream = null;
+        try {
+            outputStream = openFileOutput("data-" + String.valueOf(System.currentTimeMillis()), Context.MODE_PRIVATE);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (values != null) {
+            for (SensorData val : values) {
+                try {
+                    //outputStream.write(val.dumpString().getBytes());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -378,7 +416,6 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
                 break;
             case R.id.btn_render:
                 setupUIForRender();
-                renderDeviceData();
                 break;
             case R.id.btn_engineering:
                 setupUIForLogging();
@@ -387,16 +424,6 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
                 currentSystemState = SystemState.UNKNOWN;
         }
         updateUI(itemId);
-    }
-
-    private void renderDeviceData() {
-        if (simulator_mode)
-            return;
-        FlicqShot shot = ContentStore.Instance().getShot();
-        if (shot != null) {
-            List<SensorData> data = shot.getDataForRendering();
-            shotRenderer.Render(data);
-        }
     }
 
     private void setupUIForLogging() {

@@ -58,7 +58,7 @@ public class AsyncContentProcessor {
         executorQueue.submit(new Runnable() {
             @Override
             public void run() {
-                SensorData current = new SensorData(content, previous);
+                SensorData current = new SensorData(new FlicqSensorDataBuilder(content));
                 adapter.writeToUi(current.toString());
                 store.Dump(current);
                 count++;

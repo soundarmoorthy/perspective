@@ -18,39 +18,25 @@ public class FlicqShot {
 
     int size;
     public List<SensorData> getDataForRendering() {
-        if(values == null || values.isEmpty())
-            return null;
-        synchronized (valuesLock) {
-            if(size  == values.size())
-                return values;
-            else {
-                size = values.size();
-                return medianFilter(values);
-            }
+        if (values == null || values.isEmpty()) return null; synchronized (valuesLock) {
+            if (dirty)
+                medianFilter(values);
+            dirty = false;
+            return values;
         }
     }
 
-    private static List<SensorData> medianFilter(final List<SensorData> values) {
-        float[] p, c, n;
-        p = new float[7];
-        c = new float[7];
-        n = new float[7];
+    private static void medianFilter(final List<SensorData> values) {
         float[] w = new float[3];
-        p = values.get(0).asVector();
-        for(int i=1;i<values.size() - 1;i++) {
-            c = values.get(i).asVector();
-            n = values.get(i + 1).asVector();
-
+        for (int i = 1; i < values.size() - 1; i++) {
             for (int l = 0; l < 7; l++) {
-                w[0] = p[l];
-                w[1] = c[l];
-                w[2] = n[l];
+                w[0] = values.get(i-1) .get(l);
+                w[1] = values.get(i)   .get(l);
+                w[2] = values.get(i+1) .get(l);
                 sort(w);
                 values.get(i).set(w[1], l);
             }
-            p = c;
         }
-        return values;
     }
 
     public List<Float> getDataForUpload() {
@@ -64,12 +50,14 @@ public class FlicqShot {
     }
 
 
+    boolean dirty;
     public void add(final SensorData data)
     {
         //After processing the data we need to make sure that we
         //get them in the order we want, i.e ax,ay,az, q0,q1,q2,q3
         synchronized (valuesLock) {
                 this.values.add(data);
+                dirty = true;
         }
     }
 }

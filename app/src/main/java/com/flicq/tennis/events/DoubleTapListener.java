@@ -4,6 +4,7 @@ package com.flicq.tennis.events;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
+import com.flicq.tennis.opengl.AbstractRenderer;
 import com.flicq.tennis.opengl.ShotRenderer;
 
 /**
@@ -12,12 +13,11 @@ import com.flicq.tennis.opengl.ShotRenderer;
 public class DoubleTapListener implements GestureDetector.OnDoubleTapListener, GestureDetector.OnGestureListener
 {
 
-    private final ShotRenderer renderer;
-    public DoubleTapListener(ShotRenderer renderer)
+    private final AbstractRenderer renderer;
+    public DoubleTapListener(AbstractRenderer renderer)
     {
         this.renderer = renderer;
     }
-
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
