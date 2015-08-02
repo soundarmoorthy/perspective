@@ -35,8 +35,9 @@ public class FlicqSensorDataBuilder implements ISensorDataBuilder {
 
         float normalize = 0.0f;
         for (int i = 3, k = 0; i < 7; i++, k++) {
-            quaternion[k] = content[i] / quaternionTimeScale;
-            normalize = normalize + (quaternion[k] * quaternion[k]);
+            //quaternion[k] = content[i] / quaternionTimeScale;
+            quaternion[k] = (float)content[i] ;
+            normalize += (quaternion[k] * quaternion[k]);
         }
         normalize = FloatMath.sqrt(normalize);
 

@@ -53,7 +53,6 @@ public class AsyncContentProcessor {
         adapter.writeToUi("-------------------------");
     }
 
-    SensorData previous  = null;
     public void RunAsync(final short[] content) {
         executorQueue.submit(new Runnable() {
             @Override
@@ -63,7 +62,6 @@ public class AsyncContentProcessor {
                 store.Dump(current);
                 count++;
                 UpdateStatus();
-                previous = current;
             }
         });
     }

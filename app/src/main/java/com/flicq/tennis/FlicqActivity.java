@@ -49,8 +49,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-public class FlicqActivity extends Activity implements IActivityAdapter, View.OnClickListener
-{
+public class FlicqActivity extends Activity implements IActivityAdapter, View.OnClickListener {
 
     private static final int BLUETOOTH_ENABLE_REQUEST_CODE = 4711;
     private FlicqDevice flicqDevice = null;
@@ -97,9 +96,8 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     }
 
 
-    private void setupEventListeners()
-    {
-        mScaleDetector = new ScaleGestureDetector(this,new ScaleListener(shotRenderer));
+    private void setupEventListeners() {
+        mScaleDetector = new ScaleGestureDetector(this, new ScaleListener(shotRenderer));
         DoubleTapListener dTapListener = new DoubleTapListener(shotRenderer);
         mDetector = new GestureDetectorCompat(getApplicationContext(), dTapListener);
         mDetector.setOnDoubleTapListener(dTapListener);
@@ -138,7 +136,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         int initialScreenRotation = getScreenRotation();
         GLSurfaceView shotView = (GLSurfaceView) findViewById(R.id.shotView);
         shotRenderer = new ShotRenderer( /* Relative acceleration data */ initialScreenRotation);
-        shotView.setRenderer((ShotRenderer)shotRenderer);
+        shotView.setRenderer((ShotRenderer) shotRenderer);
         if (simulator_mode)
             setupDeviceSimulator();
         setupUIForRender();
@@ -274,7 +272,6 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     }
 
 
-
     @Override
     public void writeToUi(final String str) {
         runOnUiThread(new Runnable() {
@@ -295,10 +292,14 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
 
     @Override
     public void onDisconnected() {
-        handleUIAction(R.id.btn_capture);
-        setupUIForRender();
-
-        logDataToFile();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                handleUIAction(R.id.btn_capture);
+                setupUIForRender();
+                logDataToFile();
+            }
+        });
     }
 
     private void logDataToFile() {
@@ -320,12 +321,11 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         if (values != null) {
             for (SensorData val : values) {
                 try {
-                    //outputStream.write(val.dumpString().getBytes());
+                    outputStream.write(val.toString().getBytes());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-
             try {
                 outputStream.close();
             } catch (IOException e) {
@@ -359,6 +359,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         anim.setAnimationListener(new Animation.AnimationListener() {
             int i = 0;
             int[] res = {R.mipmap.three, R.mipmap.two, R.mipmap.one};
+
             @Override
             public void onAnimationStart(Animation animation) {
 
@@ -474,7 +475,7 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
     public boolean onTouchEvent(MotionEvent event) {
 
         boolean handled = awardChanceToExternalHandlers(event);
-        if(handled)
+        if (handled)
             return true;
         int maskedAction = event.getActionMasked();
         switch (maskedAction) {
@@ -491,17 +492,16 @@ public class FlicqActivity extends Activity implements IActivityAdapter, View.On
         return super.onTouchEvent(event);
     }
 
-    private boolean awardChanceToExternalHandlers(MotionEvent event)
-    {
+    private boolean awardChanceToExternalHandlers(MotionEvent event) {
         boolean handled = false;
-        if(mDetector !=null) {
+        if (mDetector != null) {
             handled = mDetector.onTouchEvent(event);
             if (handled)
                 return true;
         }
 
         handled = false;
-        if(mScaleDetector != null) {
+        if (mScaleDetector != null) {
             handled = mScaleDetector.onTouchEvent(event) && mScaleDetector.isInProgress();
             if (handled)
                 return true;
